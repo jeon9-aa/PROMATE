@@ -7,16 +7,12 @@ import SummaryCard from '../../components/SummaryCard/SummaryCard';
 import moreIcon from '../../assets/moreIcon.svg';
 import NewTaskModal from '../../components/NewTaskModal/NewTaskModal.jsx';
 import PostModal from './components/PostModal.jsx';
-import PostDetailModal from './components/PostDetailModal.jsx';
 import TaskDetailModal from './components/TaskDetailModal.jsx';
 import { 
   getProjectMembers, 
   getProjectTasks, 
   getProjectPosts, 
-  getPostDetail,
   createProjectPost,
-  updateProjectPost,
-  deleteProjectPost,
   getTaskDetail,
   createProjectTask,
   updateProjectTask,
@@ -58,16 +54,11 @@ function TeamPage() {
   const [boardPosts, setBoardPosts] = useState([]);
   const [isBoardLoading, setIsBoardLoading] = useState(true);
   const [boardError, setBoardError] = useState(null);
-  const [selectedPost, setSelectedPost] = useState(null);
-  const [isPostDetailLoading, setIsPostDetailLoading] = useState(false);
-  const [postDetailError, setPostDetailError] = useState(null);
 
   const [visibleTaskCount, setVisibleTaskCount] = useState(INITIAL_VISIBLE_COUNT);
   const [visiblePostCount, setVisiblePostCount] = useState(INITIAL_VISIBLE_COUNT);
   
   const [isPostModalOpen, setIsPostModalOpen] = useState(false);
-  const [isEditMode, setIsEditMode] = useState(false);
-  const [editingPostId, setEditingPostId] = useState(null);
   const [postTitle, setPostTitle] = useState('');
   const [postContent, setPostContent] = useState('');
   const [isPostSubmitting, setIsPostSubmitting] = useState(false);
@@ -218,34 +209,19 @@ function TeamPage() {
     }
   };
 
-  const handlePostClick = async (postId) => {
-    try {
-      setIsPostDetailLoading(true);
-      setPostDetailError(null);
-      setSelectedPost({ postId });
-      setSelectedPost(await getPostDetail(idToFetch, postId));
-    } catch (err) {
-      setPostDetailError(err.message || '게시글을 불러오지 못했습니다.');
-    } finally {
-      setIsPostDetailLoading(false);
-    }
+  const handlePostClick = (postId) => {
+    const params = new URLSearchParams({
+      projectId: String(idToFetch),
+      projectTitle,
+    });
+    navigate(`/board/${postId}?${params.toString()}`, {
+      state: { projectTitle, dueDate: projectDueDate },
+    });
   };
 
   const handleOpenCreateModal = () => {
-    setIsEditMode(false);
-    setEditingPostId(null);
     setPostTitle('');
     setPostContent('');
-    setIsPostModalOpen(true);
-  };
-
-  const handleOpenEditModal = () => {
-    if (!selectedPost) return;
-    setIsEditMode(true);
-    setEditingPostId(selectedPost.postId);
-    setPostTitle(selectedPost.title || '');
-    setPostContent(selectedPost.content || '');
-    setSelectedPost(null);
     setIsPostModalOpen(true);
   };
 
@@ -263,11 +239,7 @@ const handlePostSubmit = async () => {
       postType: "GENERAL",
     };
 
-    if (isEditMode && editingPostId) {
-      await updateProjectPost(idToFetch, editingPostId, postData);
-    } else {
-      await createProjectPost(idToFetch, postData);
-    }
+    await createProjectPost(idToFetch, postData);
 
     closePostModal();
     await fetchPosts();
@@ -280,21 +252,6 @@ const handlePostSubmit = async () => {
     setIsPostSubmitting(false);
   }
 };
-
-  const handleDeletePost = async () => {
-    if (!selectedPost || !window.confirm('정말로 이 게시글을 삭제하시겠습니까?')) return;
-
-    try {
-      setIsPostDetailLoading(true);
-      await deleteProjectPost(idToFetch, selectedPost.postId);
-      setSelectedPost(null);
-      await fetchPosts();
-    } catch (err) {
-      alert(`게시글 삭제에 실패했습니다: ${err.message}`);
-    } finally {
-      setIsPostDetailLoading(false);
-    }
-  };
 
   const openTaskBoard = (status) => {
     navigate(`/task-board?projectId=${idToFetch}&status=${status}`, { state: { projectTitle, dueDate: projectDueDate } });
@@ -310,8 +267,6 @@ const handlePostSubmit = async () => {
 
 const closePostModal = () => {
   setIsPostModalOpen(false);
-  setIsEditMode(false);
-  setEditingPostId(null);
   setPostTitle("");
   setPostContent("");
 };
@@ -535,7 +490,6 @@ const closePostModal = () => {
 
       <PostModal
         isOpen={isPostModalOpen}
-        isEditMode={isEditMode}
         title={postTitle}
         setTitle={setPostTitle}
         content={postContent}
@@ -543,16 +497,6 @@ const closePostModal = () => {
         onClose={closePostModal}
         onSubmit={handlePostSubmit}
         isSubmitting={isPostSubmitting}
-      />
-
-      <PostDetailModal
-        isOpen={!!selectedPost}
-        post={selectedPost}
-        isLoading={isPostDetailLoading}
-        error={postDetailError}
-        onClose={() => setSelectedPost(null)}
-        onEdit={handleOpenEditModal}
-        onDelete={handleDeletePost}
       />
 
       <TaskDetailModal

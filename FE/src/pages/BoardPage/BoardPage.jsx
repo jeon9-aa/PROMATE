@@ -106,7 +106,7 @@ function BoardPage() {
     if (projectTitle) nextSearchParams.set('projectTitle', projectTitle);
 
     navigate(`/board/${postId}?${nextSearchParams.toString()}`, {
-      state: { projectTitle },
+      state: { projectTitle, dueDate: location.state?.dueDate },
     });
   };
 
