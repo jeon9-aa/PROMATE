@@ -17,9 +17,12 @@
   display: flex;
   align-items: center;
   justify-content: space-between;
+  gap: 16px;
 }
 
 .board-detail__page-title {
+  min-width: 0;
+  overflow-wrap: anywhere;
   margin: 0;
   color: #000;
   font-family: 'YSpotlightOTF', 'Pretendard', sans-serif;
@@ -29,6 +32,7 @@
 }
 
 .board-detail__title-button {
+  text-align: left;
   padding: 0;
   border: 0;
   border-radius: 4px;
@@ -45,6 +49,7 @@
 
 .board-detail__menu {
   position: relative;
+  flex-shrink: 0;
 }
 
 .board-detail__menu-button {
@@ -118,6 +123,7 @@
 }
 
 .board-detail__post-title {
+  overflow-wrap: anywhere;
   margin: 0;
   color: #000;
   font: 700 20px/24px 'Pretendard', sans-serif;
@@ -191,6 +197,7 @@
   display: flex;
   align-items: center;
   gap: 10px;
+  flex-wrap: wrap;
   font-family: 'Pretendard', sans-serif;
 }
 
@@ -211,6 +218,11 @@
   color: #000;
   font: 400 14px/17px 'Pretendard', sans-serif;
   overflow-wrap: anywhere;
+}
+
+.board-detail__comment-content p {
+  white-space: pre-wrap;
+  line-height: 1.5;
 }
 
 .board-detail__no-comments {
@@ -298,12 +310,6 @@
   .board-detail__post-card,
   .board-detail__comment-card { padding: 20px 18px; }
   .board-detail__post-card { gap: 16px; }
-  .board-detail__post-title {
-    max-width: 100%;
-    overflow: hidden;
-    text-overflow: ellipsis;
-    white-space: nowrap;
-  }
   .board-detail__comment-form { gap: 8px; }
   .board-detail__comment-form button { width: 62px; font-size: 16px; }
 }

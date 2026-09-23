@@ -180,7 +180,7 @@ function BoardDetailPage() {
 
     try {
       await deleteProjectPost(projectId, postId);
-      navigate(boardUrl, { replace: true, state: { projectTitle } });
+      navigate(boardUrl, { replace: true, state: { projectTitle, dueDate: location.state?.dueDate } });
     } catch (deleteError) {
       window.alert(`게시글 삭제에 실패했습니다: ${deleteError.message}`);
     }
@@ -205,7 +205,7 @@ function BoardDetailPage() {
             </button>
           </h1>
 
-          {post && (
+          {!isLoading && !error && post && (
             <div className="board-detail__menu" ref={menuRef}>
               <button
                 type="button"
@@ -283,7 +283,7 @@ function BoardDetailPage() {
                   placeholder="댓글을 입력해주세요."
                   disabled={isCommentSubmitting}
                 />
-                <button type="submit" disabled={isCommentSubmitting}>
+                <button type="submit" disabled={isCommentSubmitting || !comment.trim()}>
                   {isCommentSubmitting ? '등록 중' : '등록'}
                 </button>
               </form>
@@ -294,7 +294,7 @@ function BoardDetailPage() {
         <button
           type="button"
           className="board-detail__back-button"
-          onClick={() => navigate(boardUrl, { state: { projectTitle } })}
+          onClick={() => navigate(boardUrl, { state: { projectTitle, dueDate: location.state?.dueDate } })}
         >
           <ArrowLeft size={16} />
           <span>목록</span>
