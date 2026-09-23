@@ -1,5 +1,10 @@
-.board-detail__comment-edit-button {
+.board-detail__comment-actions {
   margin-left: auto;
+  display: flex;
+  gap: 10px;
+}
+
+.board-detail__comment-edit-button {
   flex-shrink: 0;
   padding: 2px 0;
   border: 0;
@@ -10,6 +15,7 @@
 }
 
 .board-detail__comment-edit-button:disabled { cursor: not-allowed; opacity: 0.55; }
+.board-detail__comment-delete-button { color: #d83b3b; }
 .board-detail__comment-edit-form {
   display: flex;
   align-items: center;

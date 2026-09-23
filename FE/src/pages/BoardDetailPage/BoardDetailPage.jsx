@@ -3,6 +3,7 @@ import { ArrowLeft, Ellipsis } from 'lucide-react';
 import { useLocation, useNavigate, useParams, useSearchParams } from 'react-router-dom';
 import {
   createPostComment,
+  deletePostComment,
   deleteProjectPost,
   getPostComments,
   getPostDetail,
@@ -87,6 +88,8 @@ function BoardDetailPage() {
   const [editComment, setEditComment] = useState('');
   const [isCommentEditSubmitting, setIsCommentEditSubmitting] = useState(false);
   const commentEditPending = useRef(false);
+  const [deletingCommentId, setDeletingCommentId] = useState(null);
+  const commentDeletePending = useRef(false);
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [isEditOpen, setIsEditOpen] = useState(false);
   const [editTitle, setEditTitle] = useState('');
@@ -164,7 +167,7 @@ function BoardDetailPage() {
   const handleCommentSubmit = async (event) => {
     event.preventDefault();
     const content = comment.trim();
-    if (!content || isCommentSubmitting) return;
+    if (!content || isCommentSubmitting || commentDeletePending.current) return;
 
     try {
       setIsCommentSubmitting(true);
@@ -199,6 +202,24 @@ function BoardDetailPage() {
     } finally {
       commentEditPending.current = false;
       setIsCommentEditSubmitting(false);
+    }
+  };
+
+  const handleCommentDelete = async (commentId) => {
+    if (commentDeletePending.current || isCommentSubmitting || editingCommentId != null) return;
+    if (!window.confirm('이 댓글을 삭제하시겠습니까?')) return;
+
+    commentDeletePending.current = true;
+    setDeletingCommentId(commentId);
+    try {
+      await deletePostComment(projectId, postId, commentId);
+      setComments((current) => current.filter((item) => item.commentId !== commentId));
+      setCommentCount((count) => Math.max(0, count - 1));
+    } catch (deleteError) {
+      window.alert(`댓글 삭제에 실패했습니다: ${deleteError.message}`);
+    } finally {
+      commentDeletePending.current = false;
+      setDeletingCommentId(null);
     }
   };
 
@@ -318,15 +339,23 @@ function BoardDetailPage() {
                           <strong>{writer}</strong>
                           <time dateTime={createdAt}>{formatDate(createdAt)}</time>
                           {item.commentId != null && editingCommentId !== item.commentId && (
+                            <div className="board-detail__comment-actions">
                             <button
                               type="button"
                               className="board-detail__comment-edit-button"
-                              disabled={editingCommentId != null || isCommentSubmitting}
+                              disabled={editingCommentId != null || isCommentSubmitting || deletingCommentId != null}
                               onClick={() => {
                                 setEditingCommentId(item.commentId);
                                 setEditComment(item.comment ?? item.content ?? item.commentContent ?? item.text ?? '');
                               }}
                             >수정</button>
+                            <button
+                              type="button"
+                              className="board-detail__comment-edit-button board-detail__comment-delete-button"
+                              disabled={editingCommentId != null || isCommentSubmitting || deletingCommentId != null}
+                              onClick={() => handleCommentDelete(item.commentId)}
+                            >{deletingCommentId === item.commentId ? '삭제 중' : '삭제'}</button>
+                            </div>
                           )}
                         </div>
                         {editingCommentId != null && editingCommentId === item.commentId ? (
@@ -366,9 +395,9 @@ function BoardDetailPage() {
                   value={comment}
                   onChange={(event) => setComment(event.target.value)}
                   placeholder="댓글을 입력해주세요."
-                  disabled={isCommentSubmitting || isCommentEditSubmitting}
+                  disabled={isCommentSubmitting || isCommentEditSubmitting || deletingCommentId != null}
                 />
-                <button type="submit" disabled={isCommentSubmitting || isCommentEditSubmitting || !comment.trim()}>
+                <button type="submit" disabled={isCommentSubmitting || isCommentEditSubmitting || deletingCommentId != null || !comment.trim()}>
                   {isCommentSubmitting ? '등록 중' : '등록'}
                 </button>
               </form>

@@ -83,3 +83,10 @@ export const updatePostComment = async (projectId, postId, commentId, comment) =
   );
   return response.data.data;
 };
+
+export const deletePostComment = async (projectId, postId, commentId) => {
+  const response = await apiClient.delete(
+    `/projects/${projectId}/posts/${postId}/comments/${commentId}`
+  );
+  return response.data.data;
+};
