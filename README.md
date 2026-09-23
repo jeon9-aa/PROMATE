@@ -30,31 +30,15 @@
       <a href="https://github.com/jeon9-aa">@jeon9-aa</a>
     </td>
     <td align="center">
-      <img src="https://github.com/202413104.png" width="100px;" alt="김수민"/><br>
-      <b>김수민</b><br>
+      <img src="https://github.com/SeoRyeong07.png" width="100px;" alt="배서령"/><br>
+      <b>배서령</b><br>
       ─────<br>
       FE<br>
-      <a href="https://github.com/
-202413104">@
-202413104</a>
-    </td>
-    <td align="center">
-      <img src="https://github.com/kjm070909.png" width="100px;" alt="김재민"/><br>
-      <b>김재민</b><br>
-      ─────<br>
-      FE<br>
-      <a href="https://github.com/kjm070909">@kjm070909</a>
+      <a href="https://github.com/SeoRyeong07">@SeoRyeong07</a>
     </td>
   </tr>
 
   <tr>
-    <td align="center">
-      <img src="https://github.com/plmokn044330-ship-it.png" width="100px;" alt="김원빈"/><br>
-      <b>김원빈</b><br>
-      ─────<br>
-      BE<br>
-      <a href="https://github.com/plmokn044330-ship-it">@plmokn044330-ship-it</a>
-    </td>
     <td align="center">
       <img src="https://github.com/blrlk.png" width="100px;" alt="백진선"/><br>
       <b>백진선</b><br>
