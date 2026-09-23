@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import React, { useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState } from 'react';
 import { ArrowLeft, Ellipsis } from 'lucide-react';
 import { useLocation, useNavigate, useParams, useSearchParams } from 'react-router-dom';
 import {
@@ -6,6 +6,7 @@ import {
   deleteProjectPost,
   getPostComments,
   getPostDetail,
+  updatePostComment,
   updateProjectPost,
 } from '../../api/TeamPage.js';
 import ProfileAvatar from '../../components/ProfileAvatar/ProfileAvatar.jsx';
@@ -22,6 +23,31 @@ const formatDate = (value) => {
   const day = String(date.getDate()).padStart(2, '0');
   return `${year}.${month}.${day}`;
 };
+
+function CommentEditInput({ value, ...props }) {
+  const inputRef = useRef(null);
+
+  useLayoutEffect(() => {
+    const input = inputRef.current;
+    const resize = () => {
+      input.style.height = 'auto';
+      input.style.height = `${input.scrollHeight + input.offsetHeight - input.clientHeight}px`;
+    };
+    resize();
+    let previousWidth = input.getBoundingClientRect().width;
+    const observer = new ResizeObserver(() => {
+      const width = input.getBoundingClientRect().width;
+      if (width !== previousWidth) {
+        previousWidth = width;
+        resize();
+      }
+    });
+    observer.observe(input);
+    return () => observer.disconnect();
+  }, [value]);
+
+  return <textarea {...props} ref={inputRef} value={value} rows={1} />;
+}
 
 function CommentAvatar({ comment }) {
   const imageUrl = comment.profileImageUrl ?? comment.writerProfileImageUrl ?? comment.imageUrl;
@@ -57,6 +83,10 @@ function BoardDetailPage() {
   const [commentsError, setCommentsError] = useState('');
   const [comment, setComment] = useState('');
   const [isCommentSubmitting, setIsCommentSubmitting] = useState(false);
+  const [editingCommentId, setEditingCommentId] = useState(null);
+  const [editComment, setEditComment] = useState('');
+  const [isCommentEditSubmitting, setIsCommentEditSubmitting] = useState(false);
+  const commentEditPending = useRef(false);
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [isEditOpen, setIsEditOpen] = useState(false);
   const [editTitle, setEditTitle] = useState('');
@@ -145,6 +175,30 @@ function BoardDetailPage() {
       window.alert(`댓글 등록에 실패했습니다: ${submitError.message}`);
     } finally {
       setIsCommentSubmitting(false);
+    }
+  };
+
+  const handleCommentEditSubmit = async (event) => {
+    event.preventDefault();
+    const content = editComment.trim();
+    if (!content || editingCommentId == null || commentEditPending.current) return;
+
+    commentEditPending.current = true;
+    setIsCommentEditSubmitting(true);
+    try {
+      const updated = await updatePostComment(projectId, postId, editingCommentId, content);
+      setComments((current) => current.map((item) => (
+        item.commentId === editingCommentId
+          ? { ...item, comment: content, updatedAt: updated.updatedAt }
+          : item
+      )));
+      setEditingCommentId(null);
+      setEditComment('');
+    } catch (submitError) {
+      window.alert(`댓글 수정에 실패했습니다: ${submitError.message}`);
+    } finally {
+      commentEditPending.current = false;
+      setIsCommentEditSubmitting(false);
     }
   };
 
@@ -263,8 +317,39 @@ function BoardDetailPage() {
                         <div className="board-detail__comment-meta">
                           <strong>{writer}</strong>
                           <time dateTime={createdAt}>{formatDate(createdAt)}</time>
+                          {item.commentId != null && editingCommentId !== item.commentId && (
+                            <button
+                              type="button"
+                              className="board-detail__comment-edit-button"
+                              disabled={editingCommentId != null || isCommentSubmitting}
+                              onClick={() => {
+                                setEditingCommentId(item.commentId);
+                                setEditComment(item.comment ?? item.content ?? item.commentContent ?? item.text ?? '');
+                              }}
+                            >수정</button>
+                          )}
                         </div>
-                        <p>{item.comment ?? item.content ?? item.commentContent ?? item.text}</p>
+                        {editingCommentId != null && editingCommentId === item.commentId ? (
+                          <form className="board-detail__comment-edit-form" onSubmit={handleCommentEditSubmit}>
+                            <label className="board-detail__sr-only" htmlFor={`edit-comment-${item.commentId}`}>댓글 수정</label>
+                            <CommentEditInput
+                              id={`edit-comment-${item.commentId}`}
+                              value={editComment}
+                              onChange={(event) => setEditComment(event.target.value)}
+                              disabled={isCommentEditSubmitting}
+                              autoFocus
+                            />
+                            <button type="submit" disabled={isCommentEditSubmitting || !editComment.trim()}>
+                              {isCommentEditSubmitting ? '저장 중' : '저장'}
+                            </button>
+                            <button type="button" disabled={isCommentEditSubmitting} onClick={() => {
+                              setEditingCommentId(null);
+                              setEditComment('');
+                            }}>취소</button>
+                          </form>
+                        ) : (
+                          <p>{item.comment ?? item.content ?? item.commentContent ?? item.text}</p>
+                        )}
                       </div>
                     </article>
                   );
@@ -281,9 +366,9 @@ function BoardDetailPage() {
                   value={comment}
                   onChange={(event) => setComment(event.target.value)}
                   placeholder="댓글을 입력해주세요."
-                  disabled={isCommentSubmitting}
+                  disabled={isCommentSubmitting || isCommentEditSubmitting}
                 />
-                <button type="submit" disabled={isCommentSubmitting || !comment.trim()}>
+                <button type="submit" disabled={isCommentSubmitting || isCommentEditSubmitting || !comment.trim()}>
                   {isCommentSubmitting ? '등록 중' : '등록'}
                 </button>
               </form>

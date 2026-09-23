@@ -1,3 +1,67 @@
+.board-detail__comment-edit-button {
+  margin-left: auto;
+  flex-shrink: 0;
+  padding: 2px 0;
+  border: 0;
+  background: transparent;
+  color: #777;
+  font: 400 12px 'Pretendard', sans-serif;
+  cursor: pointer;
+}
+
+.board-detail__comment-edit-button:disabled { cursor: not-allowed; opacity: 0.55; }
+.board-detail__comment-edit-form {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 6px;
+  width: 100%;
+  margin-top: 4px;
+}
+
+.board-detail__comment-edit-form textarea {
+  flex: 1 1 160px;
+  min-width: 0;
+  min-height: 32px;
+  resize: none;
+  overflow: hidden;
+  overflow-wrap: anywhere;
+  box-sizing: border-box;
+  padding: 6px 9px;
+  border: 1px solid #d9d9d9;
+  border-radius: 5px;
+  background: #fafafa;
+  color: #333;
+  font: 400 13px/18px 'Pretendard', sans-serif;
+}
+
+.board-detail__comment-edit-form textarea:focus {
+  outline: none;
+  border-color: #fe9a57;
+  box-shadow: 0 0 0 2px rgba(243, 132, 30, 0.12);
+}
+
+.board-detail__comment-edit-form button {
+  flex-shrink: 0;
+  height: 28px;
+  padding: 0 10px;
+  border: 0;
+  border-radius: 4px;
+  background: #f1f1f1;
+  color: #777;
+  font: 500 12px/16px 'Pretendard', sans-serif;
+  cursor: pointer;
+}
+
+.board-detail__comment-edit-form button[type='submit'] {
+  background: #fff1e7;
+  color: #d95c09;
+}
+
+.board-detail__comment-edit-form button:hover:not(:disabled) { filter: brightness(0.96); }
+.board-detail__comment-edit-form button:focus-visible { outline: 2px solid #fe9a57; outline-offset: 2px; }
+.board-detail__comment-edit-form button:disabled { cursor: not-allowed; opacity: 0.55; }
+
 .board-detail {
   width: 100%;
   min-height: calc(100vh - 56px);

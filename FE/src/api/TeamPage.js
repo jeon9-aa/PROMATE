@@ -75,3 +75,11 @@ export const createPostComment = async (projectId, postId, comment) => {
   );
   return response.data.data;
 };
+
+export const updatePostComment = async (projectId, postId, commentId, comment) => {
+  const response = await apiClient.put(
+    `/projects/${projectId}/posts/${postId}/comments/${commentId}`,
+    { comment }
+  );
+  return response.data.data;
+};
