@@ -264,7 +264,6 @@
 
 .team-board-header .team-board-write-button {
   margin-right: 0;
-  padding-right: 0;
 }
 
 .team-board-write-button {
@@ -276,6 +275,7 @@
   height: 18px;
   padding: 10px;
   border: 0;
+  border-radius: 5px;
   background: transparent;
   color: #ff6600;
   font-family: 'Pretendard', sans-serif;
