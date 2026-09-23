@@ -1,19 +1,21 @@
 .board-detail__comment-actions {
   margin-left: auto;
   display: flex;
-  gap: 10px;
+  gap: 6px;
 }
 
 .board-detail__comment-edit-button {
   flex-shrink: 0;
-  padding: 2px 0;
+  padding: 2px 8px;
   border: 0;
+  border-radius: 4px;
   background: transparent;
   color: #777;
   font: 400 12px 'Pretendard', sans-serif;
   cursor: pointer;
 }
 
+.board-detail__comment-edit-button:hover:not(:disabled) { background: #f1f1f1; }
 .board-detail__comment-edit-button:disabled { cursor: not-allowed; opacity: 0.55; }
 .board-detail__comment-delete-button { color: #d83b3b; }
 .board-detail__comment-edit-form {
