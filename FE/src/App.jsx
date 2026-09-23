@@ -75,7 +75,8 @@ function App() {
           <Route path="/project/:projectId" element={<TeamPage />} />
           <Route path="/task-board" element={<TaskBoardPage />} />
           <Route path="/board" element={<BoardPage />} />
-          <Route path="/board/new" element={<BoardCreatePage />} />
+          <Route path="/board/new" element={<BoardCreatePage key="create" />} />
+          <Route path="/board/:postId/edit" element={<BoardCreatePage key="edit" />} />
           <Route path="/board/:postId" element={<BoardDetailPage />} />
           <Route path="/memberReview" element={<MemberReviewPage />} />
           <Route path="*" element={<ComingSoonPage />} />

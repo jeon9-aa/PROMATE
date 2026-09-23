@@ -1,7 +1,7 @@
-import { useRef, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { ArrowLeft } from 'lucide-react';
-import { useLocation, useNavigate, useSearchParams } from 'react-router-dom';
-import { createProjectPost } from '../../api/TeamPage.js';
+import { useLocation, useNavigate, useParams, useSearchParams } from 'react-router-dom';
+import { createProjectPost, getPostDetail, updateProjectPost } from '../../api/TeamPage.js';
 import '../BoardDetailPage/BoardDetailPage.css';
 import './BoardCreatePage.css';
 
@@ -9,11 +9,19 @@ export default function BoardCreatePage() {
   const [searchParams] = useSearchParams();
   const location = useLocation();
   const navigate = useNavigate();
+  const { postId: postIdParam } = useParams();
+  const isEditMode = postIdParam != null;
+  const postId = Number(postIdParam);
+  const isValidPost = !isEditMode || (Number.isSafeInteger(postId) && postId > 0);
   const projectId = Number(searchParams.get('projectId'));
   const projectTitle = location.state?.projectTitle || searchParams.get('projectTitle') || '';
   const isValidProject = Number.isSafeInteger(projectId) && projectId > 0;
   const [title, setTitle] = useState('');
   const [content, setContent] = useState('');
+  const [postType, setPostType] = useState('GENERAL');
+  const [loadedPostKey, setLoadedPostKey] = useState(null);
+  const postKey = `${projectId}/${postId}`;
+  const isLoading = isEditMode && loadedPostKey !== postKey;
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [error, setError] = useState('');
   const submittingRef = useRef(false);
@@ -21,22 +29,41 @@ export default function BoardCreatePage() {
   if (projectTitle) params.set('projectTitle', projectTitle);
   const boardUrl = isValidProject ? `/board?${params.toString()}` : '/project';
   const navigationState = { projectTitle, dueDate: location.state?.dueDate };
+  const detailUrl = `/board/${postId}?${params.toString()}`;
+
+  useEffect(() => {
+    if (!isEditMode || !isValidProject || !isValidPost) return;
+    let active = true;
+    getPostDetail(projectId, postId).then((post) => {
+      if (!active) return;
+      setTitle(post.title ?? '');
+      setContent(post.content ?? '');
+      setPostType(post.postType || 'GENERAL');
+      setError('');
+      setLoadedPostKey(postKey);
+    }).catch((fetchError) => {
+      if (active) setError(fetchError.message || '게시글을 불러오지 못했습니다.');
+    });
+    return () => { active = false; };
+  }, [isEditMode, isValidProject, isValidPost, projectId, postId, postKey]);
 
   const handleSubmit = async (event) => {
     event.preventDefault();
-    if (!isValidProject || !title.trim() || !content.trim() || submittingRef.current) return;
+    if (!isValidProject || !isValidPost || isLoading || !title.trim() || !content.trim() || submittingRef.current) return;
     submittingRef.current = true;
     setIsSubmitting(true);
     setError('');
     try {
-      await createProjectPost(projectId, {
+      const payload = {
         title: title.trim(),
         content: content.trim(),
-        postType: 'GENERAL',
-      });
-      navigate(boardUrl, { replace: true, state: navigationState });
+        postType,
+      };
+      if (isEditMode) await updateProjectPost(projectId, postId, payload);
+      else await createProjectPost(projectId, payload);
+      navigate(isEditMode ? detailUrl : boardUrl, { replace: true, state: navigationState });
     } catch (submitError) {
-      setError(submitError.message || '게시글 생성에 실패했습니다. 다시 시도해주세요.');
+      setError(submitError.message || '게시글 저장에 실패했습니다. 다시 시도해주세요.');
     } finally {
       submittingRef.current = false;
       setIsSubmitting(false);
@@ -44,7 +71,8 @@ export default function BoardCreatePage() {
   };
 
   const handleCancel = () => {
-    const destination = location.state?.fromProject && isValidProject ? `/project/${projectId}` : boardUrl;
+    const destination = isEditMode && isValidProject && isValidPost ? detailUrl
+      : location.state?.fromProject && isValidProject ? `/project/${projectId}` : boardUrl;
     navigate(destination, { replace: true, state: navigationState });
   };
 
@@ -61,26 +89,27 @@ export default function BoardCreatePage() {
         </header>
 
         <form className="board-create__form" onSubmit={handleSubmit} aria-labelledby="board-create-form-title" aria-busy={isSubmitting}>
-          <h2 id="board-create-form-title">게시글 쓰기</h2>
+          <h2 id="board-create-form-title">{isEditMode ? '게시글 수정' : '게시글 쓰기'}</h2>
+          {isLoading && isValidProject && isValidPost && !error && <p role="status">게시글을 불러오는 중...</p>}
           <label className="board-create__field">
             <span>제목</span>
             <input value={title} onChange={(event) => setTitle(event.target.value)}
-              placeholder="제목을 적어주세요." required disabled={isSubmitting || !isValidProject} />
+              placeholder="제목을 적어주세요." required disabled={isSubmitting || isLoading || !isValidProject || !isValidPost} />
           </label>
           <label className="board-create__field">
             <span>내용</span>
             <textarea value={content} onChange={(event) => setContent(event.target.value)}
-              placeholder="내용을 적어주세요." required disabled={isSubmitting || !isValidProject} />
+              placeholder="내용을 적어주세요." required disabled={isSubmitting || isLoading || !isValidProject || !isValidPost} />
           </label>
-          {(!isValidProject || error) && (
+          {(!isValidProject || !isValidPost || error) && (
             <p className="board-create__error" role="alert">
-              {!isValidProject ? '프로젝트 ID가 유효하지 않습니다. 프로젝트에서 다시 접근해주세요.' : error}
+              {!isValidProject ? '프로젝트 ID가 유효하지 않습니다. 프로젝트에서 다시 접근해주세요.' : !isValidPost ? '게시글 ID가 유효하지 않습니다.' : error}
             </p>
           )}
           <div className="board-create__actions">
             <button type="button" className="board-create__cancel" onClick={handleCancel} disabled={isSubmitting}>취소</button>
-            <button type="submit" className="board-create__submit" disabled={!isValidProject || !title.trim() || !content.trim() || isSubmitting}>
-              {isSubmitting ? '생성 중...' : '게시글 생성'}
+            <button type="submit" className="board-create__submit" disabled={!isValidProject || !isValidPost || isLoading || !title.trim() || !content.trim() || isSubmitting}>
+              {isSubmitting ? '저장 중...' : isEditMode ? '수정 완료' : '게시글 생성'}
             </button>
           </div>
         </form>

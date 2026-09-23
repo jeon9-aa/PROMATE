@@ -8,11 +8,8 @@ import {
   getPostComments,
   getPostDetail,
   updatePostComment,
-  updateProjectPost,
 } from '../../api/TeamPage.js';
 import ProfileAvatar from '../../components/ProfileAvatar/ProfileAvatar.jsx';
-import PostModal from '../TeamPage/components/PostModal.jsx';
-import '../TeamPage/TeamPage.css';
 import './BoardDetailPage.css';
 
 const formatDate = (value) => {
@@ -91,10 +88,6 @@ function BoardDetailPage() {
   const [deletingCommentId, setDeletingCommentId] = useState(null);
   const commentDeletePending = useRef(false);
   const [isMenuOpen, setIsMenuOpen] = useState(false);
-  const [isEditOpen, setIsEditOpen] = useState(false);
-  const [editTitle, setEditTitle] = useState('');
-  const [editContent, setEditContent] = useState('');
-  const [isEditSubmitting, setIsEditSubmitting] = useState(false);
 
   const boardUrl = useMemo(() => {
     const params = new URLSearchParams();
@@ -223,30 +216,11 @@ function BoardDetailPage() {
     }
   };
 
-  const openEditModal = () => {
-    setEditTitle(post?.title || '');
-    setEditContent(post?.content || '');
-    setIsMenuOpen(false);
-    setIsEditOpen(true);
-  };
-
-  const handleEditSubmit = async () => {
-    if (!editTitle.trim() || !editContent.trim() || isEditSubmitting) return;
-
-    try {
-      setIsEditSubmitting(true);
-      const updatedPost = await updateProjectPost(projectId, postId, {
-        title: editTitle.trim(),
-        content: editContent.trim(),
-        postType: post?.postType || 'GENERAL',
-      });
-      setPost((current) => ({ ...current, ...updatedPost }));
-      setIsEditOpen(false);
-    } catch (submitError) {
-      window.alert(`게시글 수정에 실패했습니다: ${submitError.message}`);
-    } finally {
-      setIsEditSubmitting(false);
-    }
+  const openEditPage = () => {
+    const params = new URLSearchParams({ projectId: String(projectId), projectTitle });
+    navigate(`/board/${postId}/edit?${params.toString()}`, {
+      state: { projectTitle, dueDate: location.state?.dueDate },
+    });
   };
 
   const handleDelete = async () => {
@@ -293,7 +267,7 @@ function BoardDetailPage() {
               </button>
               {isMenuOpen && (
                 <div className="board-detail__menu-popup">
-                  <button type="button" onClick={openEditModal}>수정</button>
+                  <button type="button" onClick={openEditPage}>수정</button>
                   <button type="button" className="board-detail__delete" onClick={handleDelete}>삭제</button>
                 </div>
               )}
@@ -415,17 +389,6 @@ function BoardDetailPage() {
         </button>
       </div>
 
-      <PostModal
-        isOpen={isEditOpen}
-        isEditMode
-        title={editTitle}
-        setTitle={setEditTitle}
-        content={editContent}
-        setContent={setEditContent}
-        onClose={() => !isEditSubmitting && setIsEditOpen(false)}
-        onSubmit={handleEditSubmit}
-        isSubmitting={isEditSubmitting}
-      />
     </section>
   );
 }
