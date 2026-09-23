@@ -163,7 +163,6 @@ body {
 }
 
 .text-input:focus {
-  background-color: #e8e8e8;
   box-shadow: 0 0 0 2px rgba(243, 132, 30, 0.25);
 }
 
@@ -239,7 +238,6 @@ body {
 }
 
 .period-date-picker:focus-visible .period-date-display {
-  background-color: #e8e8e8;
   box-shadow: 0 0 0 2px rgba(243, 132, 30, 0.25);
 }
 
@@ -436,12 +434,10 @@ body {
 }
 
 .recruit-count-select:focus {
-  background-color: #e8e8e8;
   box-shadow: 0 0 0 2px rgba(243, 132, 30, 0.25);
 }
 
 .textarea-input:focus {
-  background-color: #e8e8e8;
   box-shadow: 0 0 0 2px rgba(243, 132, 30, 0.25);
 }
 

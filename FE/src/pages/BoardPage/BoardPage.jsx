@@ -2,12 +2,10 @@ import React, { useCallback, useEffect, useState } from 'react';
 import { Ellipsis, MessageCircle, SquarePen } from 'lucide-react';
 import { useLocation, useNavigate, useSearchParams } from 'react-router-dom';
 import {
-  createProjectPost,
   getProjectPosts,
 } from '../../api/TeamPage.js';
 import { getActiveProjects, getCompletedProjects } from '../../api/Project/projectApi.js';
 import Pagination from '../../components/Pagination/Pagination.jsx';
-import PostModal from '../TeamPage/components/PostModal.jsx';
 import '../TeamPage/TeamPage.css';
 import './BoardPage.css';
 
@@ -46,12 +44,6 @@ function BoardPage() {
   const [currentPage, setCurrentPage] = useState(1);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState(null);
-  const [isPostModalOpen, setIsPostModalOpen] = useState(false);
-  const [isEditMode, setIsEditMode] = useState(false);
-  const [postTitle, setPostTitle] = useState('');
-  const [postContent, setPostContent] = useState('');
-  const [isPostSubmitting, setIsPostSubmitting] = useState(false);
-
   const fetchPosts = useCallback(async () => {
     if (!projectId) {
       setError('프로젝트 ID가 유효하지 않습니다.');
@@ -110,43 +102,11 @@ function BoardPage() {
     });
   };
 
-  const openCreateModal = () => {
-    setIsEditMode(false);
-    setPostTitle('');
-    setPostContent('');
-    setIsPostModalOpen(true);
-  };
-
-  const closePostModal = () => {
-    if (isPostSubmitting) return;
-    setIsPostModalOpen(false);
-    setPostTitle('');
-    setPostContent('');
-  };
-
-  const handlePostSubmit = async () => {
-    if (!postTitle.trim() || !postContent.trim() || isPostSubmitting) return;
-
-    try {
-      setIsPostSubmitting(true);
-      const payload = {
-        title: postTitle.trim(),
-        content: postContent.trim(),
-        postType: 'GENERAL',
-      };
-
-      await createProjectPost(projectId, payload);
-      setCurrentPage(1);
-
-      setIsPostModalOpen(false);
-      setPostTitle('');
-      setPostContent('');
-      await fetchPosts();
-    } catch (submitError) {
-      alert(`게시글 처리에 실패했습니다: ${submitError.message}`);
-    } finally {
-      setIsPostSubmitting(false);
-    }
+  const openCreatePage = () => {
+    const params = new URLSearchParams({ projectId: String(projectId), projectTitle });
+    navigate(`/board/new?${params.toString()}`, {
+      state: { projectTitle, dueDate: location.state?.dueDate },
+    });
   };
 
   const totalPages = Math.max(1, Math.ceil(posts.length / POSTS_PER_PAGE));
@@ -179,7 +139,7 @@ function BoardPage() {
         </header>
 
         <div className="project-board__toolbar">
-          <button type="button" className="project-board__write-button" onClick={openCreateModal}>
+          <button type="button" className="project-board__write-button" onClick={openCreatePage}>
             <SquarePen size={16} aria-hidden="true" />
             <span>게시글 쓰기</span>
           </button>
@@ -235,17 +195,7 @@ function BoardPage() {
         )}
       </div>
 
-      <PostModal
-        isOpen={isPostModalOpen}
-        isEditMode={isEditMode}
-        title={postTitle}
-        setTitle={setPostTitle}
-        content={postContent}
-        setContent={setPostContent}
-        onClose={closePostModal}
-        onSubmit={handlePostSubmit}
-        isSubmitting={isPostSubmitting}
-      />
+
 
     </section>
   );
