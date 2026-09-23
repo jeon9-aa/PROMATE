@@ -1,0 +1,79 @@
+.board-create {
+  padding-right: 24px;
+}
+
+.board-create__form {
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+  padding: 26px 34px;
+  border-radius: 10px;
+  background: #fff;
+  font-family: 'Pretendard', sans-serif;
+}
+
+.board-create__form h2 {
+  margin: 0;
+  color: #000;
+  font-size: 18px;
+  font-weight: 700;
+  line-height: 22px;
+}
+
+.board-create__field {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  color: #000;
+  font-size: 14px;
+  font-weight: 600;
+  line-height: 17px;
+}
+
+.board-create__field input,
+.board-create__field textarea {
+  width: 100%;
+  min-width: 0;
+  box-sizing: border-box;
+  padding: 8px 10px;
+  border: 1px solid #ababab;
+  border-radius: 5px;
+  background: #f1f1f1;
+  color: #000;
+  font: 400 14px/1.5 'Pretendard', sans-serif;
+}
+
+.board-create__field input { height: 36px; }
+.board-create__field textarea { height: 230px; min-height: 230px; resize: none; }
+.board-create__field input::placeholder,
+.board-create__field textarea::placeholder { color: #ababab; }
+.board-create__field input:focus,
+.board-create__field textarea:focus {
+  outline: none;
+  box-shadow: 0 0 0 2px rgba(243, 132, 30, 0.25);
+}
+
+.board-create__actions { display: flex; justify-content: flex-end; gap: 12px; flex-wrap: wrap; }
+.board-create__actions button {
+  min-height: 39px;
+  padding: 8px 18px;
+  border: 0;
+  border-radius: 5px;
+  color: #fff;
+  font: 700 16px/20px 'Pretendard', sans-serif;
+  cursor: pointer;
+}
+.board-create__cancel { background: #d9d9d9; }
+.board-create__actions .board-create__submit { padding-inline: 22px; background: #fe9a57; }
+.board-create__submit:hover:not(:disabled) { background: #f58b45; }
+.board-create button:disabled { opacity: 0.55; cursor: not-allowed; }
+.board-create .board-create__submit:disabled { opacity: 1; }
+.board-create__error { margin: 0; color: #d83b3b; font-size: 14px; line-height: 1.5; }
+
+.board-create .board-detail__back-button { font-size: 14px; line-height: 17px; }
+
+@media (max-width: 768px) {
+  .board-create { padding-right: 16px; }
+  .board-create__form { padding: 24px 18px; }
+  .board-create__actions button { font-size: 16px; }
+}

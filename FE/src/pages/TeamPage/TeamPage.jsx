@@ -6,13 +6,11 @@ import ProgressBar from '../../components/ProgressBar/ProgressBar';
 import SummaryCard from '../../components/SummaryCard/SummaryCard';
 import moreIcon from '../../assets/moreIcon.svg';
 import NewTaskModal from '../../components/NewTaskModal/NewTaskModal.jsx';
-import PostModal from './components/PostModal.jsx';
 import TaskDetailModal from './components/TaskDetailModal.jsx';
 import { 
   getProjectMembers, 
   getProjectTasks, 
   getProjectPosts, 
-  createProjectPost,
   getTaskDetail,
   createProjectTask,
   updateProjectTask,
@@ -58,10 +56,6 @@ function TeamPage() {
   const [visibleTaskCount, setVisibleTaskCount] = useState(INITIAL_VISIBLE_COUNT);
   const [visiblePostCount, setVisiblePostCount] = useState(INITIAL_VISIBLE_COUNT);
   
-  const [isPostModalOpen, setIsPostModalOpen] = useState(false);
-  const [postTitle, setPostTitle] = useState('');
-  const [postContent, setPostContent] = useState('');
-  const [isPostSubmitting, setIsPostSubmitting] = useState(false);
   const [isNewTaskModalOpen, setIsNewTaskModalOpen] = useState(false);
 
   const idToFetch = Number(projectId);
@@ -219,39 +213,12 @@ function TeamPage() {
     });
   };
 
-  const handleOpenCreateModal = () => {
-    setPostTitle('');
-    setPostContent('');
-    setIsPostModalOpen(true);
+  const openCreatePage = () => {
+    const params = new URLSearchParams({ projectId: String(idToFetch), projectTitle });
+    navigate(`/board/new?${params.toString()}`, {
+      state: { projectTitle, dueDate: projectDueDate, fromProject: true },
+    });
   };
-
-const handlePostSubmit = async () => {
-  if (!postTitle.trim() || !postContent.trim() || isPostSubmitting) {
-    return;
-  }
-
-  try {
-    setIsPostSubmitting(true);
-
-    const postData = {
-      title: postTitle.trim(),
-      content: postContent.trim(),
-      postType: "GENERAL",
-    };
-
-    await createProjectPost(idToFetch, postData);
-
-    closePostModal();
-    await fetchPosts();
-  } catch (err) {
-    console.log("수정 에러:", err);
-    console.log("status:", err.response?.status);
-    console.log("data:", err.response?.data);
-    alert(`게시글 처리에 실패했습니다: ${err.message}`);
-  } finally {
-    setIsPostSubmitting(false);
-  }
-};
 
   const openTaskBoard = (status) => {
     navigate(`/task-board?projectId=${idToFetch}&status=${status}`, { state: { projectTitle, dueDate: projectDueDate } });
@@ -264,12 +231,6 @@ const handlePostSubmit = async () => {
     });
     navigate(`/board?${boardParams.toString()}`, { state: { projectTitle, dueDate: projectDueDate } });
   };
-
-const closePostModal = () => {
-  setIsPostModalOpen(false);
-  setPostTitle("");
-  setPostContent("");
-};
 
   const formatDate = (dateString) => {
     if (!dateString) return '';
@@ -420,7 +381,7 @@ const closePostModal = () => {
               className="team-board-write-button"
               onClick={(event) => {
                 event.stopPropagation();
-                handleOpenCreateModal();
+                openCreatePage();
               }}
             >
               <SquarePen size={12} />
@@ -488,16 +449,7 @@ const closePostModal = () => {
         </section>
       </div>
 
-      <PostModal
-        isOpen={isPostModalOpen}
-        title={postTitle}
-        setTitle={setPostTitle}
-        content={postContent}
-        setContent={setPostContent}
-        onClose={closePostModal}
-        onSubmit={handlePostSubmit}
-        isSubmitting={isPostSubmitting}
-      />
+
 
       <TaskDetailModal
         isOpen={!!selectedTask}
