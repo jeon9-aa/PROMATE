@@ -302,22 +302,25 @@
   margin-top: auto;
 }
 
-.board-detail__comment-form input {
+.board-detail__comment-form textarea {
   min-width: 0;
-  height: 40px;
+  min-height: 40px;
+  resize: none;
+  overflow: hidden;
+  overflow-wrap: anywhere;
   flex: 1;
-  padding: 0 12px;
+  padding: 8px 12px;
   border: 1px solid #ababab;
   border-radius: 5px;
   box-sizing: border-box;
   background: #f1f1f1;
   color: #000;
-  font: 400 16px 'Pretendard', sans-serif;
+  font: 400 16px/22px 'Pretendard', sans-serif;
   outline: none;
 }
 
-.board-detail__comment-form input::placeholder { color: #ababab; }
-.board-detail__comment-form input:focus { border-color: #fe9a57; }
+.board-detail__comment-form textarea::placeholder { color: #ababab; }
+.board-detail__comment-form textarea:focus { border-color: #fe9a57; }
 
 .board-detail__comment-form button {
   width: 72px;
@@ -331,7 +334,7 @@
 }
 
 .board-detail__comment-form button:hover:not(:disabled) { background: #f58b45; }
-.board-detail__comment-form button:disabled { cursor: not-allowed; opacity: 0.55; }
+.board-detail__comment-form button:disabled { cursor: not-allowed; }
 
 .board-detail__back-button {
   align-self: flex-start;

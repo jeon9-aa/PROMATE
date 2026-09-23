@@ -24,7 +24,7 @@ const formatDate = (value) => {
   return `${year}.${month}.${day}`;
 };
 
-function CommentEditInput({ value, ...props }) {
+function CommentTextarea({ value, ...props }) {
   const inputRef = useRef(null);
 
   useLayoutEffect(() => {
@@ -332,7 +332,7 @@ function BoardDetailPage() {
                         {editingCommentId != null && editingCommentId === item.commentId ? (
                           <form className="board-detail__comment-edit-form" onSubmit={handleCommentEditSubmit}>
                             <label className="board-detail__sr-only" htmlFor={`edit-comment-${item.commentId}`}>댓글 수정</label>
-                            <CommentEditInput
+                            <CommentTextarea
                               id={`edit-comment-${item.commentId}`}
                               value={editComment}
                               onChange={(event) => setEditComment(event.target.value)}
@@ -361,7 +361,7 @@ function BoardDetailPage() {
 
               <form className="board-detail__comment-form" onSubmit={handleCommentSubmit}>
                 <label className="board-detail__sr-only" htmlFor="board-comment">댓글 입력</label>
-                <input
+                <CommentTextarea
                   id="board-comment"
                   value={comment}
                   onChange={(event) => setComment(event.target.value)}
