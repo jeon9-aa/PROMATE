@@ -1,16 +1,15 @@
-import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import React, { useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState } from 'react';
 import { ArrowLeft, Ellipsis } from 'lucide-react';
 import { useLocation, useNavigate, useParams, useSearchParams } from 'react-router-dom';
 import {
   createPostComment,
+  deletePostComment,
   deleteProjectPost,
   getPostComments,
   getPostDetail,
-  updateProjectPost,
+  updatePostComment,
 } from '../../api/TeamPage.js';
 import ProfileAvatar from '../../components/ProfileAvatar/ProfileAvatar.jsx';
-import PostModal from '../TeamPage/components/PostModal.jsx';
-import '../TeamPage/TeamPage.css';
 import './BoardDetailPage.css';
 
 const formatDate = (value) => {
@@ -22,6 +21,31 @@ const formatDate = (value) => {
   const day = String(date.getDate()).padStart(2, '0');
   return `${year}.${month}.${day}`;
 };
+
+function CommentTextarea({ value, ...props }) {
+  const inputRef = useRef(null);
+
+  useLayoutEffect(() => {
+    const input = inputRef.current;
+    const resize = () => {
+      input.style.height = 'auto';
+      input.style.height = `${input.scrollHeight + input.offsetHeight - input.clientHeight}px`;
+    };
+    resize();
+    let previousWidth = input.getBoundingClientRect().width;
+    const observer = new ResizeObserver(() => {
+      const width = input.getBoundingClientRect().width;
+      if (width !== previousWidth) {
+        previousWidth = width;
+        resize();
+      }
+    });
+    observer.observe(input);
+    return () => observer.disconnect();
+  }, [value]);
+
+  return <textarea {...props} ref={inputRef} value={value} rows={1} />;
+}
 
 function CommentAvatar({ comment }) {
   const imageUrl = comment.profileImageUrl ?? comment.writerProfileImageUrl ?? comment.imageUrl;
@@ -57,11 +81,13 @@ function BoardDetailPage() {
   const [commentsError, setCommentsError] = useState('');
   const [comment, setComment] = useState('');
   const [isCommentSubmitting, setIsCommentSubmitting] = useState(false);
+  const [editingCommentId, setEditingCommentId] = useState(null);
+  const [editComment, setEditComment] = useState('');
+  const [isCommentEditSubmitting, setIsCommentEditSubmitting] = useState(false);
+  const commentEditPending = useRef(false);
+  const [deletingCommentId, setDeletingCommentId] = useState(null);
+  const commentDeletePending = useRef(false);
   const [isMenuOpen, setIsMenuOpen] = useState(false);
-  const [isEditOpen, setIsEditOpen] = useState(false);
-  const [editTitle, setEditTitle] = useState('');
-  const [editContent, setEditContent] = useState('');
-  const [isEditSubmitting, setIsEditSubmitting] = useState(false);
 
   const boardUrl = useMemo(() => {
     const params = new URLSearchParams();
@@ -134,7 +160,7 @@ function BoardDetailPage() {
   const handleCommentSubmit = async (event) => {
     event.preventDefault();
     const content = comment.trim();
-    if (!content || isCommentSubmitting) return;
+    if (!content || isCommentSubmitting || commentDeletePending.current) return;
 
     try {
       setIsCommentSubmitting(true);
@@ -148,30 +174,53 @@ function BoardDetailPage() {
     }
   };
 
-  const openEditModal = () => {
-    setEditTitle(post?.title || '');
-    setEditContent(post?.content || '');
-    setIsMenuOpen(false);
-    setIsEditOpen(true);
+  const handleCommentEditSubmit = async (event) => {
+    event.preventDefault();
+    const content = editComment.trim();
+    if (!content || editingCommentId == null || commentEditPending.current) return;
+
+    commentEditPending.current = true;
+    setIsCommentEditSubmitting(true);
+    try {
+      const updated = await updatePostComment(projectId, postId, editingCommentId, content);
+      setComments((current) => current.map((item) => (
+        item.commentId === editingCommentId
+          ? { ...item, comment: content, updatedAt: updated.updatedAt }
+          : item
+      )));
+      setEditingCommentId(null);
+      setEditComment('');
+    } catch (submitError) {
+      window.alert(`댓글 수정에 실패했습니다: ${submitError.message}`);
+    } finally {
+      commentEditPending.current = false;
+      setIsCommentEditSubmitting(false);
+    }
   };
 
-  const handleEditSubmit = async () => {
-    if (!editTitle.trim() || !editContent.trim() || isEditSubmitting) return;
+  const handleCommentDelete = async (commentId) => {
+    if (commentDeletePending.current || isCommentSubmitting || editingCommentId != null) return;
+    if (!window.confirm('이 댓글을 삭제하시겠습니까?')) return;
 
+    commentDeletePending.current = true;
+    setDeletingCommentId(commentId);
     try {
-      setIsEditSubmitting(true);
-      const updatedPost = await updateProjectPost(projectId, postId, {
-        title: editTitle.trim(),
-        content: editContent.trim(),
-        postType: post?.postType || 'GENERAL',
-      });
-      setPost((current) => ({ ...current, ...updatedPost }));
-      setIsEditOpen(false);
-    } catch (submitError) {
-      window.alert(`게시글 수정에 실패했습니다: ${submitError.message}`);
+      await deletePostComment(projectId, postId, commentId);
+      setComments((current) => current.filter((item) => item.commentId !== commentId));
+      setCommentCount((count) => Math.max(0, count - 1));
+    } catch (deleteError) {
+      window.alert(`댓글 삭제에 실패했습니다: ${deleteError.message}`);
     } finally {
-      setIsEditSubmitting(false);
+      commentDeletePending.current = false;
+      setDeletingCommentId(null);
     }
+  };
+
+  const openEditPage = () => {
+    const params = new URLSearchParams({ projectId: String(projectId), projectTitle });
+    navigate(`/board/${postId}/edit?${params.toString()}`, {
+      state: { projectTitle, dueDate: location.state?.dueDate },
+    });
   };
 
   const handleDelete = async () => {
@@ -218,7 +267,7 @@ function BoardDetailPage() {
               </button>
               {isMenuOpen && (
                 <div className="board-detail__menu-popup">
-                  <button type="button" onClick={openEditModal}>수정</button>
+                  <button type="button" onClick={openEditPage}>수정</button>
                   <button type="button" className="board-detail__delete" onClick={handleDelete}>삭제</button>
                 </div>
               )}
@@ -263,8 +312,47 @@ function BoardDetailPage() {
                         <div className="board-detail__comment-meta">
                           <strong>{writer}</strong>
                           <time dateTime={createdAt}>{formatDate(createdAt)}</time>
+                          {item.commentId != null && editingCommentId !== item.commentId && (
+                            <div className="board-detail__comment-actions">
+                            <button
+                              type="button"
+                              className="board-detail__comment-edit-button"
+                              disabled={editingCommentId != null || isCommentSubmitting || deletingCommentId != null}
+                              onClick={() => {
+                                setEditingCommentId(item.commentId);
+                                setEditComment(item.comment ?? item.content ?? item.commentContent ?? item.text ?? '');
+                              }}
+                            >수정</button>
+                            <button
+                              type="button"
+                              className="board-detail__comment-edit-button board-detail__comment-delete-button"
+                              disabled={editingCommentId != null || isCommentSubmitting || deletingCommentId != null}
+                              onClick={() => handleCommentDelete(item.commentId)}
+                            >{deletingCommentId === item.commentId ? '삭제 중' : '삭제'}</button>
+                            </div>
+                          )}
                         </div>
-                        <p>{item.comment ?? item.content ?? item.commentContent ?? item.text}</p>
+                        {editingCommentId != null && editingCommentId === item.commentId ? (
+                          <form className="board-detail__comment-edit-form" onSubmit={handleCommentEditSubmit}>
+                            <label className="board-detail__sr-only" htmlFor={`edit-comment-${item.commentId}`}>댓글 수정</label>
+                            <CommentTextarea
+                              id={`edit-comment-${item.commentId}`}
+                              value={editComment}
+                              onChange={(event) => setEditComment(event.target.value)}
+                              disabled={isCommentEditSubmitting}
+                              autoFocus
+                            />
+                            <button type="submit" disabled={isCommentEditSubmitting || !editComment.trim()}>
+                              {isCommentEditSubmitting ? '저장 중' : '저장'}
+                            </button>
+                            <button type="button" disabled={isCommentEditSubmitting} onClick={() => {
+                              setEditingCommentId(null);
+                              setEditComment('');
+                            }}>취소</button>
+                          </form>
+                        ) : (
+                          <p>{item.comment ?? item.content ?? item.commentContent ?? item.text}</p>
+                        )}
                       </div>
                     </article>
                   );
@@ -276,14 +364,14 @@ function BoardDetailPage() {
 
               <form className="board-detail__comment-form" onSubmit={handleCommentSubmit}>
                 <label className="board-detail__sr-only" htmlFor="board-comment">댓글 입력</label>
-                <input
+                <CommentTextarea
                   id="board-comment"
                   value={comment}
                   onChange={(event) => setComment(event.target.value)}
                   placeholder="댓글을 입력해주세요."
-                  disabled={isCommentSubmitting}
+                  disabled={isCommentSubmitting || isCommentEditSubmitting || deletingCommentId != null}
                 />
-                <button type="submit" disabled={isCommentSubmitting || !comment.trim()}>
+                <button type="submit" disabled={isCommentSubmitting || isCommentEditSubmitting || deletingCommentId != null || !comment.trim()}>
                   {isCommentSubmitting ? '등록 중' : '등록'}
                 </button>
               </form>
@@ -301,17 +389,6 @@ function BoardDetailPage() {
         </button>
       </div>
 
-      <PostModal
-        isOpen={isEditOpen}
-        isEditMode
-        title={editTitle}
-        setTitle={setEditTitle}
-        content={editContent}
-        setContent={setEditContent}
-        onClose={() => !isEditSubmitting && setIsEditOpen(false)}
-        onSubmit={handleEditSubmit}
-        isSubmitting={isEditSubmitting}
-      />
     </section>
   );
 }
