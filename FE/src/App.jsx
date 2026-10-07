@@ -16,6 +16,7 @@ import ProjectPage from "./pages/ProjectPage/ProjectPage.jsx";
 import TeamPage from "./pages/TeamPage/TeamPage.jsx";
 import TaskBoardPage from "./pages/TaskBoardPage/TaskBoardPage.jsx";
 import BoardPage from "./pages/BoardPage/BoardPage.jsx";
+import BoardCreatePage from "./pages/BoardCreatePage/BoardCreatePage.jsx";
 import BoardDetailPage from "./pages/BoardDetailPage/BoardDetailPage.jsx";
 import MemberReviewPage from "./pages/MemberReviewPage/MemberReviewPage.jsx";
 import ProjectReadMePage from "./pages/ProjectReadMePage/ProjectReadMePage.jsx";
@@ -75,9 +76,11 @@ function App() {
           <Route path="/project/:projectId" element={<TeamPage />} />
           <Route path="/task-board" element={<TaskBoardPage />} />
           <Route path="/board" element={<BoardPage />} />
+          <Route path="/board/new" element={<BoardCreatePage />} />
+          <Route path="/board/:postId/edit" element={<BoardCreatePage />} />
           <Route path="/board/:postId" element={<BoardDetailPage />} />
           <Route path="/memberReview" element={<MemberReviewPage />} />
-          <Route path="/smallMeeting" element={<SmallMeetingListPage />} />
+          <Route path="/project/:projectId/small-meetings" element={<SmallMeetingListPage />} />
           <Route path="*" element={<ComingSoonPage />} />
         </Route>
       </Routes>
