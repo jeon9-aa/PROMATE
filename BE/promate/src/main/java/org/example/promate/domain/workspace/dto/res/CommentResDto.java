@@ -19,10 +19,12 @@ public class CommentResDto {
 
     @Getter
     @Builder
-    @JsonPropertyOrder({"commentId", "writer", "comment", "createdAt", "updatedAt"})
+    @JsonPropertyOrder({"commentId", "writerId", "writer", "profileImageUrl", "comment", "createdAt", "updatedAt"})
     public static class CommentDto{
         private Long commentId;
+        private Long writerId;
         private String writer;
+        private String profileImageUrl;
         private String comment;
         private LocalDateTime createdAt;
         private LocalDateTime updatedAt;

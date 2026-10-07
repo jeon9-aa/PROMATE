@@ -29,7 +29,9 @@ public class CommentConverter {
     public static CommentResDto.CommentDto toCommentDto(Comment comment){
         return CommentResDto.CommentDto.builder()
                 .commentId(comment.getId())
+                .writerId(comment.getMember().getUser().getId())
                 .writer(comment.getMember().getUser().getName())
+                .profileImageUrl(comment.getMember().getUser().getProfileImageUrl())
                 .comment(comment.getComment())
                 .createdAt(comment.getCreatedAt())
                 .updatedAt(comment.getUpdatedAt())
