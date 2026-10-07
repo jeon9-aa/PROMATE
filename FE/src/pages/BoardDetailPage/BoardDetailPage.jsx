@@ -49,7 +49,7 @@ function CommentTextarea({ value, ...props }) {
 
 function CommentAvatar({ comment }) {
   const imageUrl = comment.profileImageUrl ?? comment.writerProfileImageUrl ?? comment.imageUrl;
-  const writer = comment.writerName ?? comment.authorName ?? comment.nickname ?? '작성자';
+  const writer = comment.writer ?? comment.writerName ?? comment.authorName ?? comment.nickname ?? '작성자';
 
   return (
     <ProfileAvatar
@@ -303,7 +303,7 @@ function BoardDetailPage() {
                   <p className="board-detail__no-comments">{commentsError}</p>
                 )}
                 {!isCommentsLoading && !commentsError && comments.map((item, index) => {
-                  const writer = item.writerName ?? item.authorName ?? item.nickname ?? '작성자';
+                  const writer = item.writer ?? item.writerName ?? item.authorName ?? item.nickname ?? '작성자';
                   const createdAt = item.createdAt ?? item.updatedAt;
                   return (
                     <article className="board-detail__comment" key={item.commentId ?? item.replyId ?? index}>
