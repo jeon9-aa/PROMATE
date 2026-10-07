@@ -20,9 +20,9 @@ const getMember = (managerId) =>
   mockMembers.find((member) => member.userId === Number(managerId));
 
 const mockPostComments = [
-  { commentId: 1, postId: 1, writerName: '김철수', content: '고생하셨습니다! 디자인 파트 오늘까지 마무리할게요.', createdAt: '2026-02-09T13:00:00' },
-  { commentId: 2, postId: 1, writerName: '김영희', content: '디자인 시안 공유드렸는데 확인 부탁드려요.', createdAt: '2026-02-09T14:00:00' },
-  { commentId: 3, postId: 1, writerName: '홍길동', content: '다음 회의는 목요일 그대로 진행할까요?', createdAt: '2026-02-10T09:00:00' },
+  { commentId: 1, postId: 1, writerId: 1, writer: '김철수', profileImageUrl: null, content: '고생하셨습니다! 디자인 파트 오늘까지 마무리할게요.', createdAt: '2026-02-09T13:00:00' },
+  { commentId: 2, postId: 1, writerId: 2, writer: '김영희', profileImageUrl: null, content: '디자인 시안 공유드렸는데 확인 부탁드려요.', createdAt: '2026-02-09T14:00:00' },
+  { commentId: 3, postId: 1, writerId: 3, writer: '홍길동', profileImageUrl: null, content: '다음 회의는 목요일 그대로 진행할까요?', createdAt: '2026-02-10T09:00:00' },
 ];
 
 export const handlers = [
@@ -119,6 +119,9 @@ export const handlers = [
       .filter((comment) => comment.postId === Number(params.postId))
       .map((comment) => ({
         commentId: comment.commentId,
+        writerId: comment.writerId,
+        writer: comment.writer,
+        profileImageUrl: comment.profileImageUrl,
         comment: comment.content,
         createdAt: comment.createdAt,
         updatedAt: comment.updatedAt ?? comment.createdAt,
@@ -138,7 +141,9 @@ export const handlers = [
     const newComment = {
       commentId: Math.max(0, ...mockPostComments.map((item) => item.commentId)) + 1,
       postId: Number(params.postId),
-      writerName: '김프로',
+      writerId: 4,
+      writer: '김프로',
+      profileImageUrl: null,
       content: body.comment,
       createdAt,
     };
