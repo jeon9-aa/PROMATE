@@ -368,11 +368,6 @@ function BoardDetailPage() {
                   id="board-comment"
                   value={comment}
                   onChange={(event) => setComment(event.target.value)}
-                  onKeyDown={(event) => {
-                    if (event.key !== 'Enter' || event.shiftKey || event.nativeEvent.isComposing || event.nativeEvent.keyCode === 229) return;
-                    event.preventDefault();
-                    if (!event.repeat) event.currentTarget.form.querySelector('button[type="submit"]').click();
-                  }}
                   placeholder="댓글을 입력해주세요."
                   disabled={isCommentSubmitting || isCommentEditSubmitting || deletingCommentId != null}
                 />
