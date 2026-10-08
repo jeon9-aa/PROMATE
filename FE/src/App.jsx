@@ -79,7 +79,7 @@ function App() {
           <Route path="/board/new" element={<BoardCreatePage key="create" />} />
           <Route path="/board/:postId" element={<BoardDetailPage />} />
           <Route path="/memberReview" element={<MemberReviewPage />} />
-          <Route path="/smallMeeting" element={<SmallMeetingListPage />} />
+          <Route path="/project/:projectId/smallMeetingList" element={<SmallMeetingListPage />} />
           <Route path="*" element={<ComingSoonPage />} />
         </Route>
       </Routes>
