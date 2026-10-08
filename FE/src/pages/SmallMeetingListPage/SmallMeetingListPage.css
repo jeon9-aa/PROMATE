@@ -1,0 +1,226 @@
+/* 페이지 레이아웃 */
+.project-detail-page {
+  box-sizing: border-box;
+  width: 100%;
+  min-width: 0;
+  min-height: calc(100vh - 56px);
+  padding: 19px 30px 20px;
+  background: linear-gradient(180deg, #F0F0F0 0%, #FFFFFF 100%);
+  font-family: 'Pretendard', sans-serif;
+  color: #000;
+}
+
+.project-detail-content {
+  width: 100%;
+  min-width: 0;
+  max-width: 1300px;
+}
+
+/* 페이지 헤더 */
+.project-detail-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 16px;
+  margin-bottom: 20px;
+}
+
+.project-detail-header h1 {
+  min-width: 0;
+  margin: 0;
+  font-family: 'YSpotlightOTF', 'Pretendard', sans-serif;
+  font-size: 22px;
+  line-height: 1.35;
+  font-weight: 500;
+  overflow-wrap: anywhere;
+}
+
+.project-detail-header h1 span {
+  margin: 0 4px;
+}
+
+/* 소모임 만들기 버튼 */
+.project-detail-actions {
+  display: flex;
+  justify-content: flex-end;
+  margin-bottom: 20px;
+}
+
+.project-detail-actions button {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  color: #f60;
+  font: inherit;
+  font-size: 14px;
+  line-height: 19px;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.project-detail-actions button:disabled {
+  cursor: default;
+}
+
+.project-detail-group:hover {
+  background-color: #f8f9fa;
+}
+
+/* 소모임 목록과 카드 */
+.project-detail-list {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.project-detail-group {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 20px;
+  box-sizing: border-box;
+  min-height: 70px;
+  padding: 14px 20px;
+  background: #fff;
+  border-radius: 10px;
+  box-shadow: 0 0 10px #0000000d;
+}
+
+.project-detail-group {
+  padding: 0;
+  overflow: hidden;
+}
+
+.project-detail-group-button {
+  display: flex;
+  width: 100%;
+  min-height: 70px;
+  align-items: center;
+  justify-content: space-between;
+  gap: 20px;
+  min-width: 0;
+  box-sizing: border-box;
+  padding: 14px 20px;
+  border: 0;
+  appearance: none;
+  background: transparent;
+  color: inherit;
+  text-align: left;
+  font: inherit;
+  cursor: pointer;
+}
+
+.project-detail-group-button:hover {
+  background: #fffaf6;
+}
+
+.project-detail-group-info {
+  min-width: 0;
+}
+
+.project-detail-group-title {
+  display: block;
+  margin-bottom: 6px;
+  font-size: 16px;
+  line-height: 19px;
+  font-weight: 600;
+  overflow-wrap: anywhere;
+}
+
+.project-detail-group-meta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  color: #909090;
+  font-size: 14px;
+  line-height: 17px;
+}
+
+.project-detail-group-info {
+  min-width: 0;
+}
+
+.project-detail-group h2 {
+  margin: 0 0 6px;
+  font-size: 16px;
+  line-height: 19px;
+  font-weight: 600;
+  overflow-wrap: anywhere;
+}
+
+.project-detail-group p {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin: 0;
+  color: #909090;
+  font-size: 14px;
+  line-height: 17px;
+}
+
+.project-detail-period {
+  border-left: 1px solid #d9d9d9;
+  padding-left: 10px;
+}
+
+/* 모집 상태 */
+.project-detail-status {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  width: 74px;
+  height: 28px;
+  border-radius: 20px;
+  background: #fe9a57;
+  color: #fff;
+  font-size: 16px;
+  font-weight: 500;
+}
+
+.project-detail-status.is-closed {
+  background: #d9d9d9;
+}
+
+/* 키보드 포커스 */
+.project-detail-page :focus-visible {
+  outline: 2px solid #f60;
+  outline-offset: 4px;
+}
+
+/* 모바일 */
+@media (max-width: 768px) {
+  .project-detail-page {
+    padding: 20px 16px 40px;
+  }
+
+  .project-detail-header h1 {
+    font-size: 20px;
+    line-height: 28px;
+  }
+
+  .project-detail-group {
+    padding: 14px 16px;
+    gap: 12px;
+  }
+
+  .project-detail-group p {
+    font-size: 12px;
+    gap: 6px;
+  }
+
+  .project-detail-period {
+    padding-left: 6px;
+  }
+
+  .project-detail-status {
+    width: 64px;
+    font-size: 14px;
+  }
+}
