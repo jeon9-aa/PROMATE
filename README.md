@@ -54,11 +54,11 @@
       <a href="https://github.com/hajin0829">@hajin0829</a>
     </td>
     <td align="center">
-      <img src="https://avatars.githubusercontent.com/u/0?v=4" width="100px;" alt="이은서"/><br>
+      <img src="https://github.com/eunseo7878.png" width="100px;" alt="이은서"/><br>
       <b>이은서</b><br>
       ─────<br>
       Designer<br>
-      -
+      <a href="https://github.com/eunseo7878">@eunseo7878</a>
     </td>
   </tr>
 </table>
