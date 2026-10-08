@@ -2,9 +2,9 @@
 /* tslint:disable */
 
 /**
- * Mock Service Worker가 사용하는 서비스 워커
+ * Mock Service Worker.
  * @see https://github.com/mswjs/msw
- * - MSW가 자동으로 관리하는 파일이므로 직접 수정 x
+ * - Please do NOT modify this file.
  */
 
 const PACKAGE_VERSION = '2.15.0'
@@ -78,7 +78,7 @@ addEventListener('message', async function (event) {
         return client.id !== clientId
       })
 
-      // 연결된 페이지가 모두 닫히면 서비스 워커도 등록을 해제
+      // Unregister itself when there are no more clients
       if (remainingClients.length === 0) {
         self.registration.unregister()
       }
@@ -91,12 +91,13 @@ addEventListener('message', async function (event) {
 addEventListener('fetch', function (event) {
   const requestInterceptedAt = Date.now()
 
-  // 페이지 이동 자체는 모킹 대상에서 제외
+  // Bypass navigation requests.
   if (event.request.mode === 'navigate') {
     return
   }
 
-  // 개발자 도구를 열 때 생기는 "only-if-cached" 요청은 처리할 수 없으므로 그대로 통과
+  // Opening the DevTools triggers the "only-if-cached" request
+  // that cannot be handled by the worker. Bypass such requests.
   if (
     event.request.cache === 'only-if-cached' &&
     event.request.mode !== 'same-origin'
@@ -104,8 +105,9 @@ addEventListener('fetch', function (event) {
     return
   }
 
-  // MSW가 연결된 페이지가 없으면 요청을 가로채지 않음
-  // 등록 해제 후에도 잠시 남아 있는 서비스 워커가 요청을 처리하지 않도록 하기 위한 검사
+  // Bypass all requests when there are no active clients.
+  // Prevents the self-unregistered worked from handling requests
+  // after it's been terminated (still remains active until the next reload).
   if (activeClientIds.size === 0) {
     return
   }
@@ -129,20 +131,23 @@ async function handleRequest(event, requestId, requestInterceptedAt) {
     requestInterceptedAt,
   )
 
-  // "response:*" 이벤트에서 사용할 수 있도록 응답 복사본을 전달
-  // 메시지가 계속 대기하지 않도록 MSW가 현재 활성화되어 있는지도 확인
+  // Send back the response clone for the "response:*" life-cycle events.
+  // Ensure MSW is active and ready to handle the message, otherwise
+  // this message will pend indefinitely.
   if (client && activeClientIds.has(client.id)) {
     const serializedRequest = await serializeRequest(requestCloneForEvents)
 
-    // 서버 전송 이벤트(SSE) 응답은 본문을 복제하지 않음
-    // 스트림을 복제하면 취소 신호가 원본에 제대로 전달되지 않고,
-    // 읽히지 않는 복사본에 데이터가 계속 쌓일 수 있음
+    // Omit the body of server-sent event stream responses.
+    // Cloning such responses would prevent client-side stream cancelations
+    // from reaching the original stream (a teed stream only cancels its
+    // source once both of its branches cancel) and would buffer the
+    // entire stream into the unconsumed clone indefinitely.
     const isEventStreamResponse = response.headers
       .get('content-type')
       ?.toLowerCase()
       .startsWith('text/event-stream')
 
-    // 페이지와 MSW 양쪽에서 읽을 수 있도록 응답을 복제
+    // Clone the response so both the client and the library could consume it.
     const responseClone = isEventStreamResponse ? null : response.clone()
 
     sendToClient(
@@ -174,9 +179,10 @@ async function handleRequest(event, requestId, requestInterceptedAt) {
 }
 
 /**
- * 이 이벤트를 처리할 때 통신할 페이지를 찾음
- * 요청을 보낸 페이지와 서비스 워커를 등록한 페이지가 항상 같지는 않음
- * 응답을 만들 때는 서비스 워커를 등록한 쪽과 통신해야 함
+ * Resolve the main client for the given event.
+ * Client that issues a request doesn't necessarily equal the client
+ * that registered the worker. It's with the latter the worker should
+ * communicate with during the response resolving phase.
  * @param {FetchEvent} event
  * @returns {Promise<Client | undefined>}
  */
@@ -197,11 +203,12 @@ async function resolveMainClient(event) {
 
   return allClients
     .filter((client) => {
-      // 현재 사용자에게 보이는 페이지만 남김
+      // Get only those clients that are currently visible.
       return client.visibilityState === 'visible'
     })
     .find((client) => {
-      // 그중에서 이 서비스 워커를 등록한 페이지를 찾음
+      // Find the client ID that's recorded in the
+      // set of clients that have registered the worker.
       return activeClientIds.has(client.id)
     })
 }
@@ -214,15 +221,18 @@ async function resolveMainClient(event) {
  * @returns {Promise<Response>}
  */
 async function getResponse(event, client, requestId, requestInterceptedAt) {
-  // 요청 본문을 이미 읽었을 수도 있으므로 미리 복사
+  // Clone the request because it might've been already used
+  // (i.e. its body has been read and sent to the client).
   const requestClone = event.request.clone()
 
   function passthrough() {
-    // 헤더를 안전하게 수정할 수 있도록 새 Headers 객체로 복사
+    // Cast the request headers to a new Headers instance
+    // so the headers can be manipulated with.
     const headers = new Headers(requestClone.headers)
 
-    // 통과 요청임을 표시하려고 추가했던 값을 "accept" 헤더에서 제거
-    // 실제 서버에는 원래 요청과 같은 형태로 전달되며 CORS 설정도 그대로 적용
+    // Remove the "accept" header value that marked this request as passthrough.
+    // This prevents request alteration and also keeps it compliant with the
+    // user-defined CORS policies.
     const acceptHeader = headers.get('accept')
     if (acceptHeader) {
       const values = acceptHeader.split(',').map((value) => value.trim())
@@ -240,18 +250,20 @@ async function getResponse(event, client, requestId, requestInterceptedAt) {
     return fetch(requestClone, { headers })
   }
 
-  // MSW와 연결된 페이지가 아니면 실제 네트워크로 요청 보냄
+  // Bypass mocking when the client is not active.
   if (!client) {
     return passthrough()
   }
 
-  // 처음 페이지를 불러올 때 필요한 정적 파일 요청은 그대로 통과
-  // 현재 페이지가 활성 목록에 없다면 아직 "MOCK_ACTIVATE" 처리가 끝나지 않아 MSW가 요청을 받을 준비가 되지 않은 상태
+  // Bypass initial page load requests (i.e. static assets).
+  // The absence of the immediate/parent client in the map of the active clients
+  // means that MSW hasn't dispatched the "MOCK_ACTIVATE" event yet
+  // and is not ready to handle requests.
   if (!activeClientIds.has(client.id)) {
     return passthrough()
   }
 
-  // 요청을 가로챘다고 페이지에 알리고 어떤 응답을 돌려줄지 확인
+  // Notify the client that a request has been intercepted.
   const serializedRequest = await serializeRequest(event.request)
   const clientMessage = await sendToClient(
     client,
@@ -309,8 +321,10 @@ function sendToClient(client, message, transferrables = []) {
  * @returns {Response}
  */
 function respondWithMock(response) {
-  // 일반 Response는 상태 코드 0으로 만들 수 없음
-  // 반면 "Response.error()"의 상태 코드는 0이므로 오류 응답만 따로 처리
+  // Setting response status code to 0 is a no-op.
+  // However, when responding with a "Response.error()", the produced Response
+  // instance will have status code set to 0. Since it's not possible to create
+  // a Response instance with status code 0, handle that use-case separately.
   if (response.status === 0) {
     return Response.error()
   }
