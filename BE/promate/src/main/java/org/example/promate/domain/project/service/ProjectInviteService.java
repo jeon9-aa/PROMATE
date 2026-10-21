@@ -9,6 +9,8 @@ import org.example.promate.domain.project.entity.ProjectInvite;
 import org.example.promate.domain.project.repository.MemberRepository;
 import org.example.promate.domain.project.repository.ProjectInviteRepository;
 import org.example.promate.domain.project.repository.ProjectRepository;
+import org.example.promate.domain.recruit.entity.Recruit;
+import org.example.promate.domain.recruit.service.RecruitService;
 import org.example.promate.domain.user.exception.UserErrorCode;
 import org.example.promate.domain.user.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Value;
@@ -37,6 +39,7 @@ public class ProjectInviteService {
     private final MemberRepository memberRepository;
     private final ApplyRepository applyRepository;
     private final UserRepository userRepository;
+    private final RecruitService recruitService;
 
     @Value("${app.frontend-url}")
     private String frontendUrl;
@@ -194,7 +197,13 @@ public class ProjectInviteService {
 
         // 모집글이 존재한다면 모집 인원도 같이 증가
         if (project.getRecruit() != null) {
-            project.getRecruit().increaseJoinedCount();
+            Recruit recruit = project.getRecruit();
+            recruit.increaseJoinedCount();
+
+            // 정원이 다 찼다면 모집 마감 및 프로젝트 상태 전환
+            if (recruit.getJoinedCount() >= recruit.getTotalSlots()) {
+                recruitService.processCompletion(recruit);
+            }
         }
 
         return new ProjectInviteJoinResponseDTO(
