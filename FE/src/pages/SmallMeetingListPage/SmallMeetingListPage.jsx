@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { useLocation, useNavigate } from 'react-router-dom';
+import { useLocation, useNavigate, useParams } from 'react-router-dom';
 import { Plus } from 'lucide-react';
 import ProjectGroupCard from './components/ProjectGroupCard';
 import './SmallMeetingListPage.css';
@@ -34,6 +34,7 @@ const sampleGroups = [
 export default function SmallMeatingListPage() {
   const { state } = useLocation();
   const navigate = useNavigate();
+  const { projectId } = useParams();
   const projectTitle = state?.projectTitle || '캡스톤 디자인';
   const [groups] = useState(() => {
     try {
@@ -52,7 +53,7 @@ export default function SmallMeatingListPage() {
         </header>
         <section aria-label="소모임 목록">
           <div className="project-detail-actions">
-            <button type="button" onClick={() => navigate('/smallMeeting/add', { state: { projectTitle } })}>
+            <button type="button" onClick={() => navigate(`/project/${projectId}/smallMeeting/add`, { state: { projectTitle } })}>
               <Plus size={16} aria-hidden="true" />소모임 만들기
             </button>
           </div>
