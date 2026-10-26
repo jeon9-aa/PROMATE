@@ -9,9 +9,9 @@ export default function ProjectGroupCard({ group, onClick }) {
           <span className="project-detail-group-meta">
             <span>{group.owner}</span>
             <span className="project-detail-period">
-              <time dateTime={group.start}>{formatDate(group.start)}</time>~
-              <time dateTime={group.start}>{formatDate(group.start)}</time> ~
-              {group.end && <time dateTime={group.end}>{formatDate(group.end)}</time>}
+              <time dateTime={group.start}>{formatDate(group.start)}</time>
+              {group.end && <> ~ <time dateTime={group.end}>{formatDate(group.end)}</time></>}
+              {!group.closed && !group.end && ' ~'}
             </span>
           </span>
         </span>
@@ -21,4 +21,4 @@ export default function ProjectGroupCard({ group, onClick }) {
       </button>
     </li>
   );
-}}
+}

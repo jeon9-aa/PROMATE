@@ -28,7 +28,7 @@ export default function SmallMeetingDetailPage() {
   const { projectId } = useParams();
   const group = state?.group || fallbackGroup;
   const maxMembers = Number(group.capacity) || 5;
-  const participantStorageKey = `promate-small-meeting-joined:${projectId || 'default'}:${group.id}`;
+  const participantStorageKey = `promate-small-meeting-joined:${projectId || 'default'}:${group.id}:${encodeURIComponent(group.title || '')}`;
   const [participants, setParticipants] = useState(() => {
     const members = group.members || initialMembers;
     try {
