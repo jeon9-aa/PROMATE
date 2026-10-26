@@ -1,4 +1,4 @@
-const formatDate = (date) => date.replaceAll('-', '.');
+const formatDate = (date) => (date ? date.replaceAll('-', '.') : '');
 
 export default function ProjectGroupCard({ group, onClick }) {
   return (
@@ -10,6 +10,7 @@ export default function ProjectGroupCard({ group, onClick }) {
             <span>{group.owner}</span>
             <span className="project-detail-period">
               <time dateTime={group.start}>{formatDate(group.start)}</time>~
+              <time dateTime={group.start}>{formatDate(group.start)}</time> ~
               {group.end && <time dateTime={group.end}>{formatDate(group.end)}</time>}
             </span>
           </span>
@@ -20,4 +21,4 @@ export default function ProjectGroupCard({ group, onClick }) {
       </button>
     </li>
   );
-}
+}}
