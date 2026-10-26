@@ -10,8 +10,9 @@ export default function ProjectGroupCard({ group, onClick }) {
             <span>{group.owner}</span>
             <span className="project-detail-period">
               <time dateTime={group.start}>{formatDate(group.start)}</time>
-              {group.end && <> ~ <time dateTime={group.end}>{formatDate(group.end)}</time></>}
-              {!group.closed && !group.end && ' ~'}
+              {group.end
+                ? <> ~ <time dateTime={group.end}>{formatDate(group.end)}</time></>
+                : !group.closed && ' ~'}
             </span>
           </span>
         </span>
@@ -21,4 +22,5 @@ export default function ProjectGroupCard({ group, onClick }) {
       </button>
     </li>
   );
-}
+} 
+
