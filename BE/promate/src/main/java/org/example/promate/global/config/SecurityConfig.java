@@ -36,6 +36,8 @@ public class SecurityConfig {
                                 "/api/auth/kakao/**",
                                 "/swagger-ui/**",
                                 "/v3/api-docs/**",
+                                "/ws",
+                                "/ws/**",
 
                                 //로그인 필요없는 api 추가
                                 "/recruitments",

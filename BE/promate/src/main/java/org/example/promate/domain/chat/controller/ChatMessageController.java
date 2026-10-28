@@ -1,3 +1,4 @@
+
 package org.example.promate.domain.chat.controller;
 
 import lombok.RequiredArgsConstructor;
@@ -9,6 +10,8 @@ import org.springframework.messaging.handler.annotation.MessageMapping;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.stereotype.Controller;
 
+import java.security.Principal;
+
 @Controller
 @RequiredArgsConstructor
 public class ChatMessageController {
@@ -19,8 +22,15 @@ public class ChatMessageController {
     @MessageMapping("/chat/{chatRoomId}/messages")
     public void sendMessage(
             @DestinationVariable Long chatRoomId,
-            ChatMessageRequest request
+            ChatMessageRequest request,
+            Principal principal
     ) {
+
+        if (principal == null) {
+            throw new IllegalStateException("인증되지 않은 사용자입니다.");
+        }
+
+        Long userId = Long.valueOf(principal.getName());
 
         ChatMessageResponse response =
                 chatMessageService.sendMessage(

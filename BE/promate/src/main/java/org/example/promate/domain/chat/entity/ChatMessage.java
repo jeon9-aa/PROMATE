@@ -5,6 +5,7 @@ import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import org.example.promate.domain.chatRoom.entity.ChatRoom;
 import org.example.promate.domain.user.entity.User;
 
 import java.time.LocalDateTime;
