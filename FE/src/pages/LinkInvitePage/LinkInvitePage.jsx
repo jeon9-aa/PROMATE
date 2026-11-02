@@ -40,7 +40,11 @@ function LinkInvitePage() {
                 <span aria-hidden="true">↗</span> 링크 공유
               </button>
               <button className="link-invite-share-trigger" onClick={() => setIsModalOpen(true)}>
-                <span aria-hidden="true">▣</span> 비밀번호 초대
+                <svg className="link-invite-lock-icon" viewBox="0 0 24 24" aria-hidden="true">
+                  <path d="M7 10V7a5 5 0 0 1 10 0v3" />
+                  <rect x="5" y="10" width="14" height="11" rx="2" />
+                </svg>
+                비밀번호 초대
               </button>
             </div>
             <div className="link-invite-tags" aria-label="프로젝트 분야">
@@ -55,6 +59,8 @@ function LinkInvitePage() {
           <div className="link-invite-preview-images" aria-label="프로젝트 이미지">
             <div /><div />
           </div>
+
+          <div className="link-invite-section-divider" aria-hidden="true" />
 
           <section className="link-invite-team-section">
             <h2>팀장</h2>
