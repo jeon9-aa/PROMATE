@@ -21,6 +21,7 @@ import BoardDetailPage from "./pages/BoardDetailPage/BoardDetailPage.jsx";
 import MemberReviewPage from "./pages/MemberReviewPage/MemberReviewPage.jsx";
 import ProjectReadMePage from "./pages/ProjectReadMePage/ProjectReadMePage.jsx";
 import SmallMeetingListPage from "./pages/SmallMeetingListPage/SmallMeetingListPage.jsx";
+import PasswordInvitePage from "./pages/PasswordInvitePage/PasswordInvitePage.jsx";
 
 function AppLayout({ isMenuOpen, toggleMenu, closeMenu }) {
   return (
@@ -74,6 +75,7 @@ function App() {
           <Route path="/findTeam" element={<FindTeamPage />} />
           <Route path="/project" element={<ProjectPage />} />
           <Route path="/project/:projectId" element={<TeamPage />} />
+          <Route path="/project/:projectId/password-invite" element={<PasswordInvitePage />} />
           <Route path="/task-board" element={<TaskBoardPage />} />
           <Route path="/board" element={<BoardPage />} />
           <Route path="/board/new" element={<BoardCreatePage key="create" />} />
