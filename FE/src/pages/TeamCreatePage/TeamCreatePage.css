@@ -14,12 +14,12 @@ body {
   height: calc(100vh - 56px);
   overflow: hidden;
   background-color: #f8f8f8;
-  padding: 19px 50px 20px 30px;
+  padding: 19px 30px 20px;
   background: linear-gradient(180deg, #f0f0f0 0%, #ffffff 100%);
 }
 
 .teammaking-page-title {
-  width: 864px;
+  width: 100%;
   max-width: 100%;
   margin: 0 0 20px;
   margin-left: 0;
@@ -33,7 +33,7 @@ body {
 .card {
   background-color: #ffffff;
   border-radius: 9px;
-  width: 864px;
+  width: 100%;
   max-width: 100%;
   height: 599px;
   padding: 19px 33px;

@@ -1,7 +1,7 @@
 .team-page-container {
   width: 100%;
   min-height: calc(100vh - 56px);
-  padding: 19px 50px 20px 30px;
+  padding: 19px 30px 20px;
   box-sizing: border-box;
   overflow: auto;
   background: linear-gradient(180deg, #F0F0F0 0%, #FFFFFF 100%);
@@ -22,7 +22,6 @@
   grid-template-rows: 86px 58px minmax(58px, auto) auto minmax(190px, 1fr);
   gap: 10px 20px;
   width: 100%;
-  max-width: 1450px;
   box-sizing: border-box;
 }
 
