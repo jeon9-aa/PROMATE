@@ -1,3 +1,6 @@
+import { useState } from 'react';
+import { getCurrentUserId, saveGroup } from '../../utils/smallMeetings';
+import useProjectTitle from '../../utils/useProjectTitle';
 import { useLocation, useNavigate, useParams } from 'react-router-dom';
 import { ArrowLeft } from 'lucide-react';
 import './SmallMeetingAddPage.css';
@@ -6,11 +9,13 @@ export default function SmallMeetingAddPage() {
   const { state } = useLocation();
   const navigate = useNavigate();
   const { projectId } = useParams();
-  const projectTitle = state?.projectTitle || '캡스톤 디자인';
+  const projectTitle = useProjectTitle(projectId, state?.projectTitle);
+  const [saveError, setSaveError] = useState('');
   const listPath = `/project/${projectId}/smallMeetingList`;
 
   const handleSubmit = (event) => {
     event.preventDefault();
+    setSaveError('');
     const form = event.currentTarget;
     const formData = new FormData(form);
     const start = formData.get('startDate');
@@ -26,6 +31,7 @@ export default function SmallMeetingAddPage() {
 
     const newGroup = {
       id: Date.now(),
+      projectId: String(projectId),
       title: formData.get('title').trim(),
       description: formData.get('description').trim(),
       owner: '나',
@@ -33,14 +39,14 @@ export default function SmallMeetingAddPage() {
       start,
       end,
       closed: false,
-      members: [{ name: '나', role: '개설자' }],
+      members: [{ userId: getCurrentUserId(), name: '나', role: '개설자' }],
     };
 
     try {
-      const savedGroups = JSON.parse(localStorage.getItem('promate-small-meetings') || '[]');
-      localStorage.setItem('promate-small-meetings', JSON.stringify([...savedGroups, newGroup]));
+      saveGroup(newGroup);
     } catch {
-      localStorage.setItem('promate-small-meetings', JSON.stringify([newGroup]));
+      setSaveError('소모임을 저장하지 못했습니다. 브라우저 저장소를 확인하고 다시 시도해 주세요.');
+      return;
     }
 
     navigate(listPath, { state: { projectTitle } });
@@ -79,7 +85,7 @@ export default function SmallMeetingAddPage() {
               <fieldset className="small-meeting-add-field small-meeting-add-period">
                 <legend>소모임 기간</legend>
                 <div className="small-meeting-add-date-range">
-                  <input aria-label="시작일" name="startDate" type="date" required />
+                  <input aria-label="시작일" name="startDate" type="date" onChange={(event) => event.currentTarget.form.elements.endDate.setCustomValidity('')} required />
                   <span aria-hidden="true">~</span>
                   <input aria-label="종료일" name="endDate" type="date" onChange={(event) => event.currentTarget.setCustomValidity('')} required />
                 </div>
@@ -87,6 +93,7 @@ export default function SmallMeetingAddPage() {
             </div>
           </div>
 
+          {saveError && <p role="alert">{saveError}</p>}
           <div className="small-meeting-add-actions">
             <button className="small-meeting-add-cancel" type="button" onClick={() => navigate(listPath, { state: { projectTitle } })}>취소</button>
             <button className="small-meeting-add-submit" type="submit">생성하기</button>
