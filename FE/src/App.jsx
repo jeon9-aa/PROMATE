@@ -82,7 +82,7 @@ function App() {
           <Route path="/board/:postId" element={<BoardDetailPage />} />
           <Route path="/memberReview" element={<MemberReviewPage />} />
           <Route path="/project/:projectId/smallMeetingList" element={<SmallMeetingListPage />} />
-          <Route path="/project/:projectId/smallMeeting/DetailPage" element={<SmallMeetingDetailPage />} />
+          <Route path="/project/:projectId/smallMeeting/:meetingId" element={<SmallMeetingDetailPage />} />
           <Route path="*" element={<ComingSoonPage />} />
         </Route>
       </Routes>
