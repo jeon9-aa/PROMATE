@@ -1,0 +1,138 @@
+.small-meeting-detail-page {
+  box-sizing: border-box;
+  min-height: calc(100vh - 56px);
+  padding: 19px 30px 20px;
+  background: linear-gradient(180deg, #f0f0f0 0%, #fff 100%);
+  color: #000;
+  font-family: 'Pretendard', sans-serif;
+}
+
+.small-meeting-detail-content {
+  width: 100%;
+  min-width: 0;
+  max-width: 1300px;
+}
+
+.small-meeting-detail-header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  margin-bottom: 20px;
+}
+
+.small-meeting-detail-header h1 {
+  margin: 0;
+  font-family: 'YSpotlightOTF', 'Pretendard', sans-serif;
+  font-size: 22px;
+  line-height: 1.35;
+  font-weight: 500;
+}
+
+.small-meeting-detail-header h1 span { margin: 0 4px; }
+
+.small-meeting-more {
+  width: 32px;
+  height: 32px;
+  border: 0;
+  background: transparent;
+  color: #000;
+  font-size: 28px;
+  line-height: 1;
+  cursor: pointer;
+}
+
+.small-meeting-card {
+  box-sizing: border-box;
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  min-height: 327px;
+  padding: 24px 30px;
+  border-radius: 10px;
+  background: #fff;
+  box-shadow: 0 0 10px rgb(0 0 0 / 5%);
+}
+
+.small-meeting-card-heading {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 20px;
+}
+
+.small-meeting-title-row { display: flex; align-items: center; gap: 16px; min-width: 0; }
+.small-meeting-title-row h2 { margin: 0; font-size: 20px; line-height: 24px; font-weight: 700; overflow-wrap: anywhere; }
+
+.small-meeting-badge {
+  box-sizing: border-box;
+  flex: none;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 74px;
+  height: 30px;
+  padding: 6px 16px;
+  border-radius: 20px;
+  background: #ffebde;
+  color: #ff6600;
+  font-size: 16px;
+  line-height: 19px;
+  font-weight: 600;
+}
+
+.small-meeting-badge.is-closed { background: #eee; color: #909090; }
+
+.small-meeting-join {
+  flex: none;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 72px;
+  height: 41px;
+  border: 0;
+  border-radius: 5px;
+  background: #fe9a57;
+  color: #fff;
+  font: inherit;
+  font-size: 18px;
+  line-height: 21px;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.small-meeting-join span {
+  display: block;
+  white-space: nowrap;
+}
+
+.small-meeting-join.is-joined span {
+  font-size: 15px;
+  line-height: 15px;
+}
+
+.small-meeting-join:disabled { background: #d9d9d9; cursor: default; }
+.small-meeting-description { margin: 0; font-size: 15px; line-height: 18px; white-space: pre-wrap; overflow-wrap: anywhere; }
+
+.small-meeting-meta { display: flex; align-items: center; gap: 12px; color: #ababab; font-size: 14px; line-height: 17px; }
+.small-meeting-meta > span:first-child { display: inline-flex; align-items: center; gap: 6px; }
+.small-meeting-meta-divider { width: 1px; height: 14px; background: #d9d9d9; }
+
+.small-meeting-members { padding-top: 18px; border-top: 1px solid #d9d9d9; }
+.small-meeting-members h3 { margin: 0 0 18px; font-size: 16px; line-height: 19px; font-weight: 700; }
+.small-meeting-members ul { display: flex; flex-wrap: wrap; gap: 28px; margin: 0; padding: 0; list-style: none; }
+.small-meeting-members li { display: flex; flex-direction: column; align-items: center; gap: 6px; min-width: 40px; }
+.small-meeting-avatar { display: grid; place-items: center; box-sizing: border-box; width: 40px; height: 40px; border: 1px solid #ababab; border-radius: 50%; background: #d9d9d9; color: #666; font-size: 15px; font-weight: 600; }
+.small-meeting-member-name { font-size: 14px; line-height: 17px; font-weight: 600; }
+.small-meeting-member-role { color: #ababab; font-size: 12px; line-height: 14px; }
+
+.small-meeting-back { align-self: flex-start; display: inline-flex; align-items: center; gap: 8px; margin-top: 20px; border: 0; background: transparent; color: #ababab; font: inherit; font-size: 16px; font-weight: 700; cursor: pointer; }
+.small-meeting-detail-page :focus-visible { outline: 2px solid #f60; outline-offset: 4px; }
+
+@media (max-width: 768px) {
+  .small-meeting-detail-page { padding: 40px 16px; }
+  .small-meeting-detail-header h1 { font-size: 20px; line-height: 28px; }
+  .small-meeting-card { padding: 20px 16px; }
+  .small-meeting-title-row { align-items: flex-start; flex-direction: column; gap: 10px; }
+  .small-meeting-title-row h2 { font-size: 18px; }
+  .small-meeting-members ul { gap: 20px; }
+}
