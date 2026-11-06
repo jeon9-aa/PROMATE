@@ -47,6 +47,14 @@ public class ChatRoomResDto {
         private LocalDateTime lastMessageAt;
         private Long unreadCount;
 
+        public void updateLastMessage(
+                String lastMessage,
+                LocalDateTime lastMessageAt
+        ) {
+            this.lastMessage = lastMessage; // 마지막 메시지의 내용
+            this.lastMessageAt = lastMessageAt; // 마지막 메시지의 시간
+        }
+
         @Builder
         public ChatRoomDto(Long chatRoomId, Long recruitId, String recruitTitle, Long chatPartnerId, String chatPartnerProfileImageUrl) {
             this.chatRoomId = chatRoomId;
@@ -54,6 +62,10 @@ public class ChatRoomResDto {
             this.recruitTitle = recruitTitle;
             this.chatPartnerId = chatPartnerId;
             this.chatPartnerProfileImageUrl = chatPartnerProfileImageUrl;
+        }
+
+        public void updateUnreadCount(Long unreadCount) {
+            this.unreadCount = unreadCount;
         }
     }
 }

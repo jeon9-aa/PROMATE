@@ -38,6 +38,10 @@ public class ChatParticipant extends BaseTimeEntity {
     @JoinColumn(name = "participant_id", nullable = false)
     private User participant;
 
+    @Column(name = "last_read_message_id", nullable = false)
+    @Builder.Default
+    private Long lastReadMessageId = 0L;
+
 
     public void leave() {
         this.visible = false;
@@ -45,5 +49,11 @@ public class ChatParticipant extends BaseTimeEntity {
 
     public void show() {
         this.visible = true;
+    }
+
+    public void markAsRead(Long messageId) {
+        if (messageId > this.lastReadMessageId) {
+            this.lastReadMessageId = messageId;
+        }
     }
 }
