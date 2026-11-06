@@ -128,7 +128,7 @@ useEffect(() => {
             ))}</ul>
           </div>
         </article>
-        <button className="small-meeting-back" type="button" onClick={() => navigate(-1)}><ArrowLeft size={16} aria-hidden="true" /> 목록</button>
+        <button className="small-meeting-back" type="button" onClick={() => navigate(`/project/${projectId}/smallMeetingList`, { state: { projectTitle } })}><ArrowLeft size={16} aria-hidden="true" /> 목록</button>
       </div>
     </div>
   );
