@@ -1,6 +1,7 @@
 ﻿import { useEffect, useState } from 'react';
 import { useLocation, useNavigate, useParams } from 'react-router-dom';
 import { ArrowLeft, Users } from 'lucide-react';
+import { getProjectTasks } from '../../api/TeamPage';
 import './SmallMeetingDetailPage.css';
 
 const fallbackGroup = {
@@ -22,6 +23,26 @@ export default function SmallMeetingDetailPage() {
   const { state } = useLocation();
   const navigate = useNavigate();
   const { projectId, meetingId } = useParams();
+  const projectTitleCacheKey = `promate-project-title:${projectId || 'default'}`;
+  const [loadedProject, setLoadedProject] = useState(null);
+  let cachedProjectTitle = '';
+  try { cachedProjectTitle = sessionStorage.getItem(projectTitleCacheKey) || ''; } catch { /* 브라우저 저장소를 사용할 수 없으면 저장 없이 진행 */ }
+  const projectTitle = state?.projectTitle || cachedProjectTitle
+    || (loadedProject?.id === projectId ? loadedProject.title : '');
+
+  useEffect(() => {
+    if (!projectId || projectTitle) return;
+    let cancelled = false;
+    getProjectTasks(Number(projectId))
+      .then((data) => {
+        if (cancelled || !data?.projectTitle) return;
+        setLoadedProject({ id: projectId, title: data.projectTitle });
+        try { sessionStorage.setItem(projectTitleCacheKey, data.projectTitle); } catch { /* 브라우저 저장소를 사용할 수 없으면 저장 없이 진행 */ }
+      })
+      .catch(() => {});
+    return () => { cancelled = true; };
+  }, [projectId, projectTitle, projectTitleCacheKey]);
+
   const [group, setGroup] = useState(null);
   const [participants, setParticipants] = useState([]);
   const [isJoining, setIsJoining] = useState(false);
@@ -78,7 +99,7 @@ useEffect(() => {
     <div className="small-meeting-detail-page">
       <div className="small-meeting-detail-content">
         <header className="small-meeting-detail-header">
-          <h1>{group.title} <span aria-hidden="true">|</span> 소모임</h1>
+          <h1>{projectTitle} <span aria-hidden="true">|</span> 소모임</h1>
         </header>
         <article className="small-meeting-card">
           <div className="small-meeting-card-heading">
