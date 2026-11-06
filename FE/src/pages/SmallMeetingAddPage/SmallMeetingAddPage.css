@@ -1,0 +1,201 @@
+.small-meeting-add-page {
+  box-sizing: border-box;
+  min-height: calc(100vh - 56px);
+  padding: 19px 30px 20px;
+  background: linear-gradient(180deg, #f0f0f0 0%, #fff 100%);
+  color: #000;
+  font-family: 'Pretendard', sans-serif;
+}
+
+.small-meeting-add-content {
+  width: 100%;
+  min-width: 0;
+  max-width: 1300px;
+}
+
+.small-meeting-add-header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  margin-bottom: 20px;
+}
+
+.small-meeting-add-header h1 {
+  margin: 0;
+  font-family: 'YSpotlightOTF', 'Pretendard', sans-serif;
+  font-size: 22px;
+  line-height: 1.35;
+  font-weight: 500;
+}
+
+.small-meeting-add-header h1 span { margin: 0 4px; }
+
+.small-meeting-add-more {
+  padding: 0;
+  border: 0;
+  background: transparent;
+  color: #000;
+  font-size: 30px;
+  line-height: 1;
+  cursor: pointer;
+}
+
+.small-meeting-add-card {
+  box-sizing: border-box;
+  display: flex;
+  flex-direction: column;
+  gap: 54px;
+  min-height: 598px;
+  padding: 30px 40px;
+  border-radius: 10px;
+  background: #fff;
+  box-shadow: 0 0 10px rgb(0 0 0 / 5%);
+}
+
+.small-meeting-add-fields {
+  display: flex;
+  flex-direction: column;
+  gap: 40px;
+}
+
+.small-meeting-add-field {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 10px;
+  min-width: 0;
+  margin: 0;
+  padding: 0;
+  border: 0;
+}
+
+.small-meeting-add-field > span,
+.small-meeting-add-period legend {
+  padding: 0;
+  font-size: 14px;
+  line-height: 17px;
+  font-weight: 600;
+}
+
+.small-meeting-add-field-name input,
+.small-meeting-add-field-description textarea {
+  box-sizing: border-box;
+  width: min(600px, 100%);
+  border: 1px solid #ababab;
+  border-radius: 5px;
+  background: #f1f1f1;
+  color: #000;
+  font: inherit;
+  font-size: 16px;
+}
+
+.small-meeting-add-field-name input {
+  height: 40px;
+  padding: 0 12px;
+}
+
+.small-meeting-add-field-description textarea {
+  height: 100px;
+  padding: 10px 12px;
+  resize: vertical;
+}
+
+.small-meeting-add-field-name input::placeholder,
+.small-meeting-add-field-description textarea::placeholder { color: #ababab; }
+
+.small-meeting-add-options {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 40px;
+}
+
+.small-meeting-add-capacity select {
+  box-sizing: border-box;
+  width: 160px;
+  height: 40px;
+  padding: 0 12px;
+  border: 1px solid #ababab;
+  border-radius: 5px;
+  background: #f1f1f1;
+  color: #000;
+  font: inherit;
+  font-size: 16px;
+}
+
+.small-meeting-add-period { width: 340px; }
+
+.small-meeting-add-date-range {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  width: 100%;
+  margin-top: 8px;
+}
+
+.small-meeting-add-date-range input {
+  box-sizing: border-box;
+  width: 154px;
+  height: 37px;
+  padding: 0 8px;
+  border: 1px solid #ababab;
+  border-radius: 5px;
+  background: #f1f1f1;
+  color: #000;
+  font: inherit;
+  font-size: 14px;
+}
+
+.small-meeting-add-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 20px;
+}
+
+.small-meeting-add-actions button {
+  box-sizing: border-box;
+  height: 41px;
+  border: 0;
+  border-radius: 5px;
+  color: #fff;
+  font: inherit;
+  font-size: 18px;
+  line-height: 21px;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.small-meeting-add-cancel { width: 72px; background: #d9d9d9; }
+.small-meeting-add-submit { width: 111px; background: #fe9a57; }
+
+.small-meeting-add-back {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  margin: 20px 0 0;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  color: #ababab;
+  font: inherit;
+  font-size: 16px;
+  line-height: 19px;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.small-meeting-add-page :focus-visible {
+  outline: 2px solid #f60;
+  outline-offset: 3px;
+}
+
+@media (max-width: 768px) {
+  .small-meeting-add-page { padding: 20px 16px 40px; }
+  .small-meeting-add-card { min-height: 0; gap: 40px; padding: 24px 20px; }
+  .small-meeting-add-fields { gap: 28px; }
+  .small-meeting-add-options { align-items: stretch; flex-direction: column; gap: 24px; }
+  .small-meeting-add-period { width: min(340px, 100%); }
+  .small-meeting-add-date-range input { min-width: 0; width: calc((100% - 29px) / 2); }
+}

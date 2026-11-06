@@ -21,6 +21,7 @@ import BoardDetailPage from "./pages/BoardDetailPage/BoardDetailPage.jsx";
 import MemberReviewPage from "./pages/MemberReviewPage/MemberReviewPage.jsx";
 import ProjectReadMePage from "./pages/ProjectReadMePage/ProjectReadMePage.jsx";
 import SmallMeetingListPage from "./pages/SmallMeetingListPage/SmallMeetingListPage.jsx";
+import SmallMeetingAddPage from "./pages/SmallMeetingAddPage/SmallMeetingAddPage.jsx";
 import SmallMeetingDetailPage from "./pages/SmallMeeingDetailPage/SmallMeetingDetailPage.jsx";
 
 function AppLayout({ isMenuOpen, toggleMenu, closeMenu }) {
@@ -82,6 +83,7 @@ function App() {
           <Route path="/board/:postId" element={<BoardDetailPage />} />
           <Route path="/memberReview" element={<MemberReviewPage />} />
           <Route path="/project/:projectId/smallMeetingList" element={<SmallMeetingListPage />} />
+          <Route path="/project/:projectId/smallMeeting/add" element={<SmallMeetingAddPage />} />
           <Route path="/project/:projectId/smallMeeting/:meetingId" element={<SmallMeetingDetailPage />} />
           <Route path="*" element={<ComingSoonPage />} />
         </Route>
