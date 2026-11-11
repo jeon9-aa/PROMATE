@@ -1,4 +1,3 @@
-
 package org.example.promate.global.config;
 
 import lombok.RequiredArgsConstructor;
@@ -13,6 +12,11 @@ import org.springframework.messaging.simp.stomp.StompHeaderAccessor;
 import org.springframework.messaging.support.ChannelInterceptor;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.stereotype.Component;
+
+import org.example.promate.domain.chat.code.ChatMessageErrorCode;
+import org.example.promate.domain.chat.exception.ChatMessageException;
+import org.example.promate.domain.chatRoom.code.ChatRoomErrorCode;
+import org.example.promate.domain.chatRoom.exception.ChatRoomException;
 
 import java.security.Principal;
 import java.util.List;
@@ -34,6 +38,7 @@ public class JwtChannelInterceptor implements ChannelInterceptor {
 
         StompCommand command = accessor.getCommand();
 
+        // 1. STOMP 연결 시 JWT 인증
         if (StompCommand.CONNECT.equals(command)) {
 
             String authorization =
@@ -41,14 +46,18 @@ public class JwtChannelInterceptor implements ChannelInterceptor {
 
             if (authorization == null ||
                     !authorization.startsWith("Bearer ")) {
-                throw new IllegalArgumentException("JWT 토큰이 없습니다.");
+                throw new ChatMessageException(
+                        ChatMessageErrorCode.WEBSOCKET_UNAUTHORIZED
+                );
             }
 
             String token = authorization.substring(7);
 
             if (!jwtProvider.validateToken(token)
                     || jwtProvider.isRefreshToken(token)) {
-                throw new IllegalArgumentException("유효하지 않은 Access Token입니다.");
+                throw new ChatMessageException(
+                        ChatMessageErrorCode.WEBSOCKET_INVALID_TOKEN
+                );
             }
 
             Long userId = jwtProvider.getUserId(token);
@@ -63,19 +72,24 @@ public class JwtChannelInterceptor implements ChannelInterceptor {
             accessor.setUser(authentication);
         }
 
+        // 2. 메시지 전송 및 채팅방 구독 권한 검증
         if (StompCommand.SEND.equals(command)
                 || StompCommand.SUBSCRIBE.equals(command)) {
 
             Principal principal = accessor.getUser();
 
             if (principal == null) {
-                throw new IllegalArgumentException("인증되지 않은 사용자입니다.");
+                throw new ChatMessageException(
+                        ChatMessageErrorCode.WEBSOCKET_UNAUTHORIZED
+                );
             }
 
             String destination = accessor.getDestination();
 
             if (destination == null) {
-                throw new IllegalArgumentException("목적지가 없습니다.");
+                throw new ChatMessageException(
+                        ChatMessageErrorCode.WEBSOCKET_INVALID_DESTINATION
+                );
             }
 
             String prefix = StompCommand.SEND.equals(command)
@@ -83,16 +97,25 @@ public class JwtChannelInterceptor implements ChannelInterceptor {
                     : "/topic/chat/";
 
             if (!destination.startsWith(prefix)) {
-                throw new IllegalArgumentException("허용되지 않은 목적지입니다.");
+                throw new ChatMessageException(
+                        ChatMessageErrorCode.WEBSOCKET_INVALID_DESTINATION
+                );
             }
 
             String suffix = destination.substring(prefix.length());
 
+            // SEND 경로: /app/chat/{chatRoomId}/messages
             if (StompCommand.SEND.equals(command)) {
                 if (!suffix.endsWith("/messages")) {
-                    throw new IllegalArgumentException("잘못된 메시지 경로입니다.");
+                    throw new ChatMessageException(
+                            ChatMessageErrorCode.WEBSOCKET_INVALID_DESTINATION
+                    );
                 }
-                suffix = suffix.substring(0, suffix.length() - "/messages".length());
+
+                suffix = suffix.substring(
+                        0,
+                        suffix.length() - "/messages".length()
+                );
             }
 
             Long chatRoomId;
@@ -100,19 +123,30 @@ public class JwtChannelInterceptor implements ChannelInterceptor {
             try {
                 chatRoomId = Long.valueOf(suffix);
             } catch (NumberFormatException e) {
-                throw new IllegalArgumentException("잘못된 채팅방 ID입니다.");
+                throw new ChatMessageException(
+                        ChatMessageErrorCode.WEBSOCKET_INVALID_DESTINATION
+                );
             }
 
             Long userId = Long.valueOf(principal.getName());
 
+            // 3. 채팅방 참여자 검증
             ChatParticipant participant = chatParticipantRepository
-                    .findByChatRoom_IdAndParticipant_Id(chatRoomId, userId)
+                    .findByChatRoom_IdAndParticipant_Id(
+                            chatRoomId,
+                            userId
+                    )
                     .orElseThrow(() ->
-                            new IllegalArgumentException("채팅방 참여자가 아닙니다.")
+                            new ChatRoomException(
+                                    ChatRoomErrorCode.NOT_CHAT_ROOM_PARTICIPANT
+                            )
                     );
 
+            // 4. 채팅방을 나간 사용자 검증
             if (!participant.isVisible()) {
-                throw new IllegalArgumentException("채팅방을 나간 사용자입니다.");
+                throw new ChatRoomException(
+                        ChatRoomErrorCode.CHAT_ROOM_LEFT
+                );
             }
         }
 

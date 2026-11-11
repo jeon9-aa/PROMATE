@@ -14,6 +14,13 @@ import org.example.promate.domain.user.repository.UserRepository;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import org.example.promate.domain.chat.code.ChatMessageErrorCode;
+import org.example.promate.domain.chat.exception.ChatMessageException;
+import org.example.promate.domain.chatRoom.code.ChatRoomErrorCode;
+import org.example.promate.domain.chatRoom.exception.ChatRoomException;
+import org.example.promate.domain.user.exception.UserErrorCode;
+import org.example.promate.domain.user.exception.UserException;
+
 import java.util.List;
 
 @Service
@@ -26,9 +33,6 @@ public class ChatMessageService {
     private final UserRepository userRepository;
     private final ChatParticipantRepository chatParticipantRepository;
 
-
-    // 에러코드 추후 정리 예정!!!!!!!!!
-
     @Transactional
     public ChatMessageResponse sendMessage(
             Long chatRoomId,
@@ -38,23 +42,30 @@ public class ChatMessageService {
 
         ChatRoom chatRoom = chatRoomRepository.findById(chatRoomId)
                 .orElseThrow(() ->
-                        new RuntimeException("채팅방을 찾을 수 없습니다.")
+                        new ChatRoomException(ChatRoomErrorCode.CHAT_ROOM_NOT_FOUND)
                 );
 
         User sender = userRepository.findById(userId)
                 .orElseThrow(() ->
-                        new RuntimeException("사용자를 찾을 수 없습니다.")
+                        new UserException(UserErrorCode.USER_NOT_FOUND)
                 );
 
         ChatParticipant participant = chatParticipantRepository
                 .findByChatRoom_IdAndParticipant_Id(chatRoomId, userId)
                 .orElseThrow(() ->
-                        new RuntimeException("채팅방 참여자가 아닙니다.")
+                        new ChatRoomException(ChatRoomErrorCode.NOT_CHAT_ROOM_PARTICIPANT)
                 );
 
         if (!participant.isVisible()) {
-            throw new RuntimeException("채팅방을 나간 사용자는 메시지를 보낼 수 없습니다.");
+            throw new ChatRoomException(ChatRoomErrorCode.CHAT_ROOM_LEFT);
         }
+
+        // 빈 메시지 전송 방지
+        if (request == null || request.getContent() == null
+                || request.getContent().isBlank()) {
+            throw new ChatMessageException(ChatMessageErrorCode.MESSAGE_CONTENT_EMPTY);
+        }
+
         ChatMessage message =
                 ChatMessage.builder()
                         .chatRoom(chatRoom)
@@ -87,21 +98,19 @@ public class ChatMessageService {
         // 1. 채팅방 존재 여부 확인
         chatRoomRepository.findById(chatRoomId)
                 .orElseThrow(() ->
-                        new RuntimeException("채팅방을 찾을 수 없습니다.")
+                        new ChatRoomException(ChatRoomErrorCode.CHAT_ROOM_NOT_FOUND)
                 );
 
         // 2. 채팅방 참여자 검증
         ChatParticipant participant = chatParticipantRepository
                 .findByChatRoom_IdAndParticipant_Id(chatRoomId, userId)
                 .orElseThrow(() ->
-                        new RuntimeException("채팅방 참여자가 아닙니다.")
+                        new ChatRoomException(ChatRoomErrorCode.NOT_CHAT_ROOM_PARTICIPANT)
                 );
 
         // 3. 나간 사용자 조회 제한
         if (!participant.isVisible()) {
-            throw new RuntimeException(
-                    "채팅방을 나간 사용자는 메시지를 조회할 수 없습니다."
-            );
+            throw new ChatRoomException(ChatRoomErrorCode.CHAT_ROOM_LEFT);
         }
 
         // 4. 이전 메시지 조회
@@ -133,14 +142,12 @@ public class ChatMessageService {
         ChatParticipant participant = chatParticipantRepository
                 .findByChatRoom_IdAndParticipant_Id(chatRoomId, userId)
                 .orElseThrow(() ->
-                        new RuntimeException("채팅방 참여자가 아닙니다.")
+                        new ChatRoomException(ChatRoomErrorCode.NOT_CHAT_ROOM_PARTICIPANT)
                 );
 
         // 2. 나간 사용자 검증
         if (!participant.isVisible()) {
-            throw new RuntimeException(
-                    "채팅방을 나간 사용자는 메시지를 읽을 수 없습니다."
-            );
+            throw new ChatRoomException(ChatRoomErrorCode.CHAT_ROOM_LEFT);
         }
 
         // 3. 마지막 메시지 ID 확인 후 읽음 처리
