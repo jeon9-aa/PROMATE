@@ -1,10 +1,11 @@
-
 package org.example.promate.domain.chat.controller;
 
 import lombok.RequiredArgsConstructor;
+import org.example.promate.domain.chat.code.ChatMessageSuccessCode;
 import org.example.promate.domain.chat.dto.ChatMessageRequest;
 import org.example.promate.domain.chat.dto.ChatMessageResponse;
 import org.example.promate.domain.chat.service.ChatMessageService;
+import org.example.promate.global.ApiPayload.ApiResponse;
 import org.springframework.messaging.handler.annotation.DestinationVariable;
 import org.springframework.messaging.handler.annotation.MessageMapping;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
@@ -41,7 +42,10 @@ public class ChatMessageController {
 
         messagingTemplate.convertAndSend(
                 "/topic/chat/" + chatRoomId,
-                response
+                ApiResponse.onSuccess(
+                        ChatMessageSuccessCode.MESSAGE_SENT,
+                        response
+                )
         );
     }
 }
