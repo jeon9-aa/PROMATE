@@ -1,4 +1,3 @@
-
 package org.example.promate.domain.chatRoom.service.query;
 
 import lombok.RequiredArgsConstructor;
@@ -15,6 +14,9 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
+import java.util.Map;
+import java.util.function.Function;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -52,8 +54,7 @@ public class ChatRoomQueryServiceImpl implements ChatRoomQueryService {
                 );
 
         // 마지막 메시지 추가
-        setLastMessage(response);
-        setUnreadCount(response, userId); // 안 읽은 메시지 수
+        enrichChatRooms(List.of(response), userId);
 
         return response;
     }
@@ -65,46 +66,58 @@ public class ChatRoomQueryServiceImpl implements ChatRoomQueryService {
                 chatParticipantRepository.findAllChatRoomsByUserId(userId);
 
         // 각 채팅방에 마지막 메시지 정보 추가
-        chatRooms.forEach(dto -> {
-            setLastMessage(dto);
-            setUnreadCount(dto, userId);
-        });
+        enrichChatRooms(chatRooms, userId);
 
         return chatRooms;
     }
 
-    private void setLastMessage(ChatRoomResDto.ChatRoomDto dto) {
-
-        chatMessageRepository
-                .findTopByChatRoom_IdOrderByCreatedAtDescIdDesc(dto.getChatRoomId())
-                .ifPresent(message ->
-                        dto.updateLastMessage(
-                                message.getContent(),
-                                message.getCreatedAt()
-                        )
-                );
-    }
-
-    private void setUnreadCount(
-            ChatRoomResDto.ChatRoomDto dto,
+    private void enrichChatRooms(
+            List<ChatRoomResDto.ChatRoomDto> chatRooms,
             Long userId
     ) {
-        ChatParticipant participant = chatParticipantRepository
-                .findByChatRoom_IdAndParticipant_Id(
-                        dto.getChatRoomId(), userId
-                )
-                .orElseThrow(() ->
-                        new ChatRoomException(
-                                ChatRoomErrorCode.NOT_CHAT_ROOM_PARTICIPANT)
-                );
+        if (chatRooms.isEmpty()) {
+            return;
+        }
 
-        long unreadCount = chatMessageRepository
-                .countByChatRoom_IdAndIdGreaterThanAndSender_IdNot(
-                        dto.getChatRoomId(),
-                        participant.getLastReadMessageId(),
-                        userId
-                );
+        List<Long> chatRoomIds = chatRooms.stream()
+                .map(ChatRoomResDto.ChatRoomDto::getChatRoomId)
+                .distinct()
+                .toList();
 
-        dto.updateUnreadCount(unreadCount);
+        Map<Long, ChatMessageRepository.LatestMessageView> latestMessageMap =
+                chatMessageRepository.findLatestMessages(chatRoomIds)
+                        .stream()
+                        .collect(Collectors.toMap(
+                                ChatMessageRepository.LatestMessageView::getChatRoomId,
+                                Function.identity()
+                        ));
+
+        Map<Long, Long> unreadCountMap =
+                chatMessageRepository.findUnreadCounts(chatRoomIds, userId)
+                        .stream()
+                        .collect(Collectors.toMap(
+                                ChatMessageRepository.UnreadCountView::getChatRoomId,
+                                ChatMessageRepository.UnreadCountView::getUnreadCount
+                        ));
+
+        for (ChatRoomResDto.ChatRoomDto dto : chatRooms) {
+
+            ChatMessageRepository.LatestMessageView latestMessage =
+                    latestMessageMap.get(dto.getChatRoomId());
+
+            if (latestMessage != null) {
+                dto.updateLastMessage(
+                        latestMessage.getContent(),
+                        latestMessage.getCreatedAt()
+                );
+            }
+
+            dto.updateUnreadCount(
+                    unreadCountMap.getOrDefault(
+                            dto.getChatRoomId(),
+                            0L
+                    )
+            );
+        }
     }
 }
