@@ -1,48 +1,16 @@
-import { useState } from 'react';
-import { useLocation, useNavigate } from 'react-router-dom';
+import { useLocation, useNavigate, useParams } from 'react-router-dom';
 import { Plus } from 'lucide-react';
 import ProjectGroupCard from './components/ProjectGroupCard';
 import './SmallMeetingListPage.css';
+import { getProjectGroups } from '../../utils/smallMeetings';
+import useProjectTitle from '../../utils/useProjectTitle';
 
-const sampleGroups = [
-  {
-    id: 1,
-    title: '프론트엔드 스터디',
-    owner: '아무개',
-    start: '2026-03-17',
-    end: '',
-    closed: false,
-  },
-  {
-    id: 2,
-    title: '중간고사 스터디',
-    owner: '아무개',
-    start: '2026-03-17',
-    end: '',
-    closed: false,
-  },
-  {
-    id: 3,
-    title: '디자인시스템 스터디',
-    owner: '아무개',
-    start: '2026-03-17',
-    end: '2026-07-23',
-    closed: true,
-  },
-];
-
-export default function SmallMeatingListPage() {
+export default function SmallMeetingListPage() {
   const { state } = useLocation();
   const navigate = useNavigate();
-  const projectTitle = state?.projectTitle || '캡스톤 디자인';
-  const [groups] = useState(() => {
-    try {
-      const savedGroups = JSON.parse(localStorage.getItem('promate-small-meetings') || '[]');
-      return [...sampleGroups, ...savedGroups];
-    } catch {
-      return sampleGroups;
-    }
-  });
+  const { projectId } = useParams();
+  const projectTitle = useProjectTitle(projectId, state?.projectTitle);
+  const groups = getProjectGroups(projectId);
 
   return (
     <div className="project-detail-page">
@@ -52,7 +20,7 @@ export default function SmallMeatingListPage() {
         </header>
         <section aria-label="소모임 목록">
           <div className="project-detail-actions">
-            <button type="button" onClick={() => navigate('/smallMeeting/add', { state: { projectTitle } })}>
+            <button type="button" onClick={() => navigate(`/project/${projectId}/smallMeeting/add`, { state: { projectTitle } })}>
               <Plus size={16} aria-hidden="true" />소모임 만들기
             </button>
           </div>
@@ -61,7 +29,7 @@ export default function SmallMeatingListPage() {
               <ProjectGroupCard
                 key={group.id}
                 group={group}
-                onClick={() => navigate('/smallMeetingDetail', { state: { group, projectTitle } })}
+                onClick={() => navigate(`/project/${projectId}/smallMeeting/${group.id}`, { state: { group, projectTitle } })}
               />
             ))}
           </ul>

@@ -73,13 +73,13 @@
 .board-detail {
   width: 100%;
   min-height: calc(100vh - 56px);
-  padding: 19px 50px 80px 30px;
+  padding: 19px 30px 80px;
   box-sizing: border-box;
   background: linear-gradient(180deg, #f0f0f0 0%, #ffffff 100%);
 }
 
 .board-detail__content {
-  width: min(100%, 1300px);
+  width: 100%;
   display: flex;
   flex-direction: column;
   gap: 20px;

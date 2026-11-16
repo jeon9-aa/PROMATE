@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { ClipboardList, SquarePen, Users } from 'lucide-react';
 import { useNavigate, useParams, useLocation } from 'react-router-dom';
 import Calendar from '../../components/Calendar/Calendar';
@@ -7,6 +7,7 @@ import SummaryCard from '../../components/SummaryCard/SummaryCard';
 import moreIcon from '../../assets/moreIcon.svg';
 import NewTaskModal from '../../components/NewTaskModal/NewTaskModal.jsx';
 import TaskDetailModal from './components/TaskDetailModal.jsx';
+import TeamPageMenu from './components/TeamPageMenu.jsx';
 import { 
   getProjectMembers, 
   getProjectTasks, 
@@ -31,6 +32,7 @@ const NO_ASSIGNED_TASKS_MESSAGE = '해당 프로젝트에 할당된 태스크를
 const getTaskStatusLabel = (status) => TASK_STATUS_LABELS[status] || status;
 
 function TeamPage() {
+  const calendarRef = useRef(null);
   const { projectId } = useParams();
   const navigate = useNavigate();
   const location = useLocation();
@@ -243,7 +245,14 @@ function TeamPage() {
 
   return (
     <div className="team-page-container">
-      <h1 className="team-page-title">{projectTitle}</h1>
+      <header className="team-page-header">
+        <h1 className="team-page-title">{projectTitle}</h1>
+        <TeamPageMenu projectId={projectId} projectTitle={projectTitle} dueDate={projectDueDate}
+          onCalendarClick={() => {
+            calendarRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+            calendarRef.current?.focus({ preventScroll: true });
+          }} />
+      </header>
 
       <div className={`team-page-grid ${isTaskExpanded ? 'team-task-expanded' : ''}`}>
         <section
@@ -369,7 +378,7 @@ function TeamPage() {
           <SummaryCard title="완료한 태스크" count={completedTasksCount} isAllEmpty={true} />
         </div>
 
-        <div className="team-calendar">
+        <div className="team-calendar" ref={calendarRef} tabIndex={-1}>
           <Calendar projectId={idToFetch} projectTitle={projectTitle} />
         </div>
 
