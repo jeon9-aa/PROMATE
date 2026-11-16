@@ -41,6 +41,7 @@
   display: grid;
   grid-template-columns: 340px minmax(0, 1fr);
   width: 100%;
+  max-width: 1000px;
   height: min(820px, calc(100dvh - 180px));
   min-height: 420px;
   overflow: hidden;
