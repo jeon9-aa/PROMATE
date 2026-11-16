@@ -1,7 +1,7 @@
 .find-team-page {
   width: 100%;
   min-height: 100%;
-  padding: 19px 50px 20px 30px;
+  padding: 19px 30px 20px;
   background: linear-gradient(180deg, #F0F0F0 0%, #FFFFFF 100%);
   color: #111111;
   font-family: "Pretendard", "Noto Sans KR", sans-serif;
@@ -22,7 +22,6 @@
   align-items: center;
   justify-content: space-between;
   width: 100%;
-  max-width: 1000px;
   margin-bottom: 16px;
 }
 
@@ -99,7 +98,6 @@
   flex-direction: column;
   gap: 10px;
   width: 100%;
-  max-width: 1000px;
 }
 
 .find-team-empty {

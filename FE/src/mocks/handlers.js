@@ -1,5 +1,6 @@
 import { delay, http, HttpResponse } from 'msw';
 import { mockMembers, mockPosts, mockProject, mockSchedules, mockTasks } from './data.js';
+import { demoHandlers, demoDate } from './demo.js';
 
 const ok = (data, message = '요청이 성공했습니다.') =>
   HttpResponse.json({ isSuccess: true, message, data });
@@ -20,12 +21,13 @@ const getMember = (managerId) =>
   mockMembers.find((member) => member.userId === Number(managerId));
 
 const mockPostComments = [
-  { commentId: 1, postId: 1, writerId: 1, writer: '김철수', profileImageUrl: null, content: '고생하셨습니다! 디자인 파트 오늘까지 마무리할게요.', createdAt: '2026-02-09T13:00:00' },
-  { commentId: 2, postId: 1, writerId: 2, writer: '김영희', profileImageUrl: null, content: '디자인 시안 공유드렸는데 확인 부탁드려요.', createdAt: '2026-02-09T14:00:00' },
-  { commentId: 3, postId: 1, writerId: 3, writer: '홍길동', profileImageUrl: null, content: '다음 회의는 목요일 그대로 진행할까요?', createdAt: '2026-02-10T09:00:00' },
+  { commentId: 1, postId: 1, writerId: 1, writer: '김철수', profileImageUrl: null, content: '고생하셨습니다! 디자인 파트 오늘까지 마무리할게요.', createdAt: `${demoDate(-1)}T13:00:00` },
+  { commentId: 2, postId: 1, writerId: 2, writer: '김영희', profileImageUrl: null, content: '디자인 시안 공유드렸는데 확인 부탁드려요.', createdAt: `${demoDate(-1)}T14:00:00` },
+  { commentId: 3, postId: 1, writerId: 3, writer: '홍길동', profileImageUrl: null, content: '다음 회의는 목요일 그대로 진행할까요?', createdAt: `${demoDate()}T09:00:00` },
 ];
 
 export const handlers = [
+  ...demoHandlers,
   http.get('*/projects/:projectId/members', async () => {
     await delay(150);
     return ok(mockMembers);
