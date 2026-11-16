@@ -1,7 +1,9 @@
 /* 공통 스타일 */
 .chat-page {
-  min-height: calc(100vh - 56px);
-  padding: 19px 30px 20px;
+  display: flex;
+  flex-direction: column;
+  height: calc(100dvh - 56px);
+  padding: 19px 30px 0;
   background: linear-gradient(180deg, #F0F0F0 0%, #FFFFFF 100%);
   color: #000;
   font-family: 'Pretendard', sans-serif;
@@ -29,6 +31,7 @@
 
 /* 제목과 채팅 영역 */
 .chat-page > h1 {
+  flex-shrink: 0;
   margin: 0 0 20px;
   padding: 0;
   font-family: 'YSpotlightOTF', 'Pretendard', sans-serif;
@@ -39,11 +42,11 @@
 
 .chat-page__workspace {
   display: grid;
+  flex: 1;
   grid-template-columns: 340px minmax(0, 1fr);
   width: 100%;
   max-width: 1000px;
-  height: min(820px, calc(100dvh - 180px));
-  min-height: 420px;
+  min-height: 0;
   overflow: hidden;
   border-radius: 10px;
   background: #fff;
@@ -401,7 +404,6 @@
 @media (max-width: 640px) {
   .chat-page__workspace {
     grid-template-columns: minmax(0, 1fr);
-    height: calc(100dvh - 160px);
   }
 
   .chat-room-list {
