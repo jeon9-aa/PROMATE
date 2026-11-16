@@ -69,7 +69,7 @@ function App() {
         >
           <Route path="/" element={<DashboardPage />} />
           <Route path="/dashboard" element={<DashboardPage />} />
-          <Route path="/chat" element={<ChatAndRoomListPage />} />
+          <Route path="/chat/:roomId?" element={<ChatAndRoomListPage />} />
           <Route path="/teamCreate" element={<TeamCreatePage />} />
           <Route path="/readme/:postId" element={<ProjectReadMePage />} />
           <Route path="/applicant" element={<ApplicantPage/>} />
