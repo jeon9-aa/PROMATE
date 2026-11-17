@@ -51,9 +51,43 @@
 .project-readme-date-container {
   display: flex;
   flex-direction: column;
-  align-items: flex-end;
+  align-items: flex-start;
   gap: 4px;
+  margin-left: 12px;
+}
+
+.project-readme-share-actions {
+  display: flex;
+  align-items: center;
+  gap: 10px;
   margin-left: auto;
+  flex-shrink: 0;
+}
+
+.project-readme-share-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 0;
+  border: none;
+  border-radius: 5px;
+  background: transparent;
+  color: #ABABAB;
+  font-family: inherit;
+  font-size: 13px;
+  font-weight: 600;
+  line-height: 17px;
+  white-space: nowrap;
+  cursor: pointer;
+}
+
+.project-readme-link-btn {
+  padding: 4px 10px;
+}
+
+.project-readme-share-btn img {
+  width: 17px;
+  height: 17px;
 }
 
 .project-readme-created-at {
@@ -67,14 +101,42 @@
   margin-top: 40px;
 }
 
+.project-readme-participant-actions {
+  justify-content: flex-start;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+
 .project-readme-apply-btn {
   border: none;
   border-radius: 5px;
-  padding: 8px 36px;
-  font-size: 17px;
-  font-weight: 600;
+  padding: 10px 30px;
+  font-family: inherit;
+  font-size: 18px;
+  font-weight: 700;
+  line-height: 21px;
   cursor: pointer;
   transition: background-color 0.2s ease;
+}
+
+.project-readme-chat-btn {
+  display: inline-flex;
+  justify-content: center;
+  align-items: center;
+  box-sizing: border-box;
+  height: 41px;
+  padding: 0 24px;
+  border: 1.5px solid #FE9A57;
+  border-radius: 5px;
+  background: transparent;
+  color: #FE9A57;
+  font-family: inherit;
+  font-size: 18px;
+  font-weight: 700;
+  line-height: 21px;
+  white-space: nowrap;
+  cursor: pointer;
 }
 
 .project-readme-apply-btn.apply {
