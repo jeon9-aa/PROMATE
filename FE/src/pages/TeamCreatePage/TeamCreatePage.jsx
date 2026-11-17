@@ -1,6 +1,6 @@
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { useRef } from "react";
+import { useAuthStore } from "../../stores/useAuthStore.js";
 import logoIcon from "../../assets/logoIcon.svg";
 import FormActions from "./components/FormActions.jsx";
 import ProjectDescriptionField from "./components/ProjectDescriptionField.jsx";
@@ -39,6 +39,18 @@ const getTodayValue = () => {
 function TeamCreatePage() {
   const navigate = useNavigate();
   const imageInputRef = useRef(null);
+  const hasShownLoginAlert = useRef(false);
+  const isLoggedIn = useAuthStore((state) => state.isLoggedIn);
+  const token = localStorage.getItem("accessToken")?.trim();
+  const canAccess = isLoggedIn && !!token && token !== "null" && token !== "undefined";
+
+  useEffect(() => {
+    if (canAccess || hasShownLoginAlert.current) return;
+
+    hasShownLoginAlert.current = true;
+    alert("로그인 후 이용 가능합니다.");
+    navigate(-1);
+  }, [canAccess, navigate]);
 
   const todayValue = getTodayValue();
   const [projectName, setProjectName] = useState("");
@@ -123,6 +135,8 @@ function TeamCreatePage() {
       alert(error.message || "팀 모집 게시글 생성 중 오류가 발생했습니다.");
     }
   };
+
+  if (!canAccess) return null;
 
   return (
     <div className="page-wrapper">
