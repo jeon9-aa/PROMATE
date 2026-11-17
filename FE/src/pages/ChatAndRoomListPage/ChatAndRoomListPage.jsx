@@ -1,12 +1,15 @@
 import { useState } from 'react';
-import { useNavigate, useParams, useSearchParams } from 'react-router-dom';
+import { useLocation, useNavigate, useParams, useSearchParams } from 'react-router-dom';
 import ChatRoomList from './components/ChatRoomList';
 import ChatPanel from './components/ChatPanel';
 import { initialRooms } from './chatData';
 import './ChatAndRoomListPage.css';
 
 export default function ChatAndRoomListPage() {
-  const [rooms, setRooms] = useState(initialRooms);
+  const { state } = useLocation();
+  const [rooms, setRooms] = useState(() => state?.createdRoom
+    ? [state.createdRoom, ...initialRooms.filter((item) => item.id !== state.createdRoom.id)]
+    : initialRooms);
   const navigate = useNavigate();
   const { roomId } = useParams();
   const [searchParams, setSearchParams] = useSearchParams();
