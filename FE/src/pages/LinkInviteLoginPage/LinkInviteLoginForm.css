@@ -15,24 +15,24 @@
 .link-invite-login-page .kakao-login-btn {
   width: 100%;
   min-width: 0;
-  height: 50px;
+  height: 40px;
   margin: 0;
   padding: 12px 16px;
 }
 
 .link-invite-login-page .kakao-login-content {
-  gap: 16px;
+  gap: 9px;
 }
 
 .link-invite-login-page .kakao-icon {
-  width: 28px;
-  height: 26px;
+  width: 22px;
+  height: 20px;
   object-fit: contain;
 }
 
 .link-invite-login-page .kakao-login-text {
-  font-size: 18px;
-  line-height: 21px;
+  font-size: 13px;
+  line-height: 16px;
 }
 
 .link-invite-login-page .kakao-login-btn:focus-visible {

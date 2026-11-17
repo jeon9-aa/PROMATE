@@ -6,7 +6,7 @@
   width: 100%;
   min-height: 100vh;
   min-height: 100dvh;
-  padding-top: 100px;
+  padding-top: 60px;
   background: linear-gradient(180deg, #f0f0f0 0%, #ffffff 100%);
   font-family: "Pretendard", Arial, sans-serif;
 }
@@ -19,10 +19,11 @@
   display: flex;
   flex-direction: column;
   align-items: center;
-  width: 460px;
+  width: 350px;
   max-width: 100%;
-  min-height: 880px;
-  padding: 50px;
+  min-height: calc(100vh - 60px);
+  min-height: calc(100dvh - 60px);
+  padding: 40px;
   gap: 24px;
   background: #ffffff;
   box-shadow: 0 0 5px rgba(0, 0, 0, 0.08);
@@ -59,7 +60,7 @@
   flex-shrink: 0;
   width: 100%;
   min-height: 205px;
-  padding: 48px 28px 24px;
+  padding: 48px 0 24px;
   gap: 14px;
   border-radius: 10px;
 }
@@ -103,7 +104,7 @@
   color: #909090;
 }
 
-@media (max-width: 480px) {
+@media (max-width: 350px) {
   .link-invite-login-page {
     padding-top: 48px;
   }
