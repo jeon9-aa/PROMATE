@@ -148,7 +148,12 @@ public class ProjectInviteService {
             );
         }
 
-        Project project = invite.getProject();
+        Project project = projectRepository.findByIdForUpdate(
+                invite.getProject().getId()
+        ).orElseThrow(() ->
+                new GeneralException(ProjectErrorCode.ID_NOT_FOUND)
+        );
+        
 
         // 5. 이미 프로젝트 멤버인지 확인
         if (memberRepository.existsByProjectIdAndUserIdAndIsDeletedFalse(
