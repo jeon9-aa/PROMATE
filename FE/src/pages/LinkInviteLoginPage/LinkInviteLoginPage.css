@@ -1,0 +1,120 @@
+.link-invite-login-page {
+  box-sizing: border-box;
+  display: flex;
+  justify-content: center;
+  align-items: stretch;
+  width: 100%;
+  min-height: 100vh;
+  min-height: 100dvh;
+  padding-top: 100px;
+  background: linear-gradient(180deg, #f0f0f0 0%, #ffffff 100%);
+  font-family: "Pretendard", Arial, sans-serif;
+}
+
+.link-invite-login-page * {
+  box-sizing: border-box;
+}
+
+.link-invite-login-panel {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  width: 460px;
+  max-width: 100%;
+  min-height: 880px;
+  padding: 50px;
+  gap: 24px;
+  background: #ffffff;
+  box-shadow: 0 0 5px rgba(0, 0, 0, 0.08);
+  border-radius: 20px 20px 0 0;
+}
+
+.invite-login-logo {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  flex-shrink: 0;
+  height: 26px;
+  gap: 5px;
+}
+
+.invite-login-logo img {
+  display: block;
+}
+
+.invite-login-logo span {
+  font-family: "YSpotlightOTF", sans-serif;
+  font-size: 20px;
+  font-weight: 400;
+  line-height: 26px;
+  letter-spacing: -0.005em;
+  color: #000000;
+}
+
+.invite-team-card {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  flex-shrink: 0;
+  width: 100%;
+  min-height: 205px;
+  padding: 48px 28px 24px;
+  gap: 14px;
+  border-radius: 10px;
+}
+
+.invite-team-avatar {
+  width: 56px;
+  height: 56px;
+  flex-shrink: 0;
+  overflow: hidden;
+  background: #d9d9d9;
+  border: 1px solid #ababab;
+  border-radius: 50%;
+}
+
+.invite-team-avatar img {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.invite-team-name {
+  max-width: 100%;
+  margin: 0;
+  font-family: "YSpotlightOTF", sans-serif;
+  font-size: 24px;
+  font-weight: 400;
+  line-height: 32px;
+  text-align: center;
+  overflow-wrap: anywhere;
+  color: #000000;
+}
+
+.invite-team-description {
+  margin: 0;
+  font-size: 14px;
+  font-weight: 400;
+  line-height: 17px;
+  text-align: center;
+  overflow-wrap: anywhere;
+  color: #909090;
+}
+
+@media (max-width: 480px) {
+  .link-invite-login-page {
+    padding-top: 48px;
+  }
+
+  .link-invite-login-panel {
+    min-height: calc(100dvh - 48px);
+    padding: 40px 24px;
+  }
+
+  .invite-team-card {
+    padding-right: 0;
+    padding-left: 0;
+  }
+}
