@@ -1,6 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import { useLocation, useNavigate, useParams } from 'react-router-dom';
 import logoGray from '../../assets/icons/logoGW.svg';
+import linkIcon from '../../assets/icons/linkIcon.svg';
+import lockIcon from '../../assets/icons/lockIcon.svg';
 import ProfileModal from '../../components/ProfileModal/ProfileModal';
 import ApplyModal from '../../components/ApplyModal/ApplyModal';
 import apiClient from '../../api/apiClient';
@@ -142,14 +144,24 @@ function ProjectReadMePage() {
         <div className="project-readme-header-row">
           <h1 className="project-readme-title">{projectData.title}</h1>
           <div className="project-readme-date-container">
-            <span className="project-readme-created-at">
-              작성일: {projectData.createdAt?.split('T')[0]}
-            </span>
             {projectData.startDate && projectData.endDate && (
               <span className="project-readme-created-at">
                 프로젝트 기간: {projectData.startDate} ~ {projectData.endDate}
               </span>
             )}
+            <span className="project-readme-created-at">
+              모집글 작성일: {projectData.createdAt?.split('T')[0]}
+            </span>
+          </div>
+          <div className="project-readme-share-actions">
+            <button type="button" className="project-readme-share-btn project-readme-link-btn">
+              <img src={linkIcon} alt="" />
+              링크 공유
+            </button>
+            <button type="button" className="project-readme-share-btn">
+              <img src={lockIcon} alt="" />
+              비밀번호 초대
+            </button>
           </div>
         </div>
 
@@ -201,7 +213,7 @@ function ProjectReadMePage() {
             </button>
           </div>
         ) : (
-          <div className="project-readme-apply-container">
+          <div className="project-readme-apply-container project-readme-participant-actions">
             {projectData.status === "RECRUITING" ? (
               <button 
                 className={`project-readme-apply-btn ${isApplied ? 'reviewing' : 'apply'}`}
@@ -215,6 +227,9 @@ function ProjectReadMePage() {
                 모집완료
               </button>
             )}
+            <button type="button" className="project-readme-chat-btn">
+              팀장과 채팅하기
+            </button>
           </div>
         )}
       </div>
