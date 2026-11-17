@@ -1,3 +1,4 @@
+import GuardedButton from '../GuardedButton/GuardedButton.jsx';
 import React, { useMemo, useState, useEffect } from 'react';
 import './Calendar.css';
 import calendarIcon from '../../assets/CalendarIcon.svg';
@@ -170,17 +171,17 @@ function Calendar({ showAddButton = true, projectId, projectTitle: fallbackProje
           </div>
 
           <div className="calendar-nav">
-            <button className="nav-btn" type="button" onClick={handlePrevMonth}>
+            <GuardedButton className="nav-btn" type="button" onClick={handlePrevMonth}>
               &lt;
-            </button>
+            </GuardedButton>
 
             <span className="nav-date">
               {year}.{String(month + 1).padStart(2, '0')}
             </span>
 
-            <button className="nav-btn" type="button" onClick={handleNextMonth}>
+            <GuardedButton className="nav-btn" type="button" onClick={handleNextMonth}>
               &gt;
-            </button>
+            </GuardedButton>
           </div>
           
           {hasError && (
@@ -197,10 +198,10 @@ function Calendar({ showAddButton = true, projectId, projectTitle: fallbackProje
 
         {showAddButton && (
           <div className="calendar-header-right">
-            <button className="add-event-btn-header" type="button" onClick={handleOpenModal}>
+            <GuardedButton className="add-event-btn-header" type="button" onClick={handleOpenModal}>
               <img src={plusIcon} alt="일정 추가 아이콘" />
               <span>일정 추가</span>
-            </button>
+            </GuardedButton>
           </div>
         )}
       </div>

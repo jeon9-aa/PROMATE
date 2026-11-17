@@ -1,3 +1,4 @@
+import GuardedButton from '../../components/GuardedButton/GuardedButton.jsx';
 import React, { useState, useEffect } from 'react';
 import { useLocation, useNavigate, useParams } from 'react-router-dom';
 import logoGray from '../../assets/icons/logoGW.svg';
@@ -193,27 +194,27 @@ function ProjectReadMePage() {
 
         {projectData.isAuthor ? (
           <div className="project-readme-apply-container">
-            <button 
+            <GuardedButton
               className="project-readme-delete-btn"
               onClick={handleDelete}
             >
               삭제
-            </button>
+            </GuardedButton>
           </div>
         ) : (
           <div className="project-readme-apply-container">
             {projectData.status === "RECRUITING" ? (
-              <button 
+              <GuardedButton
                 className={`project-readme-apply-btn ${isApplied ? 'reviewing' : 'apply'}`}
                 onClick={() => !isApplied && handleApplyClick()}
                 disabled={isApplied}
               >
                 {isApplied ? '지원완료' : '지원하기'}
-              </button>
+              </GuardedButton>
             ) : (
-              <button className="project-readme-apply-btn reviewing" disabled style={{ cursor: 'default' }}>
+              <GuardedButton className="project-readme-apply-btn reviewing" disabled style={{ cursor: 'default' }}>
                 모집완료
-              </button>
+              </GuardedButton>
             )}
           </div>
         )}

@@ -1,3 +1,4 @@
+import GuardedButton from '../../../components/GuardedButton/GuardedButton.jsx';
 import React, { useState } from 'react';
 import ReactDOM from 'react-dom';
 import './AddProjectModal.css';
@@ -39,7 +40,7 @@ const AddProjectModal = ({ onClose, onAdd, initialValues }) => {
     onClose();
   };
 
-  const handleAdd = () => {
+  const handleAdd = async () => {
     if (!projectName.trim()) {
       alert('프로젝트 이름을 입력해주세요.');
       return;
@@ -57,7 +58,7 @@ const AddProjectModal = ({ onClose, onAdd, initialValues }) => {
       alert('시작 날짜는 완료 날짜보다 늦을 수 없습니다.');
       return;
     }
-    onAdd({
+    await onAdd({
       projectName: projectName.trim(),
       description: description.trim(),
       role: role.trim() || null,
@@ -134,8 +135,8 @@ const AddProjectModal = ({ onClose, onAdd, initialValues }) => {
           </div>
 
           <div className="add-modal-actions">
-            <button className="add-modal-btn-cancel" onClick={handleClose}>취소</button>
-            <button className="add-modal-btn-add" onClick={handleAdd}>{isEditMode ? '수정 완료' : '프로젝트 추가'}</button>
+            <GuardedButton className="add-modal-btn-cancel" onClick={handleClose}>취소</GuardedButton>
+            <GuardedButton className="add-modal-btn-add" onClick={handleAdd}>{isEditMode ? '수정 완료' : '프로젝트 추가'}</GuardedButton>
           </div>
 
         </div>

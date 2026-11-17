@@ -1,3 +1,4 @@
+import GuardedButton from '../../components/GuardedButton/GuardedButton.jsx';
 import React, { useEffect, useMemo, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import './DashboardPage.css';
@@ -236,23 +237,23 @@ function DashboardPage() {
             </div>
 
             {visibleStatusCount < dashboardData.projectStatuses.length ? (
-              <button 
+              <GuardedButton
                 className="more-btn" 
                 onClick={handleShowMoreStatus} 
                 style={{ alignSelf: 'center', marginTop: '16px' }}
               >
                 더보기
                 <img src={moreIcon} alt="moreIcon" />
-              </button>
+              </GuardedButton>
             ) : dashboardData.projectStatuses.length > 3 ? (
-              <button 
+              <GuardedButton
                 className="more-btn" 
                 onClick={() => setVisibleStatusCount(3)} 
                 style={{ alignSelf: 'center', marginTop: '16px' }}
               >
                 접기
                 <img src={moreIcon} alt="moreIcon" style={{ transform: 'rotate(180deg)' }} />
-              </button>
+              </GuardedButton>
             ) : null}
           </div>
         </div>

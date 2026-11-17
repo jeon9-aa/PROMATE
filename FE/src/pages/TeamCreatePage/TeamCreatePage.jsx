@@ -1,3 +1,4 @@
+import GuardedButton from '../../components/GuardedButton/GuardedButton.jsx';
 import { useEffect, useRef, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useAuthStore } from "../../stores/useAuthStore.js";
@@ -60,7 +61,8 @@ function TeamCreatePage() {
   const [endDate, setEndDate] = useState(todayValue);
   const [description, setDescription] = useState("");
   const [recruitImageUrl, setRecruitImageUrl] = useState("");
-  const isSubmitEnabled = projectName.trim() !== "" && description.trim() !== "";
+  const [isCreated, setIsCreated] = useState(false);
+  const isSubmitEnabled = !isCreated && projectName.trim() !== "" && description.trim() !== "";
 
   const handleCancel = () => {
     setProjectName("");
@@ -127,6 +129,7 @@ function TeamCreatePage() {
 
       const response = await apiClient.post("/recruitments", payload);
       if (response.data && response.data.isSuccess) {
+        setIsCreated(true);
         alert("팀 모집 게시글 발행을 성공했습니다.");
         navigate(-1);
       }
@@ -143,7 +146,7 @@ function TeamCreatePage() {
       <h1 className="teammaking-page-title">프로젝트 생성</h1>
       <div className="card">
         <div className="teammaking-image-field">
-          <button
+          <GuardedButton
             type="button"
             className={`teammaking-logo-box${recruitImageUrl ? " has-image" : ""}`}
             onClick={() => imageInputRef.current?.click()}
@@ -155,15 +158,15 @@ function TeamCreatePage() {
               alt={recruitImageUrl ? "선택한 프로젝트 이미지 미리보기" : ""}
             />
             <span className="teammaking-logo-edit" aria-hidden="true">+</span>
-          </button>
+          </GuardedButton>
           {recruitImageUrl && (
-            <button
+            <GuardedButton
               type="button"
               className="teammaking-image-reset"
               onClick={handleResetImage}
             >
               기본 이미지로 변경
-            </button>
+            </GuardedButton>
           )}
           <input
             ref={imageInputRef}

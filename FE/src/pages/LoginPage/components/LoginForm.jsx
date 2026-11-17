@@ -1,3 +1,5 @@
+import GuardedForm from '../../../components/GuardedForm/GuardedForm.jsx';
+import GuardedButton from '../../../components/GuardedButton/GuardedButton.jsx';
 import { useState } from "react";
 import kakaoLogo from "../../../assets/kakao_logo.svg";
 
@@ -6,12 +8,12 @@ function LoginForm({ onLogin, isLoading }) {
 
   const handleSubmit = (event) => {
     event.preventDefault();
-    onLogin();
+    return onLogin();
   };
 
   return (
-    <form className="login-form" onSubmit={handleSubmit}>
-      <button
+    <GuardedForm className="login-form" onSubmit={handleSubmit}>
+      <GuardedButton
         type="submit"
         className="kakao-login-btn"
         disabled={isLoading}
@@ -23,8 +25,8 @@ function LoginForm({ onLogin, isLoading }) {
             {isLoading ? "이동 중..." : "카카오 로그인으로 시작"}
           </span>
         </span>
-      </button>
-    </form>
+      </GuardedButton>
+    </GuardedForm>
   );
 }
 

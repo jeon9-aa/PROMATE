@@ -1,3 +1,5 @@
+import GuardedForm from '../../components/GuardedForm/GuardedForm.jsx';
+import GuardedButton from '../../components/GuardedButton/GuardedButton.jsx';
 import { useState } from 'react';
 import { getCurrentUserId, saveGroup } from '../../utils/smallMeetings';
 import useProjectTitle from '../../utils/useProjectTitle';
@@ -57,10 +59,10 @@ export default function SmallMeetingAddPage() {
       <div className="small-meeting-add-content">
         <header className="small-meeting-add-header">
           <h1>{projectTitle} <span aria-hidden="true">|</span> 소모임</h1>
-          <button className="small-meeting-add-more" type="button" aria-label="더 보기">···</button>
+          <GuardedButton className="small-meeting-add-more" type="button" aria-label="더 보기">···</GuardedButton>
         </header>
 
-        <form className="small-meeting-add-card" onSubmit={handleSubmit}>
+        <GuardedForm className="small-meeting-add-card" onSubmit={handleSubmit}>
           <div className="small-meeting-add-fields">
             <label className="small-meeting-add-field small-meeting-add-field-name">
               <span>소모임 이름</span>
@@ -95,14 +97,14 @@ export default function SmallMeetingAddPage() {
 
           {saveError && <p role="alert">{saveError}</p>}
           <div className="small-meeting-add-actions">
-            <button className="small-meeting-add-cancel" type="button" onClick={() => navigate(listPath, { state: { projectTitle } })}>취소</button>
-            <button className="small-meeting-add-submit" type="submit">생성하기</button>
+            <GuardedButton className="small-meeting-add-cancel" type="button" onClick={() => navigate(listPath, { state: { projectTitle } })}>취소</GuardedButton>
+            <GuardedButton className="small-meeting-add-submit" type="submit">생성하기</GuardedButton>
           </div>
-        </form>
+        </GuardedForm>
 
-        <button className="small-meeting-add-back" type="button" onClick={() => navigate(listPath, { state: { projectTitle } })}>
+        <GuardedButton className="small-meeting-add-back" type="button" onClick={() => navigate(listPath, { state: { projectTitle } })}>
           <ArrowLeft size={16} aria-hidden="true" /> 목록
-        </button>
+        </GuardedButton>
       </div>
     </div>
   );

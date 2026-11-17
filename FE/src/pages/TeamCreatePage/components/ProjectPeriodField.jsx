@@ -1,3 +1,4 @@
+import GuardedButton from '../../../components/GuardedButton/GuardedButton.jsx';
 import { useMemo, useState } from 'react';
 
 const weekdays = ['일', '월', '화', '수', '목', '금', '토'];
@@ -112,27 +113,27 @@ function ProjectPeriodField({ startDate, endDate, onStartDateChange, onEndDateCh
       <span className="teammaking-form-label">프로젝트 기간</span>
 
       <div className="project-period-row">
-        <button
+        <GuardedButton
           type="button"
           className="period-date-picker"
           onClick={() => openPicker('start')}
           aria-label="프로젝트 시작일 선택"
         >
           <span className="period-date-display">{formatDateLabel(startDate)}</span>
-        </button>
+        </GuardedButton>
 
         <span className="period-separator" aria-hidden="true">
           ~
         </span>
 
-        <button
+        <GuardedButton
           type="button"
           className="period-date-picker"
           onClick={() => openPicker('end')}
           aria-label="프로젝트 종료일 선택"
         >
           <span className="period-date-display">{formatDateLabel(endDate)}</span>
-        </button>
+        </GuardedButton>
       </div>
 
       {pickerTarget && (
@@ -153,15 +154,15 @@ function ProjectPeriodField({ startDate, endDate, onStartDateChange, onEndDateCh
 
             <div className="date-picker-calendar">
               <div className="date-picker-monthbar">
-                <button type="button" onClick={() => moveMonth(-1)} aria-label="이전 달">
+                <GuardedButton type="button" onClick={() => moveMonth(-1)} aria-label="이전 달">
                   ‹
-                </button>
+                </GuardedButton>
                 <strong>
                   {visibleMonth.getFullYear()}년 {visibleMonth.getMonth() + 1}월
                 </strong>
-                <button type="button" onClick={() => moveMonth(1)} aria-label="다음 달">
+                <GuardedButton type="button" onClick={() => moveMonth(1)} aria-label="다음 달">
                   ›
-                </button>
+                </GuardedButton>
               </div>
 
               <div className="date-picker-weekdays" aria-hidden="true">
@@ -187,7 +188,7 @@ function ProjectPeriodField({ startDate, endDate, onStartDateChange, onEndDateCh
                   }
 
                   return (
-                    <button
+                    <GuardedButton
                       key={value}
                       type="button"
                       className={isSelected ? 'date-picker-day date-picker-day--selected' : 'date-picker-day'}
@@ -195,21 +196,21 @@ function ProjectPeriodField({ startDate, endDate, onStartDateChange, onEndDateCh
                       disabled={isDisabled}
                     >
                       {date.getDate()}
-                    </button>
+                    </GuardedButton>
                   );
                 })}
               </div>
 
               <div className="date-picker-actions">
-                <button type="button" onClick={clearDate}>
+                <GuardedButton type="button" onClick={clearDate}>
                   삭제
-                </button>
-                <button type="button" onClick={closePicker}>
+                </GuardedButton>
+                <GuardedButton type="button" onClick={closePicker}>
                   취소
-                </button>
-                <button type="button" onClick={applyDate}>
+                </GuardedButton>
+                <GuardedButton type="button" onClick={applyDate}>
                   설정
-                </button>
+                </GuardedButton>
               </div>
             </div>
           </div>
