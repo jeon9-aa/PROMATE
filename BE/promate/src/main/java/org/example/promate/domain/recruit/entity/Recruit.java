@@ -58,7 +58,7 @@ public class Recruit extends BaseEntity {
     private List<RecruitWishlist> recruitWishlists = new ArrayList<>();
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name="user_id")
+    @JoinColumn(name="user_id", nullable = false)
     private User user;
 
     //모집글 1개당 1개의 프로젝트로 수정했습니다

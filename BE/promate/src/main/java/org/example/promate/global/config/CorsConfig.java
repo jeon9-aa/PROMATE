@@ -20,7 +20,7 @@ public class CorsConfig {
                 "http://localhost:3000",
                 "http://localhost:8082",
                 "http://localhost:5173",
-                "https://promate-tawny.vercel.app"
+                "https://promate-nd-six.vercel.app"
 
         ));
         config.setAllowedMethods(List.of("GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"));
