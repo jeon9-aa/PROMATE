@@ -11,6 +11,7 @@ const getTodayString = () => {
 };
 
 const formatDateWithDay = (dateString) => {
+  if (!dateString) return '날짜 선택';
   const [year, month, day] = dateString.split('-').map(Number);
   const date = new Date(year, month - 1, day);
   const formattedMonth = String(month).padStart(2, '0');
@@ -27,6 +28,7 @@ const AddProjectModal = ({ onClose, onAdd, initialValues }) => {
   const [startDate, setStartDate] = useState(initialValues?.startDate ?? getTodayString());
   const [endDate, setEndDate] = useState(initialValues?.endDate ?? getTodayString());
   const isEditMode = !!initialValues;
+  const today = getTodayString();
 
   const handleClose = () => {
     setProjectName('');
@@ -40,6 +42,19 @@ const AddProjectModal = ({ onClose, onAdd, initialValues }) => {
   const handleAdd = () => {
     if (!projectName.trim()) {
       alert('프로젝트 이름을 입력해주세요.');
+      return;
+    }
+    if (!startDate) {
+      alert('시작 날짜를 입력해주세요.');
+      return;
+    }
+    const currentDate = getTodayString();
+    if (startDate > currentDate || (endDate && endDate > currentDate)) {
+      alert('프로젝트 날짜는 오늘까지만 입력할 수 있습니다.');
+      return;
+    }
+    if (endDate && startDate > endDate) {
+      alert('시작 날짜는 완료 날짜보다 늦을 수 없습니다.');
       return;
     }
     onAdd({
@@ -99,6 +114,7 @@ const AddProjectModal = ({ onClose, onAdd, initialValues }) => {
                   type="date"
                   className="add-modal-hidden-date"
                   value={startDate}
+                  max={endDate && endDate < today ? endDate : today}
                   onChange={(e) => setStartDate(e.target.value)}
                 />
               </div>
@@ -109,6 +125,8 @@ const AddProjectModal = ({ onClose, onAdd, initialValues }) => {
                   type="date"
                   className="add-modal-hidden-date"
                   value={endDate}
+                  min={startDate || undefined}
+                  max={today}
                   onChange={(e) => setEndDate(e.target.value)}
                 />
               </div>
