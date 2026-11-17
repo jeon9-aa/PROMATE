@@ -59,7 +59,7 @@
 .project-readme-share-actions {
   display: flex;
   align-items: center;
-  gap: 10px;
+  gap: 0px;
   margin-left: auto;
   flex-shrink: 0;
 }
@@ -68,9 +68,9 @@
   display: inline-flex;
   align-items: center;
   gap: 8px;
-  padding: 0;
+  padding: 8px 14px;
   border: none;
-  border-radius: 5px;
+  border-radius: 8px;
   background: transparent;
   color: #ABABAB;
   font-family: inherit;
@@ -81,8 +81,8 @@
   cursor: pointer;
 }
 
-.project-readme-link-btn {
-  padding: 4px 10px;
+.project-readme-share-btn:hover {
+  background-color: #EFEFEF;
 }
 
 .project-readme-share-btn img {
@@ -137,6 +137,12 @@
   line-height: 21px;
   white-space: nowrap;
   cursor: pointer;
+}
+
+.project-readme-chat-btn:hover {
+  background-color: #FFF3EB;
+  border-color: #F07F3C;
+  color: #F07F3C;
 }
 
 .project-readme-apply-btn.apply {
