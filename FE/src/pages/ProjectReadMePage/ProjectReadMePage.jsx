@@ -144,14 +144,14 @@ function ProjectReadMePage() {
         <div className="project-readme-header-row">
           <h1 className="project-readme-title">{projectData.title}</h1>
           <div className="project-readme-date-container">
-            <span className="project-readme-created-at">
-              작성일: {projectData.createdAt?.split('T')[0]}
-            </span>
             {projectData.startDate && projectData.endDate && (
               <span className="project-readme-created-at">
                 프로젝트 기간: {projectData.startDate} ~ {projectData.endDate}
               </span>
             )}
+            <span className="project-readme-created-at">
+              모집글 작성일: {projectData.createdAt?.split('T')[0]}
+            </span>
           </div>
           <div className="project-readme-share-actions">
             <button type="button" className="project-readme-share-btn project-readme-link-btn">
