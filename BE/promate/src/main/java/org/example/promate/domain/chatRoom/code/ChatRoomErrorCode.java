@@ -13,6 +13,7 @@ public enum ChatRoomErrorCode implements BaseErrorCode {
     CHAT_ROOM_ALREADY_EXISTS(HttpStatus.BAD_REQUEST, "CHATROOM_E003", "이미 존재하는 채팅방입니다."),
     NOT_CHAT_ROOM_PARTICIPANT(HttpStatus.BAD_REQUEST, "CHATROOM_E004", "채팅방 참여자가 아닙니다."),
     CHAT_PARTNER_NOT_FOUND(HttpStatus.NOT_FOUND, "CHATROOM_E005", "채팅방 상대를 찾을 수 없습니다."),
+    CHAT_ROOM_LEFT(HttpStatus.FORBIDDEN, "CHATROOM_E006", "채팅방을 나간 사용자는 이용할 수 없습니다."),
     ;
 
     private final HttpStatus status;
