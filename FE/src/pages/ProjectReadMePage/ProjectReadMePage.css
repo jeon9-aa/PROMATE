@@ -260,23 +260,52 @@
 @media (max-width: 768px) {
   .project-readme-banner {
     padding-left: 20px;
-    height: 140px;
+    height: 110px;
+    flex-shrink: 0;
+  }
+  .project-readme-banner-logo-wrapper {
+    position: absolute;
+    bottom: 0;
   }
   .project-readme-banner-logo {
-    width: 135px;
-    height: 135px;
+    display: block;
+    width: 110px;
+    height: 110px;
   }
   .project-readme-info-section {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) auto;
+    column-gap: 8px;
     padding: 30px 20px 10px;
   }
+  .project-readme-info-section > * {
+    grid-column: 1 / -1;
+  }
   .project-readme-header-row {
-    flex-direction: column;
-    align-items: flex-start;
-    gap: 5px;
+    display: contents;
+  }
+  .project-readme-title {
+    grid-column: 1 / -1;
   }
   .project-readme-date-container {
+    grid-column: 1 / -1;
+    margin-top: -12px;
     margin-left: 0;
     align-items: flex-start;
+  }
+  .project-readme-info-section > .project-readme-tags {
+    grid-column: 1;
+    grid-row: 3;
+    align-items: center;
+  }
+  .project-readme-share-actions {
+    grid-column: 2;
+    grid-row: 3;
+    gap: 4px;
+  }
+  .project-readme-share-btn {
+    gap: 4px;
+    padding: 8px 6px;
   }
   .common-tag.hide-inactive:not(.active) {
     display: none;
