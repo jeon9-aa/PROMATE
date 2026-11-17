@@ -104,14 +104,19 @@
   color: #909090;
 }
 
-@media (max-width: 350px) {
+@media (max-width: 480px) {
   .link-invite-login-page {
-    padding-top: 48px;
+    padding-top: 0;
+    background: #ffffff;
   }
 
   .link-invite-login-panel {
-    min-height: calc(100dvh - 48px);
-    padding: 40px 24px;
+    width: 100%;
+    min-height: 100vh;
+    min-height: 100dvh;
+    padding: 40px min(24px, 6vw);
+    border-radius: 0;
+    box-shadow: none;
   }
 
   .invite-team-card {
