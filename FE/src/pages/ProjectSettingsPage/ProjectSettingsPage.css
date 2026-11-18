@@ -431,3 +431,160 @@
     gap: 24px;
   }
 }
+
+/* Member management */
+.project-settings-member-list {
+  margin: 0;
+  padding: 0 10px;
+  list-style: none;
+}
+
+.project-settings-member-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 20px;
+  min-height: 68px;
+  padding: 14px 0;
+}
+
+.project-settings-member-person {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  min-width: 0;
+}
+
+.project-settings-member-person .profile-avatar {
+  flex-shrink: 0;
+  border: 1px solid #ababab;
+}
+
+.project-settings-member-name {
+  font-size: 16px;
+  font-weight: 500;
+  overflow-wrap: anywhere;
+}
+
+.project-settings-member-leader {
+  padding: 4px 10px;
+  border-radius: 20px;
+  background: #ffebde;
+  color: #ff6600;
+  font-size: 14px;
+  font-weight: 600;
+  white-space: nowrap;
+}
+
+.project-settings-member-actions {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 20px;
+  width: 300px;
+  flex-shrink: 0;
+}
+
+.project-settings-member-role {
+  position: relative;
+  width: 125px;
+  flex-shrink: 0;
+}
+
+.project-settings-role-input {
+  width: 100%;
+  height: 36px;
+  padding: 7px 34px 7px 12px;
+  box-sizing: border-box;
+  border: 1px solid #d9d9d9;
+  border-radius: 5px;
+  background: #fff;
+  color: #000;
+  font: 500 14px/20px 'Pretendard', sans-serif;
+  text-overflow: ellipsis;
+}
+
+.project-settings-role-input:hover {
+  border-color: #ababab;
+}
+
+.project-settings-role-input:focus,
+.project-settings-role-input:focus-visible {
+  outline: none;
+}
+
+.project-settings-role-icon {
+  position: absolute;
+  top: 11px;
+  right: 12px;
+  color: #ababab;
+  pointer-events: none;
+}
+
+.project-settings-role-save {
+  position: absolute;
+  top: 6px;
+  right: 6px;
+  height: 24px;
+  padding: 0 5px;
+  border: 0;
+  border-radius: 4px;
+  background: #fff1ef;
+  color: #ff6600;
+  font: 500 12px/24px 'Pretendard', sans-serif;
+  cursor: pointer;
+}
+
+.project-settings-role-save:hover:not(:disabled) {
+  background: #ffe2d8;
+}
+
+.project-settings-role-save:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.project-settings-member-remove {
+  padding: 8px 0;
+  border: 0;
+  background: transparent;
+  color: #ababab;
+  font: 400 14px/17px 'Pretendard', sans-serif;
+  white-space: nowrap;
+  cursor: pointer;
+}
+
+.project-settings-member-remove:hover:not(:disabled) {
+  color: #de0000;
+}
+
+.project-settings-member-remove:disabled {
+  cursor: not-allowed;
+  opacity: 0.5;
+}
+
+.project-settings-members-error button {
+  padding: 6px 12px;
+  border: 0;
+  border-radius: 5px;
+  background: #f1f1f1;
+  font: inherit;
+  cursor: pointer;
+}
+
+@media (max-width: 600px) {
+  .project-settings-member-list {
+    padding: 0;
+  }
+
+  .project-settings-member-row {
+    flex-wrap: wrap;
+    gap: 12px;
+  }
+
+  .project-settings-member-actions {
+    width: 100%;
+  }
+
+
+}

@@ -4,6 +4,7 @@ import MainButton from '../../components/MainButton/MainButton';
 import ProjectAvatar from '../../components/ProjectAvatar/ProjectAvatar';
 import Tag from '../../components/Tag/Tag';
 import useProjectTitle from '../../utils/useProjectTitle';
+import ProjectMembersPanel from './ProjectMembersPanel';
 import './ProjectSettingsPage.css';
 
 const categories = [
@@ -72,13 +73,15 @@ export default function ProjectSettingsPage() {
         onKeyDown={(event) => {
           if (!['ArrowLeft', 'ArrowRight', 'Home', 'End'].includes(event.key)) return;
           event.preventDefault();
-          const nextTab = event.key === 'Home' ? 'info' : event.key === 'End' ? 'recruitment' : activeTab === 'info' ? 'recruitment' : 'info';
+          const tabs = ['info', 'recruitment', 'members'];
+          const direction = event.key === 'ArrowLeft' ? -1 : 1;
+          const nextTab = event.key === 'Home' ? tabs[0] : event.key === 'End' ? tabs[2] : tabs[(tabs.indexOf(activeTab) + direction + tabs.length) % tabs.length];
           setActiveTab(nextTab);
           document.getElementById(`project-settings-${nextTab}-tab`)?.focus();
         }}>
         <button type="button" role="tab" id="project-settings-info-tab" aria-selected={activeTab === 'info'} tabIndex={activeTab === 'info' ? 0 : -1} aria-controls="project-settings-info" onClick={() => setActiveTab('info')}>정보</button>
         <button type="button" role="tab" id="project-settings-recruitment-tab" aria-selected={activeTab === 'recruitment'} tabIndex={activeTab === 'recruitment' ? 0 : -1} aria-controls="project-settings-recruitment" onClick={() => setActiveTab('recruitment')}>모집</button>
-        <button type="button" role="tab" aria-selected="false" disabled title="인원 설정은 준비 중입니다">인원</button>
+        <button type="button" role="tab" id="project-settings-members-tab" aria-selected={activeTab === 'members'} tabIndex={activeTab === 'members' ? 0 : -1} aria-controls="project-settings-members" onClick={() => setActiveTab('members')}>멤버</button>
       </div>
 
       {activeTab === 'info' ? (
@@ -153,7 +156,7 @@ export default function ProjectSettingsPage() {
           )}
         </div>
       </form>
-      ) : (
+      ) : activeTab === 'recruitment' ? (
         <section className="project-settings-card project-settings-recruitment" id="project-settings-recruitment" role="tabpanel" aria-labelledby="project-settings-recruitment-tab">
           <h2>프로젝트 모집 관리</h2>
           <div className="project-settings-recruitment-row">
@@ -176,7 +179,10 @@ export default function ProjectSettingsPage() {
             </button>
           </div>
         </section>
-      )}
+      ) : null}
+      <div hidden={activeTab !== 'members'}>
+        <ProjectMembersPanel key={projectId} projectId={projectId} />
+      </div>
     </div>
   );
 }
