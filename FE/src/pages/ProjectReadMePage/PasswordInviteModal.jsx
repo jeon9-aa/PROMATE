@@ -3,7 +3,7 @@ import { createPortal } from 'react-dom';
 import { Clock } from 'lucide-react';
 import './PasswordInviteModal.css';
 
-export default function PasswordInviteModal({ onClose }) {
+export default function PasswordInviteModal({ onClose, onSubmit }) {
   const dialogRef = useRef(null);
   const [password, setPassword] = useState('');
 
@@ -22,8 +22,8 @@ export default function PasswordInviteModal({ onClose }) {
 
   const handleSubmit = (event) => {
     event.preventDefault();
-    // Registration will be connected when the invitation API is available.
-    window.alert('비밀번호 등록 기능은 준비 중입니다.');
+    if (!/^[0-9]{4}$/.test(password)) return;
+    onSubmit(password);
   };
 
   return createPortal(

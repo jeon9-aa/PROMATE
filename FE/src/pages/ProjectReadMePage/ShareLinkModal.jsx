@@ -2,7 +2,13 @@ import { useEffect, useRef, useState } from 'react';
 import { createPortal } from 'react-dom';
 import './ShareLinkModal.css';
 
-export default function ShareLinkModal({ shareUrl, onClose }) {
+export default function ShareLinkModal({
+  shareUrl,
+  onClose,
+  title = '링크 공유',
+  description = '해당 링크로 입장한 참가자는 지원자 검토 후 참여할 수 있습니다.',
+  linkLabel = '공유 링크',
+}) {
   const dialogRef = useRef(null);
   const inputRef = useRef(null);
   const [copyMessage, setCopyMessage] = useState('');
@@ -45,12 +51,12 @@ export default function ShareLinkModal({ shareUrl, onClose }) {
             event.clientY < rect.top || event.clientY > rect.bottom) onClose();
       }}
     >
-      <h2 id="project-share-title">링크 공유</h2>
+      <h2 id="project-share-title">{title}</h2>
       <p id="project-share-description">
-        해당 링크로 입장한 참가자는 지원자 검토 후 참여할 수 있습니다.
+        {description}
       </p>
       <div className="project-share-field">
-        <label htmlFor="project-share-url">공유 링크</label>
+        <label htmlFor="project-share-url">{linkLabel}</label>
         <div className="project-share-input-row">
           <input ref={inputRef} id="project-share-url" value={shareUrl} readOnly />
           <button type="button" onClick={handleCopy}>복사</button>

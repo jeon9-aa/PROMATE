@@ -41,6 +41,32 @@ function ProjectReadMePage() {
   const [isProfileModalOpen, setIsProfileModalOpen] = useState(false);
   const [isShareModalOpen, setIsShareModalOpen] = useState(false);
   const [isPasswordModalOpen, setIsPasswordModalOpen] = useState(false);
+  const [isPasswordLinkModalOpen, setIsPasswordLinkModalOpen] = useState(false);
+  // API 연동 전 임시 초대 상태
+  const [passwordInvitations, setPasswordInvitations] = useState({});
+
+  const handlePasswordInviteClick = () => {
+    if (!projectData?.isAuthor) {
+      // 비밀번호 입력 페이지 나중에 연결 예정
+      return;
+    }
+    const invitation = passwordInvitations[postId];
+    if (invitation && invitation.expiresAt > Date.now()) {
+      setIsPasswordLinkModalOpen(true);
+    } else {
+      setIsPasswordModalOpen(true);
+    }
+  };
+
+  const handlePasswordRegister = (password) => {
+    if (!projectData?.isAuthor || !/^[0-9]{4}$/.test(password)) return;
+    setPasswordInvitations((previous) => ({
+      ...previous,
+      [postId]: { password, expiresAt: Date.now() + 24 * 60 * 60 * 1000 },
+    }));
+    setIsPasswordModalOpen(false);
+    setIsPasswordLinkModalOpen(true);
+  };
   const [selectedUser, setSelectedUser] = useState(null);
   const [modalPosition, setModalPosition] = useState(null);
 
@@ -201,7 +227,7 @@ function ProjectReadMePage() {
               링크 공유
             </button>
             <button type="button" className="project-readme-share-btn"
-              onClick={() => setIsPasswordModalOpen(true)} aria-haspopup="dialog">
+              onClick={handlePasswordInviteClick} aria-haspopup={projectData.isAuthor ? 'dialog' : undefined}>
               <img src={lockIcon} alt="" />
               비밀번호 초대
             </button>
@@ -278,8 +304,21 @@ function ProjectReadMePage() {
         )}
       </div>
 
-      {isPasswordModalOpen && (
-        <PasswordInviteModal onClose={() => setIsPasswordModalOpen(false)} />
+      {isPasswordModalOpen && projectData.isAuthor && (
+        <PasswordInviteModal
+          onClose={() => setIsPasswordModalOpen(false)}
+          onSubmit={handlePasswordRegister}
+        />
+      )}
+
+      {isPasswordLinkModalOpen && projectData.isAuthor && (
+        <ShareLinkModal
+          shareUrl={`${window.location.origin}${location.pathname}?invite=password`}
+          title="비밀번호 링크 공유"
+          description="해당 링크에서 비밀번호를 입력한 참가자는 지원자 검토 없이 바로 프로젝트에 참여합니다."
+          linkLabel="비밀번호 초대 링크"
+          onClose={() => setIsPasswordLinkModalOpen(false)}
+        />
       )}
 
       {isShareModalOpen && (
