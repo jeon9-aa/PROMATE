@@ -10,6 +10,7 @@ import apiClient from '../../api/apiClient';
 import { getOrCreateChatRoom } from '../../api/Recruits/recruitmentApi';
 import Tag from '../../components/Tag/Tag';
 import ShareLinkModal from './ShareLinkModal';
+import PasswordInviteModal from './PasswordInviteModal';
 import './ProjectReadMePage.css';
 
 const categoryMap = {
@@ -39,6 +40,7 @@ function ProjectReadMePage() {
 
   const [isProfileModalOpen, setIsProfileModalOpen] = useState(false);
   const [isShareModalOpen, setIsShareModalOpen] = useState(false);
+  const [isPasswordModalOpen, setIsPasswordModalOpen] = useState(false);
   const [selectedUser, setSelectedUser] = useState(null);
   const [modalPosition, setModalPosition] = useState(null);
 
@@ -198,7 +200,8 @@ function ProjectReadMePage() {
               <img src={linkIcon} alt="" />
               링크 공유
             </button>
-            <button type="button" className="project-readme-share-btn">
+            <button type="button" className="project-readme-share-btn"
+              onClick={() => setIsPasswordModalOpen(true)} aria-haspopup="dialog">
               <img src={lockIcon} alt="" />
               비밀번호 초대
             </button>
@@ -274,6 +277,10 @@ function ProjectReadMePage() {
           </div>
         )}
       </div>
+
+      {isPasswordModalOpen && (
+        <PasswordInviteModal onClose={() => setIsPasswordModalOpen(false)} />
+      )}
 
       {isShareModalOpen && (
         <ShareLinkModal
