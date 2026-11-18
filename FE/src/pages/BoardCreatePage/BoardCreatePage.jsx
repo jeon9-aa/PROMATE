@@ -1,3 +1,5 @@
+import GuardedForm from '../../components/GuardedForm/GuardedForm.jsx';
+import GuardedButton from '../../components/GuardedButton/GuardedButton.jsx';
 import { useEffect, useRef, useState } from 'react';
 import { ArrowLeft } from 'lucide-react';
 import { useLocation, useNavigate, useParams, useSearchParams } from 'react-router-dom';
@@ -81,14 +83,14 @@ export default function BoardCreatePage() {
       <div className="board-detail__content">
         <header className="board-detail__page-header">
           <h1 id="board-create-heading" className="board-detail__page-title">
-            <button type="button" className="board-detail__title-button" disabled={isSubmitting}
+            <GuardedButton type="button" className="board-detail__title-button" disabled={isSubmitting}
               onClick={() => navigate(isValidProject ? `/project/${projectId}` : '/project', { state: navigationState })}>
               {projectTitle ? `${projectTitle} | 게시판` : '게시판'}
-            </button>
+            </GuardedButton>
           </h1>
         </header>
 
-        <form className="board-create__form" onSubmit={handleSubmit} aria-labelledby="board-create-form-title" aria-busy={isSubmitting}>
+        <GuardedForm className="board-create__form" onSubmit={handleSubmit} aria-labelledby="board-create-form-title" aria-busy={isSubmitting}>
           <h2 id="board-create-form-title">{isEditMode ? '게시글 수정' : '게시글 쓰기'}</h2>
           {isLoading && isValidProject && isValidPost && !error && <p role="status">게시글을 불러오는 중...</p>}
           <label className="board-create__field">
@@ -107,18 +109,18 @@ export default function BoardCreatePage() {
             </p>
           )}
           <div className="board-create__actions">
-            <button type="button" className="board-create__cancel" onClick={handleCancel} disabled={isSubmitting}>취소</button>
-            <button type="submit" className="board-create__submit" disabled={!isValidProject || !isValidPost || isLoading || !title.trim() || !content.trim() || isSubmitting}>
+            <GuardedButton type="button" className="board-create__cancel" onClick={handleCancel} disabled={isSubmitting}>취소</GuardedButton>
+            <GuardedButton type="submit" className="board-create__submit" disabled={!isValidProject || !isValidPost || isLoading || !title.trim() || !content.trim() || isSubmitting}>
               {isSubmitting ? '저장 중...' : isEditMode ? '수정 완료' : '게시글 생성'}
-            </button>
+            </GuardedButton>
           </div>
-        </form>
+        </GuardedForm>
 
-        <button type="button" className="board-detail__back-button" disabled={isSubmitting}
+        <GuardedButton type="button" className="board-detail__back-button" disabled={isSubmitting}
           onClick={() => navigate(boardUrl, { replace: true, state: navigationState })}>
           <ArrowLeft size={16} aria-hidden="true" />
           <span>목록</span>
-        </button>
+        </GuardedButton>
       </div>
     </section>
   );

@@ -1,3 +1,4 @@
+import GuardedButton from '../GuardedButton/GuardedButton.jsx';
 import React, { useState, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { getUserInfo } from '../../api/User/userProfileApi.js';
@@ -55,9 +56,9 @@ function Header({ onMenuClick }) {
   return (
     <header className="header">
       <div className="header-left">
-        <button className="hamburger-btn" onClick={onMenuClick} aria-label="메뉴 열기">
+        <GuardedButton className="hamburger-btn" onClick={onMenuClick} aria-label="메뉴 열기">
           <span></span><span></span><span></span>
-        </button>
+        </GuardedButton>
         <div className="header-logo">
           <Link to="/" className="logo-link">
             <img src={logoImg} alt="ProMate 로고" className="logo-image" />
@@ -70,7 +71,7 @@ function Header({ onMenuClick }) {
       <div className="header-right">
         {isLoggedIn ? (
           <>
-            <button
+            <GuardedButton
               type="button"
               className="header-logout-btn"
               onClick={handleLogout}
@@ -79,7 +80,7 @@ function Header({ onMenuClick }) {
             >
               <img src={logoutIcon} alt="" className="header-logout-icon default-icon" />
               <img src={logoutIconHover} alt="" className="header-logout-icon hover-icon" />
-            </button>
+            </GuardedButton>
             <Link to="/profile" className="header-greeting">
               <strong>{userData.userName}</strong> 님 안녕하세요 :)
             </Link>

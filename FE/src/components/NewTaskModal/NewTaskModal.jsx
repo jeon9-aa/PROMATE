@@ -1,3 +1,4 @@
+import GuardedButton from '../GuardedButton/GuardedButton.jsx';
 import React, { useState, useEffect } from 'react';
 import './NewTaskModal.css';
 
@@ -18,7 +19,7 @@ function NewTaskModal({ isOpen, onClose, onSubmit, projectId, members = [] }) {
 
   if (!isOpen) return null;
 
-  const handleSubmit = () => {
+  const handleSubmit = async () => {
     if (!title.trim() || !managerId || !dueDate) {
       alert('태스크 제목, 담당자, 마감일은 필수 입력 항목입니다.');
       return;
@@ -31,7 +32,7 @@ function NewTaskModal({ isOpen, onClose, onSubmit, projectId, members = [] }) {
       dueDate,
     };
     
-    if (onSubmit) onSubmit(newTask);
+    if (onSubmit) await onSubmit(newTask);
     onClose();
   };
 
@@ -91,8 +92,8 @@ function NewTaskModal({ isOpen, onClose, onSubmit, projectId, members = [] }) {
         </div>
 
         <div className="task-modal-actions">
-          <button className="task-btn-cancel" onClick={onClose}>취소</button>
-          <button className="task-btn-submit" onClick={handleSubmit}>태스크 추가</button>
+          <GuardedButton className="task-btn-cancel" onClick={onClose}>취소</GuardedButton>
+          <GuardedButton className="task-btn-submit" onClick={handleSubmit}>태스크 추가</GuardedButton>
         </div>
       </div>
     </div>

@@ -1,3 +1,4 @@
+import GuardedButton from '../../components/GuardedButton/GuardedButton.jsx';
 import { useLocation, useNavigate, useParams } from 'react-router-dom';
 import { Plus } from 'lucide-react';
 import ProjectGroupCard from './components/ProjectGroupCard';
@@ -20,9 +21,9 @@ export default function SmallMeetingListPage() {
         </header>
         <section aria-label="소모임 목록">
           <div className="project-detail-actions">
-            <button type="button" onClick={() => navigate(`/project/${projectId}/smallMeeting/add`, { state: { projectTitle } })}>
+            <GuardedButton type="button" onClick={() => navigate(`/project/${projectId}/smallMeeting/add`, { state: { projectTitle } })}>
               <Plus size={16} aria-hidden="true" />소모임 만들기
-            </button>
+            </GuardedButton>
           </div>
           <ul className="project-detail-list">
             {groups.map((group) => (

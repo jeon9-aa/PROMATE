@@ -1,3 +1,4 @@
+import GuardedButton from '../../components/GuardedButton/GuardedButton.jsx';
 import React, { useEffect, useMemo, useState } from 'react';
 import { useSearchParams, useLocation } from 'react-router-dom';
 import { getProjectTasks, updateTaskStatus, deleteProjectTask, getProjectMembers, createProjectTask, getTaskDetail } from '../../api/TeamPage.js';
@@ -160,25 +161,25 @@ function TaskBoardPage() {
         <div className="task-board__toolbar">
           <nav className="task-board__tabs" aria-label="태스크 상태 필터">
             {taskTabs.map((tab) => (
-              <button
+              <GuardedButton
                 key={tab.key}
                 type="button"
                 className={`task-board__tab ${activeTab === tab.key ? 'task-board__tab--active' : ''}`}
                 onClick={() => setActiveTab(tab.key)}
               >
                 {tab.label}
-              </button>
+              </GuardedButton>
             ))}
           </nav>
 
-          <button
+          <GuardedButton
             type="button"
             className="task-board__write-button"
             onClick={() => setIsNewTaskModalOpen(true)}
           >
             <img src={writeIcon} alt="" aria-hidden="true" />
             태스크 쓰기
-          </button>
+          </GuardedButton>
         </div>
 
         <div className="task-board__list" aria-label="태스크 목록">
@@ -203,7 +204,7 @@ function TaskBoardPage() {
 
             {task.status === 'IN_PROGRESS' || task.status === 'TODO' ? (
                 <div className="task-board__actions" aria-label={`${task.title} 상태 변경`}>
-                  <button
+                  <GuardedButton
                     type="button"
                     className="task-board__action-button task-board__action-button--cancel"
                     onClick={(e) => {
@@ -212,8 +213,8 @@ function TaskBoardPage() {
                     }}
                   >
                     삭제하기
-                  </button>
-                  <button
+                  </GuardedButton>
+                  <GuardedButton
                     type="button"
                     className="task-board__action-button task-board__action-button--complete"
                     onClick={(e) => {
@@ -222,7 +223,7 @@ function TaskBoardPage() {
                     }}
                   >
                     완료하기
-                  </button>
+                  </GuardedButton>
                 </div>
               ) : (
                 <span className={`task-board__status task-board__status--${task.status}`}>
