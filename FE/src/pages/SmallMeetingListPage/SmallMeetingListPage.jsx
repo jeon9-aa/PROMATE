@@ -1,9 +1,9 @@
+import { useEffect, useState } from 'react';
 import GuardedButton from '../../components/GuardedButton/GuardedButton.jsx';
 import { useLocation, useNavigate, useParams } from 'react-router-dom';
 import { Plus } from 'lucide-react';
-import ProjectGroupCard from './components/ProjectGroupCard';
+import { getProjectSubgroups } from '../../api/Project/projectApi';
 import './SmallMeetingListPage.css';
-import { getProjectGroups } from '../../utils/smallMeetings';
 import useProjectTitle from '../../utils/useProjectTitle';
 
 export default function SmallMeetingListPage() {
@@ -12,6 +12,22 @@ export default function SmallMeetingListPage() {
   const { projectId } = useParams();
   const projectTitle = useProjectTitle(projectId, state?.projectTitle);
   const groups = getProjectGroups(projectId, state?.createdGroup);
+  const [list, setList] = useState(null);
+  const currentList = list?.projectId === projectId ? list : null;
+
+  useEffect(() => {
+    const controller = new AbortController();
+
+    getProjectSubgroups(projectId, controller.signal)
+      .then((groups) => {
+        if (!controller.signal.aborted) setList({ projectId, groups });
+      })
+      .catch(() => {
+        if (!controller.signal.aborted) setList({ projectId, error: true });
+      });
+
+    return () => controller.abort();
+  }, [projectId]);
 
   return (
     <div className="project-detail-page">
@@ -25,15 +41,28 @@ export default function SmallMeetingListPage() {
               <Plus size={16} aria-hidden="true" />소모임 만들기
             </GuardedButton>
           </div>
-          <ul className="project-detail-list">
-            {groups.map((group) => (
-              <ProjectGroupCard
-                key={group.id}
-                group={group}
-                onClick={() => navigate(`/project/${projectId}/smallMeeting/${group.id}`, { state: { group, projectTitle } })}
-              />
-            ))}
-          </ul>
+          {!currentList && <p role="status">소모임 목록을 불러오는 중입니다.</p>}
+          {(currentList?.error || currentList?.groups?.length === 0) && (
+            <p className="small-meeting-list-empty" role="status">등록된 소모임이 없습니다.</p>
+          )}
+          {currentList?.groups?.length > 0 && (
+            <ul className="project-detail-list">
+              {currentList.groups.map((subgroup) => (
+                <li className="project-detail-group" key={subgroup.id}>
+                  <button
+                    className="project-detail-group-button"
+                    type="button"
+                    onClick={() => navigate(`/project/${projectId}/smallMeeting/${subgroup.id}`, { state: { subgroup, projectTitle } })}
+                  >
+                    <span className="project-detail-group-info">
+                      <span className="project-detail-group-title">{subgroup.comment || `소모임 #${subgroup.id}`}</span>
+                      {subgroup.grade != null && <span className="project-detail-group-meta">학년 {subgroup.grade}</span>}
+                    </span>
+                  </button>
+                </li>
+              ))}
+            </ul>
+          )}
         </section>
       </div>
     </div>

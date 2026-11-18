@@ -1,38 +1,3 @@
-export const sampleGroups = [
-  {
-    id: 1,
-    title: '프론트엔드 스터디',
-    owner: '아무개',
-    start: '2026-03-17',
-    end: '',
-    closed: false,
-    members: [
-      { userId: 'sample-1-owner', name: '김은비', role: '개설자' },
-      { userId: 'sample-1-member', name: '김철수', role: '참여자' },
-    ],
-  },
-  {
-    id: 2,
-    title: '중간고사 스터디',
-    owner: '아무개',
-    start: '2026-03-17',
-    end: '',
-    closed: false,
-    members: [
-      { userId: 'sample-2-owner', name: '김영희', role: '개설자' },
-    ],
-  },
-  {
-    id: 3,
-    title: '디자인시스템 스터디',
-    owner: '아무개',
-    start: '2026-03-17',
-    end: '2026-07-23',
-    closed: true,
-    members: [],
-  },
-];
-
 const storageKey = 'promate-small-meetings';
 
 export function readSavedGroups() {
@@ -51,6 +16,8 @@ export function getProjectGroups(projectId, createdGroup) {
   }
   const projectGroupIds = new Set(projectGroups.map((group) => String(group.id)));
   return [...sampleGroups.filter((group) => !projectGroupIds.has(String(group.id))), ...projectGroups];
+  try { saved = readSavedGroups(); } catch { /* Storage unavailable. */ }
+  return saved.filter((group) => group && String(group.projectId) === String(projectId));
 }
 
 export function saveGroup(group) {
