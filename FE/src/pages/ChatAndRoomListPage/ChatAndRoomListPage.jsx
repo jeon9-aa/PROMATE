@@ -3,16 +3,30 @@ import { useNavigate, useParams, useSearchParams } from 'react-router-dom';
 import ChatRoomList from './components/ChatRoomList';
 import ChatPanel from './components/ChatPanel';
 import { initialRooms } from './chatData';
+import useChatSocket from './useChatSocket';
 import './ChatAndRoomListPage.css';
 
+const isMock = import.meta.env.VITE_USE_MOCK === 'true';
+
 export default function ChatAndRoomListPage() {
-  const [rooms, setRooms] = useState(initialRooms);
+  const [rooms, setRooms] = useState(isMock ? initialRooms : []);
   const navigate = useNavigate();
   const { roomId } = useParams();
   const [searchParams, setSearchParams] = useSearchParams();
   const selectedId = roomId || searchParams.get('roomId');
   const [drafts, setDrafts] = useState({});
-  const room = rooms.find((item) => item.id === selectedId);
+  const liveRoomId = !isMock && /^[1-9]\d*$/.test(selectedId || '') ? selectedId : null;
+  const room = rooms.find((item) => item.id === selectedId) || (liveRoomId ? {
+    id: liveRoomId, projectName: '채팅방', name: liveRoomId, messages: [], unread: 0,
+  } : undefined);
+  const socket = useChatSocket(liveRoomId, (id, message) => {
+    setRooms((previous) => {
+      const existing = previous.find((item) => item.id === id);
+      if (existing?.messages.some((item) => item.id === message.id)) return previous;
+      if (!existing) return [...previous, { id, projectName: '채팅방', name: id, unread: 0, messages: [message] }];
+      return previous.map((item) => item.id === id ? { ...item, messages: [...item.messages, message] } : item);
+    });
+  });
 
   function selectRoom(id) {
     if (window.matchMedia('(max-width: 640px)').matches) {
@@ -26,9 +40,11 @@ export default function ChatAndRoomListPage() {
   function sendMessage() {
     const text = (drafts[selectedId] || '').trim();
     if (!text || !room) return;
-    const message = { id: crypto.randomUUID(), text, sentAt: new Date().toISOString(), isMine: true };
-    setRooms((previous) => previous.map((item) => item.id === selectedId
-      ? { ...item, messages: [...item.messages, message] } : item));
+    if (isMock) {
+      const message = { id: crypto.randomUUID(), text, sentAt: new Date().toISOString(), isMine: true };
+      setRooms((previous) => previous.map((item) => item.id === selectedId
+        ? { ...item, messages: [...item.messages, message] } : item));
+    } else if (!socket.send(text)) return;
     setDrafts((previous) => ({ ...previous, [selectedId]: '' }));
   }
 
@@ -46,8 +62,10 @@ export default function ChatAndRoomListPage() {
         <ChatPanel key={room?.id || 'empty'} room={room} draft={drafts[selectedId] || ''}
           onDraftChange={(value) => setDrafts((previous) => ({ ...previous, [selectedId]: value }))}
           onSend={sendMessage}
+          canSend={isMock || socket.ready}
+          status={isMock ? '' : socket.error || (socket.ready ? '' : '채팅 서버에 연결 중입니다.')}
           onBack={() => navigate(roomId ? `/chat?${new URLSearchParams({ roomId })}` : '/chat')}
-          onLeave={leaveRoom} />
+          onLeave={isMock ? leaveRoom : undefined} />
       </div>
     </section>
   );
