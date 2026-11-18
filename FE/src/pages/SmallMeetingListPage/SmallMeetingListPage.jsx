@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react';
+import GuardedButton from '../../components/GuardedButton/GuardedButton.jsx';
 import { useLocation, useNavigate, useParams } from 'react-router-dom';
 import { Plus } from 'lucide-react';
 import { getProjectSubgroups } from '../../api/Project/projectApi';
@@ -35,9 +36,9 @@ export default function SmallMeetingListPage() {
         </header>
         <section aria-label="소모임 목록">
           <div className="project-detail-actions">
-            <button type="button" onClick={() => navigate(`/project/${projectId}/smallMeeting/add`, { state: { projectTitle } })}>
+            <GuardedButton type="button" onClick={() => navigate(`/project/${projectId}/smallMeeting/add`, { state: { projectTitle } })}>
               <Plus size={16} aria-hidden="true" />소모임 만들기
-            </button>
+            </GuardedButton>
           </div>
           {!currentList && <p role="status">소모임 목록을 불러오는 중입니다.</p>}
           {(currentList?.error || currentList?.groups?.length === 0) && (

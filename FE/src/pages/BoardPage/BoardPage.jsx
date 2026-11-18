@@ -1,3 +1,4 @@
+import GuardedButton from '../../components/GuardedButton/GuardedButton.jsx';
 import React, { useCallback, useEffect, useState } from 'react';
 import { Ellipsis, MessageCircle, SquarePen } from 'lucide-react';
 import { useLocation, useNavigate, useSearchParams } from 'react-router-dom';
@@ -120,7 +121,7 @@ function BoardPage() {
       <div className="project-board__content">
         <header className="project-board__header">
           <h1 id="project-board-title" className="project-board__title">
-            <button
+            <GuardedButton
               type="button"
               className="project-board__title-button"
               onClick={() => navigate(`/project/${projectId}`, {
@@ -131,7 +132,7 @@ function BoardPage() {
               })}
             >
               {projectTitle ? `${projectTitle} | 게시판` : '게시판'}
-            </button>
+            </GuardedButton>
           </h1>
           <span className="project-board__more" aria-hidden="true">
             <Ellipsis size={24} aria-hidden="true" />
@@ -139,10 +140,10 @@ function BoardPage() {
         </header>
 
         <div className="project-board__toolbar">
-          <button type="button" className="project-board__write-button" onClick={openCreatePage}>
+          <GuardedButton type="button" className="project-board__write-button" onClick={openCreatePage}>
             <SquarePen size={16} aria-hidden="true" />
             <span>게시글 쓰기</span>
-          </button>
+          </GuardedButton>
         </div>
 
         <div

@@ -84,6 +84,7 @@ function FindTeamPage() {
               return {
                 id: item.recruitmentId,
                 title: item.title,
+                recruitImageUrl: item.recruitImageUrl,
                 summary: item.description || "",
                 capacity: item.maxMember,
                 category: item.category,
@@ -214,6 +215,7 @@ function FindTeamPage() {
               <ApplicantBox
                 key={team.id}
                 title={team.title}
+                avatarSrc={team.recruitImageUrl}
                 summary={team.summary}
                 capacity={team.capacity}
                 isBookmarked={team.bookmarked}

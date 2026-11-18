@@ -1,3 +1,4 @@
+import GuardedButton from '../GuardedButton/GuardedButton.jsx';
 import React, { useState } from 'react';
 import ReactDOM from 'react-dom';
 import './AddEventModal.css';
@@ -135,12 +136,12 @@ function AddEventModal({ isOpen, onClose, onAddEvent }) {
           </div>
 
           <div className="aem-actions">
-            <button type="button" className="aem-cancel-btn" onClick={handleClose} disabled={isSubmitting}>
+            <GuardedButton type="button" className="aem-cancel-btn" onClick={handleClose} disabled={isSubmitting}>
               취소
-            </button>
-            <button type="button" className="aem-submit-btn" onClick={handleSubmit} disabled={isSubmitting}>
+            </GuardedButton>
+            <GuardedButton type="button" className="aem-submit-btn" onClick={handleSubmit} disabled={isSubmitting}>
               {isSubmitting ? '추가 중...' : '일정 추가'}
-            </button>
+            </GuardedButton>
           </div>
         </div>
       </div>

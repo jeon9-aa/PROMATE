@@ -1,3 +1,5 @@
+import GuardedForm from '../GuardedForm/GuardedForm.jsx';
+import GuardedButton from '../GuardedButton/GuardedButton.jsx';
 import { useEffect, useState, useRef } from "react";
 import "./ApplyModal.css";
 import { getApplicationForm, postApplication } from "../../api/Recruits/recruitmentApi";
@@ -94,7 +96,7 @@ function ApplyModal({
       <div className="apply-modal">
         <h2 className="apply-modal-title">{fetchedTitle || projectName}</h2>
 
-        <form className="apply-modal-form" onSubmit={handleSubmit}>
+        <GuardedForm className="apply-modal-form" onSubmit={handleSubmit}>
           <div className="apply-modal-group">
             <label htmlFor="apply-job" className="apply-modal-label">
               기여하고 싶은 분야 (선택)
@@ -129,23 +131,23 @@ function ApplyModal({
           </div>
 
           <div className="apply-modal-button-wrap">
-            <button
+            <GuardedButton
               type="button"
               className="apply-modal-cancel-btn"
               onClick={onClose}
               disabled={isSubmitting}
             >
               취소
-            </button>
-            <button 
+            </GuardedButton>
+            <GuardedButton
               type="submit" 
               className="apply-modal-submit-btn"
               disabled={isSubmitting}
             >
               {isSubmitting ? "지원중..." : "지원하기"}
-            </button>
+            </GuardedButton>
           </div>
-        </form>
+        </GuardedForm>
       </div>
     </div>
   );

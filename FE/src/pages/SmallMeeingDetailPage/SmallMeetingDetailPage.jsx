@@ -1,4 +1,5 @@
-﻿import { useState } from 'react';
+import GuardedButton from '../../components/GuardedButton/GuardedButton.jsx';
+import { useState } from 'react';
 import { useLocation, useNavigate, useParams } from 'react-router-dom';
 import { ArrowLeft, Users } from 'lucide-react';
 import { getCurrentUserId, getProjectGroups } from '../../utils/smallMeetings';
@@ -55,9 +56,9 @@ export default function SmallMeetingDetailPage() {
               <h2>{group.title}</h2>
               <span className={`small-meeting-badge${isClosed ? ' is-closed' : ''}`}>{isClosed ? '마감' : '모집 중'}</span>
             </div>
-            <button className={`small-meeting-join${hasJoined ? ' is-joined' : ''}`} type="button" onClick={handleJoin} disabled={isClosed || hasJoined}>
+            <GuardedButton className={`small-meeting-join${hasJoined ? ' is-joined' : ''}`} type="button" onClick={handleJoin} disabled={isClosed || hasJoined}>
               <span>{hasJoined ? '참여 완료' : isFull ? '마감' : '참여'}</span>
-            </button>
+            </GuardedButton>
           </div>
           {group.description && <p className="small-meeting-description">{group.description}</p>}
           <div className="small-meeting-meta">
@@ -77,6 +78,8 @@ export default function SmallMeetingDetailPage() {
           </div>
         </article>}
         <button className="small-meeting-back" type="button" onClick={() => navigate(`/project/${projectId}/smallMeetingList`, { state: { projectTitle } })}><ArrowLeft size={16} aria-hidden="true" /> 목록</button>
+        </article>
+        <GuardedButton className="small-meeting-back" type="button" onClick={() => navigate(`/project/${projectId}/smallMeetingList`, { state: { projectTitle } })}><ArrowLeft size={16} aria-hidden="true" /> 목록</GuardedButton>
       </div>
     </div>
   );

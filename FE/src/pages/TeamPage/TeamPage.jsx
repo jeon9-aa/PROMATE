@@ -1,3 +1,4 @@
+import GuardedButton from '../../components/GuardedButton/GuardedButton.jsx';
 import React, { useState, useEffect, useRef } from 'react';
 import { ClipboardList, SquarePen, Users } from 'lucide-react';
 import { useNavigate, useParams, useLocation } from 'react-router-dom';
@@ -284,7 +285,7 @@ function TeamPage() {
           unit="개"
           isAllEmpty={true}
           actionButton={
-            <button
+            <GuardedButton
               type="button"
               className="team-board-write-button"
               onClick={(e) => {
@@ -294,7 +295,7 @@ function TeamPage() {
             >
               <SquarePen size={12} />
               <span>태스크 쓰기</span>
-            </button>
+            </GuardedButton>
           }
         />
 
@@ -385,7 +386,7 @@ function TeamPage() {
         <section className={`team-card team-board-card ${isBoardExpanded ? 'team-card-expanded' : ''}`}>
           <div className="team-board-header team-board-header-clickable" onClick={openBoard}>
             <PanelTitle icon={<ClipboardList size={18} />} title="게시판" onClick={openBoard} />
-            <button
+            <GuardedButton
               type="button"
               className="team-board-write-button"
               onClick={(event) => {
@@ -395,7 +396,7 @@ function TeamPage() {
             >
               <SquarePen size={12} />
               <span>글쓰기</span>
-            </button>
+            </GuardedButton>
           </div>
           <div className="team-board-list">
             {isBoardLoading && <div className="team-member-status">불러오는 중...</div>}
@@ -485,7 +486,7 @@ function TeamPage() {
 
 function MoreButton({ isExpanded, onClick }) {
   return (
-    <button
+    <GuardedButton
       className="team-more-button"
       type="button"
       aria-expanded={isExpanded}
@@ -496,7 +497,7 @@ function MoreButton({ isExpanded, onClick }) {
     >
       <span>{isExpanded ? '접기' : '더보기'}</span>
       <img src={moreIcon} alt="" aria-hidden="true" />
-    </button>
+    </GuardedButton>
   );
 }
 
