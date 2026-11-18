@@ -15,6 +15,7 @@ export default function SmallMeetingDetailPage() {
   const userId = getCurrentUserId();
   const participantStorageKey = `promate-small-meeting-joined:${projectId || 'default'}:${meetingId}:${userId}`;
   const [joinedThisVisit, setJoinedThisVisit] = useState({});
+  const subgroup = String(state?.subgroup?.id) === meetingId ? state.subgroup : null;
   const group = getProjectGroups(projectId).find((item) => String(item.id) === String(meetingId));
   let joined = Boolean(joinedThisVisit[participantStorageKey]);
   try { joined ||= localStorage.getItem(participantStorageKey) === 'true'; } catch { /* Storage unavailable. */ }
@@ -34,7 +35,7 @@ export default function SmallMeetingDetailPage() {
     try { localStorage.setItem(participantStorageKey, 'true'); } catch { /* Keep this visit's joined state. */ }
   };
 
-  if (!group) return <div className="small-meeting-detail-page">소모임을 찾을 수 없습니다. 목록에서 다시 선택해 주세요.</div>;
+  if (!group && !subgroup) return <div className="small-meeting-detail-page">소모임을 찾을 수 없습니다. 목록에서 다시 선택해 주세요.</div>;
 
   return (
     <div className="small-meeting-detail-page">
@@ -42,7 +43,13 @@ export default function SmallMeetingDetailPage() {
         <header className="small-meeting-detail-header">
           <h1>{projectTitle} <span aria-hidden="true">|</span> 소모임</h1>
         </header>
-        <article className="small-meeting-card">
+        {subgroup ? (
+          <article className="small-meeting-card">
+            <h2>소모임 #{subgroup.id}</h2>
+            {subgroup.grade != null && <p>학년 {subgroup.grade}</p>}
+            {subgroup.comment && <p className="small-meeting-description">{subgroup.comment}</p>}
+          </article>
+        ) : <article className="small-meeting-card">
           <div className="small-meeting-card-heading">
             <div className="small-meeting-title-row">
               <h2>{group.title}</h2>
@@ -68,7 +75,7 @@ export default function SmallMeetingDetailPage() {
               </li>
             ))}</ul>
           </div>
-        </article>
+        </article>}
         <button className="small-meeting-back" type="button" onClick={() => navigate(`/project/${projectId}/smallMeetingList`, { state: { projectTitle } })}><ArrowLeft size={16} aria-hidden="true" /> 목록</button>
       </div>
     </div>

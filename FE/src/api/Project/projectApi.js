@@ -1,5 +1,14 @@
 import apiClient from '../apiClient';
 
+export const getProjectSubgroups = async (projectId, signal) => {
+  const { data } = await apiClient.get(`/projects/${encodeURIComponent(projectId)}/subgroups`, { signal });
+  const payload = data?.data ?? data;
+
+  if (Array.isArray(payload)) return payload;
+  if (payload?.id != null) return [payload];
+  throw new Error('Unexpected subgroup response');
+};
+
 export const getAppliedProjects = () => {
   return apiClient.get('/projects/applications/me');
 };
