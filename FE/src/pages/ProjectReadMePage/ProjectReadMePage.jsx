@@ -9,6 +9,7 @@ import ApplyModal from '../../components/ApplyModal/ApplyModal';
 import apiClient from '../../api/apiClient';
 import { getOrCreateChatRoom } from '../../api/Recruits/recruitmentApi';
 import Tag from '../../components/Tag/Tag';
+import ShareLinkModal from './ShareLinkModal';
 import './ProjectReadMePage.css';
 
 const categoryMap = {
@@ -37,6 +38,7 @@ function ProjectReadMePage() {
   const [isLoading, setIsLoading] = useState(true);
 
   const [isProfileModalOpen, setIsProfileModalOpen] = useState(false);
+  const [isShareModalOpen, setIsShareModalOpen] = useState(false);
   const [selectedUser, setSelectedUser] = useState(null);
   const [modalPosition, setModalPosition] = useState(null);
 
@@ -191,7 +193,8 @@ function ProjectReadMePage() {
             </span>
           </div>
           <div className="project-readme-share-actions">
-            <button type="button" className="project-readme-share-btn project-readme-link-btn">
+            <button type="button" className="project-readme-share-btn project-readme-link-btn"
+              onClick={() => setIsShareModalOpen(true)} aria-haspopup="dialog">
               <img src={linkIcon} alt="" />
               링크 공유
             </button>
@@ -271,6 +274,13 @@ function ProjectReadMePage() {
           </div>
         )}
       </div>
+
+      {isShareModalOpen && (
+        <ShareLinkModal
+          shareUrl={`${window.location.origin}${location.pathname}`}
+          onClose={() => setIsShareModalOpen(false)}
+        />
+      )}
 
       <ProfileModal 
         isOpen={isProfileModalOpen} 

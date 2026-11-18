@@ -1,0 +1,94 @@
+.project-share-modal {
+  box-sizing: border-box;
+  position: fixed;
+  inset: min(29vh, 313px) 0 auto;
+  width: 400px;
+  max-width: calc(100vw - 32px);
+  max-height: calc(100dvh - min(29vh, 313px) - 16px);
+  margin: 0 auto;
+  padding: 30px;
+  overflow-y: auto;
+  border: none;
+  border-radius: 10px;
+  background: #FFFFFF;
+  box-shadow: 0 0 10px rgb(0 0 0 / 5%);
+  color: #000000;
+  font-family: 'Pretendard', sans-serif;
+}
+
+.project-share-modal::backdrop {
+  background: rgb(0 0 0 / 40%);
+}
+
+.project-share-modal h2 {
+  margin: 0 0 20px;
+  font-size: 20px;
+  font-weight: 700;
+  line-height: 24px;
+}
+
+.project-share-modal > p:not(.project-share-status) {
+  margin: 0 0 20px;
+  color: #ABABAB;
+  font-size: 16px;
+  line-height: 19px;
+}
+
+.project-share-field {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.project-share-field label {
+  font-size: 16px;
+  font-weight: 600;
+  line-height: 19px;
+}
+
+.project-share-input-row {
+  display: flex;
+  gap: 10px;
+}
+
+.project-share-input-row input {
+  box-sizing: border-box;
+  flex: 1;
+  min-width: 0;
+  height: 41px;
+  padding: 10px 12px;
+  border: 1px solid #ABABAB;
+  border-radius: 5px;
+  background: #F1F1F1;
+  color: #000000;
+  font: 600 16px / 19px 'Pretendard', sans-serif;
+}
+
+.project-share-input-row button {
+  flex-shrink: 0;
+  height: 41px;
+  padding: 10px 20px;
+  border: none;
+  border-radius: 5px;
+  background: #FE9A57;
+  color: #FFFFFF;
+  font: 700 18px / 21px 'Pretendard', sans-serif;
+  cursor: pointer;
+}
+
+.project-share-input-row button:hover {
+  background: #F07F3C;
+}
+
+.project-share-input-row :focus-visible {
+  outline: 2px solid #FF6600;
+  outline-offset: 2px;
+}
+
+.project-share-status {
+  min-height: 18px;
+  margin: 12px 0 0;
+  color: #666666;
+  font-size: 13px;
+  line-height: 18px;
+}
