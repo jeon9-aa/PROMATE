@@ -3,14 +3,16 @@ import { Client } from '@stomp/stompjs';
 import SockJS from 'sockjs-client/dist/sockjs';
 import { getUserInfo } from '../../api/User/userProfileApi';
 import { useAuthStore } from '../../stores/useAuthStore';
-import { getChatMessages } from '../../api/Chat/chatApi';
+import { getChatMessages, markChatMessagesRead } from '../../api/Chat/chatApi';
 import { toChatMessage } from './chatMessages';
+import { createChatReadMarker } from './chatReadMarker';
 
 export default function useChatSocket(roomId, onMessage) {
   const clientRef = useRef(null);
   const onMessageRef = useRef(onMessage);
   const [connection, setConnection] = useState({});
   const [history, setHistory] = useState({});
+  const [readStatus, setReadStatus] = useState({});
   const isLoggedIn = useAuthStore((state) => state.isLoggedIn);
 
   useEffect(() => { onMessageRef.current = onMessage; }, [onMessage]);
@@ -20,6 +22,14 @@ export default function useChatSocket(roomId, onMessage) {
     let disposed = false;
     let userId;
     let historyController;
+    const readMarker = createChatReadMarker({
+      markRead: (signal) => markChatMessagesRead(roomId, signal),
+      isVisible: () => document.visibilityState === 'visible',
+      onSuccess: () => setReadStatus({ roomId, error: '' }),
+      onError: () => setReadStatus({ roomId, error: '읽음 처리에 실패했습니다. 채팅방을 다시 열어 주세요.' }),
+    });
+    const handleVisibility = () => { void readMarker.flush(); };
+    document.addEventListener('visibilitychange', handleVisibility);
     async function loadHistory() {
       historyController?.abort();
       const controller = new AbortController();
@@ -31,6 +41,7 @@ export default function useChatSocket(roomId, onMessage) {
         const messages = data.map((item) => toChatMessage(item, roomId, userId)).filter(Boolean);
         onMessageRef.current(roomId, messages);
         setHistory({ roomId, loading: false, error: '' });
+        void readMarker.request();
       } catch (error) {
         if (disposed || controller.signal.aborted) return;
         setHistory({ roomId, loading: false, error: error.message || '이전 메시지를 불러오지 못했습니다.' });
@@ -67,6 +78,7 @@ export default function useChatSocket(roomId, onMessage) {
             const message = toChatMessage(response.data, roomId, userId);
             if (!message) return;
             onMessageRef.current(roomId, [message]);
+            void readMarker.request();
             update(true);
           } catch {
             update(true, '메시지를 읽지 못했습니다.');
@@ -94,6 +106,8 @@ export default function useChatSocket(roomId, onMessage) {
     return () => {
       disposed = true;
       historyController?.abort();
+      readMarker.dispose();
+      document.removeEventListener('visibilitychange', handleVisibility);
       clientRef.current = null;
       void client.deactivate();
     };
@@ -119,6 +133,7 @@ export default function useChatSocket(roomId, onMessage) {
     send, ready,
     historyLoading: Boolean(roomId && isLoggedIn && (history.roomId !== roomId || history.loading)),
     historyError: history.roomId === roomId ? history.error : '',
+    readError: readStatus.roomId === roomId ? readStatus.error : '',
     error: !isLoggedIn ? '로그인이 필요합니다.' : connection.roomId === roomId ? connection.error : '',
   };
 }

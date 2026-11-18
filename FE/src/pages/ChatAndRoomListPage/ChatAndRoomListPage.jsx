@@ -66,7 +66,7 @@ export default function ChatAndRoomListPage() {
           canSend={isMock || socket.ready}
           historyLoading={!isMock && socket.historyLoading}
           historyError={isMock ? '' : socket.historyError}
-          status={isMock ? '' : socket.error || (socket.ready ? '' : '채팅 서버에 연결 중입니다.')}
+          status={isMock ? '' : socket.error || socket.readError || (socket.ready ? '' : '채팅 서버에 연결 중입니다.')}
           onBack={() => navigate(roomId ? `/chat?${new URLSearchParams({ roomId })}` : '/chat')}
           onLeave={isMock ? leaveRoom : undefined} />
       </div>

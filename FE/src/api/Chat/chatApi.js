@@ -1,5 +1,9 @@
 import apiClient from '../apiClient';
 
+export async function markChatMessagesRead(chatRoomId, signal) {
+  await apiClient.patch(`/chat-rooms/${encodeURIComponent(chatRoomId)}/messages/read`, undefined, { signal });
+}
+
 export async function getChatMessages(chatRoomId, signal) {
   const response = await apiClient.get(`/chat-rooms/${encodeURIComponent(chatRoomId)}/messages`, { signal });
   if (!Array.isArray(response.data.data)) {
