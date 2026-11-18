@@ -49,10 +49,9 @@ export default function SmallMeetingAddPage() {
     setIsSubmitting(true);
     let response;
     try {
-      response = await apiClient.post(`/projects/${encodeURIComponent(projectId)}/subgroup`, {
+      response = await apiClient.post(`/projects/${encodeURIComponent(projectId)}/subgroups`, {
         name: newGroup.title,
-        description: newGroup.description,
-        capacity: newGroup.capacity,
+        year: Number(start.split('-')[0]),
       });
     } catch {
       setSaveError('소모임을 생성하지 못했습니다. 다시 시도해 주세요.');
@@ -60,19 +59,13 @@ export default function SmallMeetingAddPage() {
       return;
     }
 
-    const id = response.data?.data?.subGroupId;
-    if (id == null) {
-      setSaveError('서버 응답에서 생성된 소모임 정보를 확인할 수 없습니다.');
-      setIsSubmitting(false);
-      return;
-    }
-
-    const createdGroup = { ...newGroup, id };
-    try {
-      saveGroup(createdGroup);
-    } catch {
-      navigate(listPath, { state: { projectTitle, createdGroup } });
-      return;
+    const id = (response.data?.result ?? response.data)?.id;
+    if (id != null) {
+      try {
+        saveGroup({ ...newGroup, id });
+      } catch {
+        // 서버에서 생성한 소모임은 로컬 저장소 오류와 관계없이 유지된다.
+      }
     }
 
     navigate(listPath, { state: { projectTitle } });
@@ -122,7 +115,7 @@ export default function SmallMeetingAddPage() {
           {saveError && <p role="alert">{saveError}</p>}
           <div className="small-meeting-add-actions">
             <GuardedButton className="small-meeting-add-cancel" type="button" onClick={() => navigate(listPath, { state: { projectTitle } })}>취소</GuardedButton>
-            <GuardedButton className="small-meeting-add-submit" type="submit" disabled={isSubmitting}>생성하기</GuardedButton>
+            <GuardedButton className="small-meeting-add-submit" type="submit">생성하기</GuardedButton>
           </div>
         </GuardedForm>
 
