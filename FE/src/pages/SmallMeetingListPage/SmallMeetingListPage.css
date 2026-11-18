@@ -69,6 +69,13 @@
 }
 
 /* 소모임 목록과 카드 */
+.small-meeting-list-empty {
+  margin: 0;
+  padding: 60px 20px;
+  color: #888;
+  text-align: center;
+}
+
 .project-detail-list {
   display: flex;
   flex-direction: column;
