@@ -11,6 +11,7 @@ import { getOrCreateChatRoom } from '../../api/Recruits/recruitmentApi';
 import Tag from '../../components/Tag/Tag';
 import ShareLinkModal from './ShareLinkModal';
 import PasswordInviteModal from './PasswordInviteModal';
+import PasswordJoinNoticeModal from './PasswordJoinNoticeModal';
 import './ProjectReadMePage.css';
 
 const categoryMap = {
@@ -42,6 +43,7 @@ function ProjectReadMePage() {
   const [isShareModalOpen, setIsShareModalOpen] = useState(false);
   const [isPasswordModalOpen, setIsPasswordModalOpen] = useState(false);
   const [isPasswordLinkModalOpen, setIsPasswordLinkModalOpen] = useState(false);
+  const [isPasswordJoinNoticeOpen, setIsPasswordJoinNoticeOpen] = useState(false);
   // API 연동 전 임시 초대 상태
   const [passwordInvitations, setPasswordInvitations] = useState({});
 
@@ -56,6 +58,11 @@ function ProjectReadMePage() {
     } else {
       setIsPasswordModalOpen(true);
     }
+  };
+
+  const handlePasswordJoinContinue = () => {
+    setIsPasswordJoinNoticeOpen(false);
+    navigate(`/readme/${postId}/password`);
   };
 
   const handlePasswordRegister = (password) => {
@@ -227,7 +234,7 @@ function ProjectReadMePage() {
               링크 공유
             </button>
             <button type="button" className="project-readme-share-btn"
-              onClick={handlePasswordInviteClick} aria-haspopup={projectData.isAuthor ? 'dialog' : undefined}>
+              onClick={handlePasswordInviteClick} aria-haspopup="dialog">
               <img src={lockIcon} alt="" />
               비밀번호 초대
             </button>
@@ -303,6 +310,13 @@ function ProjectReadMePage() {
           </div>
         )}
       </div>
+
+      {isPasswordJoinNoticeOpen && !projectData.isAuthor && (
+        <PasswordJoinNoticeModal
+          onClose={() => setIsPasswordJoinNoticeOpen(false)}
+          onContinue={handlePasswordJoinContinue}
+        />
+      )}
 
       {isPasswordModalOpen && projectData.isAuthor && (
         <PasswordInviteModal
