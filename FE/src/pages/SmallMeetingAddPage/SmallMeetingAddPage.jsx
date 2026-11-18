@@ -114,10 +114,8 @@ export default function SmallMeetingAddPage() {
 
           {saveError && <p role="alert">{saveError}</p>}
           <div className="small-meeting-add-actions">
-            <button className="small-meeting-add-cancel" type="button" onClick={() => navigate(listPath, { state: { projectTitle } })}>취소</button>
-            <button className="small-meeting-add-submit" type="submit" disabled={isSubmitting}>생성하기</button>
             <GuardedButton className="small-meeting-add-cancel" type="button" onClick={() => navigate(listPath, { state: { projectTitle } })}>취소</GuardedButton>
-            <GuardedButton className="small-meeting-add-submit" type="submit">생성하기</GuardedButton>
+            <GuardedButton className="small-meeting-add-submit" type="submit" disabled={isSubmitting}>생성하기</GuardedButton>
           </div>
         </GuardedForm>
 
