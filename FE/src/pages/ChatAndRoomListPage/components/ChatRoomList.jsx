@@ -1,10 +1,13 @@
 import ProfileAvatar from '../../../components/ProfileAvatar/ProfileAvatar';
 import { formatRoomTime } from '../chatData';
 
-export default function ChatRoomList({ rooms, selectedId, onSelect }) {
+export default function ChatRoomList({ rooms, selectedId, onSelect, isLoading, error, onRetry }) {
   return (
-    <aside className="chat-room-list" aria-label="채팅방 목록">
-      <div className="chat-room-list__heading">전체 채팅방 {rooms.length}</div>
+    <aside className="chat-room-list" aria-label="채팅방 목록" aria-busy={isLoading}>
+      <div className="chat-room-list__heading">전체 채팅방{!isLoading && !error && ` ${rooms.length}`}</div>
+      {isLoading ? <p className="chat-empty" role="status">채팅방 목록을 불러오는 중입니다...</p>
+        : error ? <div className="chat-empty"><p role="alert">{error}</p><button type="button" onClick={onRetry}>다시 시도</button></div>
+        : <>
       <ul className="chat-room-list__items">
         {rooms.map((room) => {
           const latest = room.messages.at(-1);
@@ -29,6 +32,7 @@ export default function ChatRoomList({ rooms, selectedId, onSelect }) {
         })}
       </ul>
       {!rooms.length && <p className="chat-empty">참여 중인 채팅방이 없습니다.</p>}
+      </>}
     </aside>
   );
 }

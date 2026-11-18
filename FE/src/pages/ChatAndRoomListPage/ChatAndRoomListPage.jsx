@@ -2,15 +2,35 @@ import { useEffect, useState } from 'react';
 import { useLocation, useNavigate, useParams, useSearchParams } from 'react-router-dom';
 import ChatRoomList from './components/ChatRoomList';
 import ChatPanel from './components/ChatPanel';
-import { initialRooms } from './chatData';
-import { getChatRoom } from '../../api/Chat/chatApi';
+import { getChatRoom, getChatRooms } from '../../api/Chat/chatApi';
 import './ChatAndRoomListPage.css';
+
+function toRoom(data, existing) {
+  return {
+    ...existing,
+    id: String(data.chatRoomId),
+    recruitId: data.recruitId,
+    projectName: data.recruitTitle,
+    chatPartnerId: data.chatPartnerId,
+    name: existing?.name || '채팅 상대',
+    avatarUrl: data.chatPartnerProfileImageUrl,
+    lastMessage: data.lastMessage,
+    lastMessageAt: data.lastMessageAt,
+    unread: data.unreadCount ?? 0,
+    messages: existing?.messages || [],
+  };
+}
 
 export default function ChatAndRoomListPage() {
   const { state } = useLocation();
   const [rooms, setRooms] = useState(() => state?.createdRoom
-    ? [state.createdRoom, ...initialRooms.filter((item) => item.id !== state.createdRoom.id)]
-    : initialRooms);
+    ? [state.createdRoom]
+    : []);
+  const [listRetryCount, setListRetryCount] = useState(0);
+  const [listRequest, setListRequest] = useState(null);
+  const isListLoading = listRequest?.key !== listRetryCount;
+  const listError = !isListLoading ? listRequest?.error : null;
+  const listedRooms = (listRequest?.ids || []).map((id) => rooms.find((item) => item.id === id)).filter(Boolean);
   const navigate = useNavigate();
   const { roomId } = useParams();
   const [searchParams, setSearchParams] = useSearchParams();
@@ -18,12 +38,29 @@ export default function ChatAndRoomListPage() {
   const [drafts, setDrafts] = useState({});
   const [retryCount, setRetryCount] = useState(0);
   const [roomRequest, setRoomRequest] = useState(null);
-  const isDemoRoom = initialRooms.some((item) => item.id === selectedId);
-  const shouldFetch = Boolean(selectedId) && !isDemoRoom;
+  const shouldFetch = Boolean(selectedId);
   const requestKey = `${selectedId}:${retryCount}`;
   const isLoading = shouldFetch && roomRequest?.key !== requestKey;
   const error = shouldFetch && roomRequest?.key === requestKey ? roomRequest.error : null;
   const room = rooms.find((item) => item.id === selectedId);
+
+  useEffect(() => {
+    const controller = new AbortController();
+    getChatRooms({ signal: controller.signal }).then((data) => {
+      if (controller.signal.aborted) return;
+      setRooms((previous) => {
+        const updated = data.map((item) => toRoom(item, previous.find((room) => room.id === String(item.chatRoomId))));
+        const ids = new Set(updated.map((item) => item.id));
+        return [...updated, ...previous.filter((item) => !ids.has(item.id))];
+      });
+      setListRequest({ key: listRetryCount, ids: data.map((item) => String(item.chatRoomId)), error: null });
+    }).catch((error) => {
+      if (!controller.signal.aborted) {
+        setListRequest({ key: listRetryCount, ids: [], error: error.message || '채팅방 목록을 불러오지 못했습니다.' });
+      }
+    });
+    return () => controller.abort();
+  }, [listRetryCount]);
 
   useEffect(() => {
     if (!shouldFetch) return;
@@ -33,19 +70,7 @@ export default function ChatAndRoomListPage() {
       if (controller.signal.aborted) return;
       setRooms((previous) => {
         const existing = previous.find((item) => item.id === String(data.chatRoomId));
-        const updated = {
-          ...existing,
-          id: String(data.chatRoomId),
-          recruitId: data.recruitId,
-          projectName: data.recruitTitle,
-          chatPartnerId: data.chatPartnerId,
-          name: existing?.name || '채팅 상대',
-          avatarUrl: data.chatPartnerProfileImageUrl,
-          lastMessage: data.lastMessage,
-          lastMessageAt: data.lastMessageAt,
-          unread: data.unreadCount ?? 0,
-          messages: existing?.messages || [],
-        };
+        const updated = toRoom(data, existing);
         return existing
           ? previous.map((item) => item.id === updated.id ? updated : item)
           : [updated, ...previous];
@@ -66,7 +91,6 @@ export default function ChatAndRoomListPage() {
     } else {
       setSearchParams({ roomId: id });
     }
-    setRooms((previous) => previous.map((item) => item.id === id ? { ...item, unread: 0 } : item));
   }
 
   function sendMessage() {
@@ -88,7 +112,8 @@ export default function ChatAndRoomListPage() {
     <section className="chat-page" aria-labelledby="chat-page-title">
       <h1 id="chat-page-title">채팅</h1>
       <div className={`chat-page__workspace${roomId ? ' chat-page__workspace--selected chat-page__workspace--panel-only' : ''}`}>
-        {!roomId && <ChatRoomList rooms={rooms} selectedId={selectedId} onSelect={selectRoom} />}
+        {!roomId && <ChatRoomList rooms={listedRooms} selectedId={selectedId} onSelect={selectRoom}
+          isLoading={isListLoading} error={listError} onRetry={() => setListRetryCount((count) => count + 1)} />}
         {isLoading || error ? (
           <div className="chat-panel chat-panel--empty" aria-busy={isLoading}>
             {error ? <><p role="alert">{error}</p><button type="button" onClick={() => setRetryCount((count) => count + 1)}>다시 시도</button></>
