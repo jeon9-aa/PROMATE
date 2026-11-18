@@ -54,6 +54,9 @@
 }
 
 .chat-page__workspace.chat-page__workspace--panel-only {
+  grid-template-columns: minmax(0, 1fr);
+}
+
 /* 채팅방 목록 */
 .chat-room-list {
   display: flex;
