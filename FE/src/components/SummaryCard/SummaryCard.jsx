@@ -1,5 +1,6 @@
 import GuardedButton from '../GuardedButton/GuardedButton.jsx';
 import React, { useState } from 'react';
+import ProjectAvatar from '../ProjectAvatar/ProjectAvatar';
 import moreIcon from '../../assets/moreIcon.svg';
 import './SummaryCard.css';
 import { getDiffDays } from '../../pages/DashboardPage/components/DateUtils';
@@ -83,6 +84,7 @@ function SummaryCard({ title, count, unit = '개', subtitle, actionButton, items
                     />
                   )}
 
+                  {showDot && <ProjectAvatar src={item.recruitImageUrl} size="32px" />}
                   <div className="item-text">
                     <span className="item-name">{item.title}</span>
                     <span className="item-date">마감일: {item.dueDate}</span>

@@ -1,10 +1,13 @@
 import GuardedButton from '../../components/GuardedButton/GuardedButton.jsx';
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { useLocation, useNavigate, useParams } from 'react-router-dom';
 import logoGray from '../../assets/icons/logoGW.svg';
+import linkIcon from '../../assets/icons/linkIcon.svg';
+import lockIcon from '../../assets/icons/lockIcon.svg';
 import ProfileModal from '../../components/ProfileModal/ProfileModal';
 import ApplyModal from '../../components/ApplyModal/ApplyModal';
 import apiClient from '../../api/apiClient';
+import { getOrCreateChatRoom } from '../../api/Recruits/recruitmentApi';
 import Tag from '../../components/Tag/Tag';
 import './ProjectReadMePage.css';
 
@@ -41,6 +44,41 @@ function ProjectReadMePage() {
   const [applyJob, setApplyJob] = useState('');
   const [applyMotivation, setApplyMotivation] = useState('');
   const [isApplied, setIsApplied] = useState(false);
+  const [isCreatingChatRoom, setIsCreatingChatRoom] = useState(false);
+  const chatRoomRequestPending = useRef(false);
+
+  const handleChatClick = async () => {
+    if (chatRoomRequestPending.current) return;
+    const token = localStorage.getItem('accessToken');
+    if (!token || token === 'null' || token === 'undefined') {
+      alert('로그인이 필요한 서비스입니다.');
+      return;
+    }
+
+    chatRoomRequestPending.current = true;
+    setIsCreatingChatRoom(true);
+    try {
+      const { chatRoomId } = await getOrCreateChatRoom(postId);
+      navigate(`/chat/${chatRoomId}`, {
+        state: {
+          createdRoom: {
+            id: String(chatRoomId),
+            projectName: projectData.title,
+            name: projectData.author?.nickname || '팀장',
+            avatarUrl: null,
+            memberCount: 2,
+            unread: 0,
+            messages: [],
+          },
+        },
+      });
+    } catch (error) {
+      alert(error.message || '채팅방 연결에 실패했습니다. 다시 시도해 주세요.');
+    } finally {
+      chatRoomRequestPending.current = false;
+      setIsCreatingChatRoom(false);
+    }
+  };
 
   useEffect(() => {
     const fetchProjectDetail = async () => {
@@ -143,14 +181,24 @@ function ProjectReadMePage() {
         <div className="project-readme-header-row">
           <h1 className="project-readme-title">{projectData.title}</h1>
           <div className="project-readme-date-container">
-            <span className="project-readme-created-at">
-              작성일: {projectData.createdAt?.split('T')[0]}
-            </span>
             {projectData.startDate && projectData.endDate && (
               <span className="project-readme-created-at">
                 프로젝트 기간: {projectData.startDate} ~ {projectData.endDate}
               </span>
             )}
+            <span className="project-readme-created-at">
+              모집글 작성일: {projectData.createdAt?.split('T')[0]}
+            </span>
+          </div>
+          <div className="project-readme-share-actions">
+            <button type="button" className="project-readme-share-btn project-readme-link-btn">
+              <img src={linkIcon} alt="" />
+              링크 공유
+            </button>
+            <button type="button" className="project-readme-share-btn">
+              <img src={lockIcon} alt="" />
+              비밀번호 초대
+            </button>
           </div>
         </div>
 
@@ -202,7 +250,7 @@ function ProjectReadMePage() {
             </GuardedButton>
           </div>
         ) : (
-          <div className="project-readme-apply-container">
+          <div className="project-readme-apply-container project-readme-participant-actions">
             {projectData.status === "RECRUITING" ? (
               <GuardedButton
                 className={`project-readme-apply-btn ${isApplied ? 'reviewing' : 'apply'}`}
@@ -216,6 +264,10 @@ function ProjectReadMePage() {
                 모집완료
               </GuardedButton>
             )}
+            <button type="button" className="project-readme-chat-btn"
+              onClick={handleChatClick} disabled={isCreatingChatRoom} aria-busy={isCreatingChatRoom}>
+              {isCreatingChatRoom ? '채팅방 연결 중...' : '팀장과 채팅하기'}
+            </button>
           </div>
         )}
       </div>

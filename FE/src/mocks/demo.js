@@ -1,4 +1,5 @@
 import { http, HttpResponse } from 'msw';
+import recruitImage from '../assets/logoIcon.svg';
 import { mockMembers, mockPosts, mockProject, mockSchedules, mockTasks } from './data.js';
 
 // Local calendar dates keep the demo useful on any presentation day.
@@ -9,7 +10,7 @@ export function demoDate(offset = 0) {
 }
 
 const projects = [
-  { ...mockProject, description: '팀 매칭부터 일정과 태스크 관리까지 함께하는 협업 서비스', startDate: demoDate(-21), endDate: demoDate(21) },
+  { ...mockProject, recruitImageUrl: recruitImage, description: '팀 매칭부터 일정과 태스크 관리까지 함께하는 협업 서비스', startDate: demoDate(-21), endDate: demoDate(21) },
 ];
 mockTasks.forEach((task, index) => {
   task.projectId = 1;
@@ -30,6 +31,7 @@ const categories = ['PROJECT', 'STUDY', 'CONTEST', 'DEV', 'ETC'];
 const titles = ['캠퍼스 생활 도우미', '함께하는 알고리즘 스터디', '친환경 아이디어 공모전', '동네 맛집 지도 개발', '주말 독서 모임'];
 const recruitments = Array.from({ length: 15 }, (_, index) => ({
   recruitmentId: index + 1,
+  recruitImageUrl: index % 2 === 0 ? recruitImage : null,
   title: `${titles[index % 5]} ${Math.floor(index / 5) + 1}기`,
   description: '작은 목표부터 함께 완성할 팀원을 모집합니다. 매주 진행 상황을 공유하고 결과물을 만들어갑니다.',
   content: '함께 배우며 결과물을 완성할 팀원을 찾습니다.\n\n매주 한 번 온라인으로 만나 진행 상황을 공유합니다. 기획, 디자인, 개발 중 관심 있는 분야로 참여해주세요.\n\n최종 발표와 회고까지 함께할 분을 기다립니다.',
@@ -126,6 +128,7 @@ export const demoHandlers = [
     return ok({ applicationId: item.myApplicationId });
   }),
   ...['pending', 'accepted', 'rejected'].map((status) => http.get(`*/recruitments/:recruitmentId/applications/${status}`, ({ params }) => ok({
+    recruitImageUrl: findRecruitment(params)?.recruitImageUrl ?? null,
     applicants: applications.filter((item) => item.recruitmentId === Number(params.recruitmentId) && item.status === status.toUpperCase()),
   }))),
   http.get('*/recruitments/:recruitmentId/applications/:applicationId', ({ params }) => {

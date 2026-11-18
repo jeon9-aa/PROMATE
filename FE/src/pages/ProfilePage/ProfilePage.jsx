@@ -1,4 +1,5 @@
 import GuardedButton from '../../components/GuardedButton/GuardedButton.jsx';
+import ProjectAvatar from '../../components/ProjectAvatar/ProjectAvatar';
 import React, { useState, useEffect, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import apiClient from '../../api/apiClient';
@@ -285,6 +286,7 @@ const ProfilePage = () => {
                 <div key={proj.historyId ?? proj.id ?? proj.projectId} className="project-experience-row">
                   <div className="proj-row-inner">
                     <div className="proj-name-group">
+                      {!proj.isManual && <ProjectAvatar src={proj.recruitImageUrl} size="32px" />}
                       <span className="proj-title">{proj.title}</span>
                       {proj.role && <span className="proj-role">{proj.role}</span>}
                     </div>
