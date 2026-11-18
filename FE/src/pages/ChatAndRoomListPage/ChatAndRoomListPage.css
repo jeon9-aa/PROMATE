@@ -53,6 +53,7 @@
   box-shadow: 0 0 10px rgb(0 0 0 / 5%);
 }
 
+.chat-page__workspace.chat-page__workspace--panel-only {
 /* 채팅방 목록 */
 .chat-room-list {
   display: flex;
