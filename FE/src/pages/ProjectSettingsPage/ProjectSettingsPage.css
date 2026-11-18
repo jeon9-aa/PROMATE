@@ -308,6 +308,68 @@
   background: #ababab;
 }
 
+/* 모집 관리 */
+.project-settings-card.project-settings-recruitment {
+  gap: 20px;
+}
+
+.project-settings-recruitment-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 20px;
+  padding: 0 10px;
+}
+
+.project-settings-recruitment-copy {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 8px 20px;
+  min-width: 0;
+}
+
+.project-settings-recruitment-copy > span {
+  font-size: 16px;
+  font-weight: 600;
+  line-height: 19px;
+}
+
+.project-settings-recruitment-copy p {
+  margin: 0;
+  color: #ababab;
+  font-size: 14px;
+  line-height: 17px;
+}
+
+.project-settings-switch {
+  display: flex;
+  align-items: center;
+  flex-shrink: 0;
+  width: 52px;
+  height: 32px;
+  padding: 4px;
+  border: 0;
+  border-radius: 100px;
+  background: #ababab;
+  cursor: pointer;
+}
+
+.project-settings-switch[aria-checked='true'] {
+  background: #fe9a57;
+}
+
+.project-settings-switch-handle {
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  background: #fff;
+}
+
+.project-settings-switch[aria-checked='true'] .project-settings-switch-handle {
+  transform: translateX(20px);
+}
+
 .project-settings-page [aria-disabled='true'] {
   cursor: default;
 }
@@ -337,6 +399,10 @@
 }
 
 @media (max-width: 600px) {
+  .project-settings-recruitment-row {
+    padding: 0;
+  }
+
   .project-settings-card {
     padding: 24px 20px;
     gap: 24px;

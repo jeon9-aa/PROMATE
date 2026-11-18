@@ -1,3 +1,4 @@
+import { useState } from 'react';
 import { useLocation, useParams } from 'react-router-dom';
 import MainButton from '../../components/MainButton/MainButton';
 import ProjectAvatar from '../../components/ProjectAvatar/ProjectAvatar';
@@ -36,6 +37,8 @@ export default function ProjectSettingsPage() {
   const projectTitle = useProjectTitle(projectId, state?.projectTitle);
   const [savedProject, setSavedProject] = useState(null);
   const [draft, setDraft] = useState(null);
+  const [activeTab, setActiveTab] = useState('info');
+  const [isRecruiting, setIsRecruiting] = useState(true);
   const sourceProject = state?.project || previewProject;
   const project = savedProject || {
     ...sourceProject,
@@ -65,12 +68,20 @@ export default function ProjectSettingsPage() {
         <h1>{title} | 프로젝트 설정</h1>
       </header>
 
-      <div className="project-settings-tabs" role="tablist" aria-label="프로젝트 설정">
-        <button type="button" role="tab" id="project-settings-info-tab" aria-selected="true" aria-controls="project-settings-info">정보</button>
-        <button type="button" role="tab" aria-selected="false" disabled title="모집 설정은 준비 중입니다">모집</button>
+      <div className="project-settings-tabs" role="tablist" aria-label="프로젝트 설정"
+        onKeyDown={(event) => {
+          if (!['ArrowLeft', 'ArrowRight', 'Home', 'End'].includes(event.key)) return;
+          event.preventDefault();
+          const nextTab = event.key === 'Home' ? 'info' : event.key === 'End' ? 'recruitment' : activeTab === 'info' ? 'recruitment' : 'info';
+          setActiveTab(nextTab);
+          document.getElementById(`project-settings-${nextTab}-tab`)?.focus();
+        }}>
+        <button type="button" role="tab" id="project-settings-info-tab" aria-selected={activeTab === 'info'} tabIndex={activeTab === 'info' ? 0 : -1} aria-controls="project-settings-info" onClick={() => setActiveTab('info')}>정보</button>
+        <button type="button" role="tab" id="project-settings-recruitment-tab" aria-selected={activeTab === 'recruitment'} tabIndex={activeTab === 'recruitment' ? 0 : -1} aria-controls="project-settings-recruitment" onClick={() => setActiveTab('recruitment')}>모집</button>
         <button type="button" role="tab" aria-selected="false" disabled title="인원 설정은 준비 중입니다">인원</button>
       </div>
 
+      {activeTab === 'info' ? (
       <form className={`project-settings-card${isEditing ? ' is-editing' : ''}`} id="project-settings-info" role="tabpanel" aria-labelledby="project-settings-info-tab" onSubmit={handleSave}>
         <h2>프로젝트 정보 관리</h2>
         <div className="project-settings-fields">
@@ -142,7 +153,30 @@ export default function ProjectSettingsPage() {
           )}
         </div>
       </form>
+      ) : (
+        <section className="project-settings-card project-settings-recruitment" id="project-settings-recruitment" role="tabpanel" aria-labelledby="project-settings-recruitment-tab">
+          <h2>프로젝트 모집 관리</h2>
+          <div className="project-settings-recruitment-row">
+            <div className="project-settings-recruitment-copy">
+              <span id="project-settings-recruitment-label">신규 모집 여부</span>
+              <p id="project-settings-recruitment-description">
+                {isRecruiting ? '프로젝트가 공개되고 신규 지원 접수를 받습니다.' : '신규 지원 접수를 받지 않습니다.'}
+              </p>
+            </div>
+            <button
+              type="button"
+              className="project-settings-switch"
+              role="switch"
+              aria-checked={isRecruiting}
+              aria-labelledby="project-settings-recruitment-label"
+              aria-describedby="project-settings-recruitment-description"
+              onClick={() => setIsRecruiting((current) => !current)}
+            >
+              <span className="project-settings-switch-handle" />
+            </button>
+          </div>
+        </section>
+      )}
     </div>
   );
 }
-import { useState } from 'react';
