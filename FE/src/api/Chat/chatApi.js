@@ -1,5 +1,14 @@
 import apiClient from '../apiClient';
 
+export const leaveChatRoom = async (chatRoomId) => {
+  const response = await apiClient.delete(`/chat-rooms/${encodeURIComponent(chatRoomId)}/leave`);
+  const data = response.data?.data;
+  if (!response.data?.isSuccess || String(data?.chatRoomId) !== String(chatRoomId)) {
+    throw new Error('채팅방 나가기 결과를 확인할 수 없습니다.');
+  }
+  return data;
+};
+
 export const getChatRooms = async ({ signal } = {}) => {
   const response = await apiClient.get('/chat-rooms', { signal });
   if (!response.data?.isSuccess || !Array.isArray(response.data?.data)) {

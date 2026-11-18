@@ -3,7 +3,7 @@ import { ChevronLeft, LogOut, Menu, MessageCircle, Send } from 'lucide-react';
 import ProfileAvatar from '../../../components/ProfileAvatar/ProfileAvatar';
 import ChatMessage from './ChatMessage';
 
-export default function ChatPanel({ room, draft, onDraftChange, onSend, onBack, onLeave }) {
+export default function ChatPanel({ room, draft, onDraftChange, onSend, onBack, onLeave, isLeaving = false }) {
   const [menuOpen, setMenuOpen] = useState(false);
   const menuRef = useRef(null);
   const menuButtonRef = useRef(null);
@@ -41,9 +41,10 @@ export default function ChatPanel({ room, draft, onDraftChange, onSend, onBack, 
         <div className="chat-panel__identity"><h2>{room.projectName} · {room.name}</h2>{room.memberCount != null && <span>멤버 {room.memberCount}명</span>}</div>
         <div className="chat-panel__menu" ref={menuRef}>
           <button ref={menuButtonRef} type="button" className="chat-icon-button" aria-label="채팅방 메뉴" aria-expanded={menuOpen} aria-controls="chat-room-actions" onClick={() => setMenuOpen(!menuOpen)}><Menu size={20} /></button>
-          {menuOpen && <div id="chat-room-actions" className="chat-panel__dropdown"><button type="button" onClick={() => { setMenuOpen(false); onLeave(); }}><LogOut size={16} />채팅방 나가기</button></div>}
+          {menuOpen && <div id="chat-room-actions" className="chat-panel__dropdown"><button type="button" disabled={isLeaving} onClick={() => { setMenuOpen(false); onLeave(); }}><LogOut size={16} />채팅방 나가기</button></div>}
         </div>
       </header>
+      {isLeaving && <p className="chat-empty" role="status">채팅방을 나가는 중입니다...</p>}
       <div className="chat-panel__messages" ref={messagesRef} role="log" aria-label="대화 내용" aria-live="polite">
         {room.messages.map((message) => <ChatMessage key={message.id} message={message} room={room} />)}
         {!room.messages.length && <p className="chat-empty">{room.lastMessage ? '이전 대화 내역은 아직 불러올 수 없습니다.' : '첫 메시지를 보내보세요.'}</p>}
@@ -56,6 +57,7 @@ export default function ChatPanel({ room, draft, onDraftChange, onSend, onBack, 
         }}
       >
         <textarea
+          disabled={isLeaving}
           rows={1}
           aria-label="메시지"
           placeholder="메시지를 입력하세요"
@@ -68,7 +70,7 @@ export default function ChatPanel({ room, draft, onDraftChange, onSend, onBack, 
             }
           }}
         />
-        <button className="chat-composer__send" type="submit" aria-label="메시지 보내기">
+        <button className="chat-composer__send" type="submit" aria-label="메시지 보내기" disabled={isLeaving}>
           <Send size={18} />
         </button>
       </form>

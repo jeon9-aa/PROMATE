@@ -1,8 +1,8 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { useLocation, useNavigate, useParams, useSearchParams } from 'react-router-dom';
 import ChatRoomList from './components/ChatRoomList';
 import ChatPanel from './components/ChatPanel';
-import { getChatRoom, getChatRooms } from '../../api/Chat/chatApi';
+import { getChatRoom, getChatRooms, leaveChatRoom } from '../../api/Chat/chatApi';
 import './ChatAndRoomListPage.css';
 
 function toRoom(data, existing) {
@@ -36,6 +36,8 @@ export default function ChatAndRoomListPage() {
   const [searchParams, setSearchParams] = useSearchParams();
   const selectedId = roomId || searchParams.get('roomId');
   const [drafts, setDrafts] = useState({});
+  const [leavingRoomId, setLeavingRoomId] = useState(null);
+  const leavePending = useRef(false);
   const [retryCount, setRetryCount] = useState(0);
   const [roomRequest, setRoomRequest] = useState(null);
   const shouldFetch = Boolean(selectedId);
@@ -102,10 +104,31 @@ export default function ChatAndRoomListPage() {
     setDrafts((previous) => ({ ...previous, [selectedId]: '' }));
   }
 
-  function leaveRoom() {
+  async function leaveRoom() {
+    if (!selectedId || !room || leavePending.current) return;
     if (!window.confirm('이 채팅방을 나가시겠어요?')) return;
-    setRooms((previous) => previous.filter((item) => item.id !== selectedId));
-    navigate('/chat');
+    const leavingId = selectedId;
+    leavePending.current = true;
+    setLeavingRoomId(leavingId);
+    try {
+      await leaveChatRoom(leavingId);
+      setRooms((previous) => previous.filter((item) => item.id !== leavingId));
+      setListRequest((previous) => previous
+        ? { ...previous, ids: previous.ids.filter((id) => id !== leavingId) }
+        : previous);
+      setDrafts((previous) => {
+        const next = { ...previous };
+        delete next[leavingId];
+        return next;
+      });
+      setListRetryCount((count) => count + 1);
+      navigate('/chat', { replace: true });
+    } catch (error) {
+      alert(error.message || '채팅방 나가기에 실패했습니다. 다시 시도해 주세요.');
+    } finally {
+      leavePending.current = false;
+      setLeavingRoomId(null);
+    }
   }
 
   return (
@@ -124,7 +147,7 @@ export default function ChatAndRoomListPage() {
           onDraftChange={(value) => setDrafts((previous) => ({ ...previous, [selectedId]: value }))}
           onSend={sendMessage}
           onBack={() => navigate(roomId ? `/chat?${new URLSearchParams({ roomId })}` : '/chat')}
-          onLeave={leaveRoom} />}
+          onLeave={leaveRoom} isLeaving={leavingRoomId === selectedId} />}
       </div>
     </section>
   );
