@@ -9,6 +9,10 @@ import ApplyModal from '../../components/ApplyModal/ApplyModal';
 import apiClient from '../../api/apiClient';
 import { getOrCreateChatRoom } from '../../api/Recruits/recruitmentApi';
 import Tag from '../../components/Tag/Tag';
+import ShareLinkModal from './ShareLinkModal';
+import PasswordInviteModal from './PasswordInviteModal';
+import { formatInviteExpiry } from './formatInviteExpiry';
+import PasswordJoinNoticeModal from './PasswordJoinNoticeModal';
 import './ProjectReadMePage.css';
 
 const categoryMap = {
@@ -37,6 +41,42 @@ function ProjectReadMePage() {
   const [isLoading, setIsLoading] = useState(true);
 
   const [isProfileModalOpen, setIsProfileModalOpen] = useState(false);
+  const [isShareModalOpen, setIsShareModalOpen] = useState(false);
+  const [isPasswordModalOpen, setIsPasswordModalOpen] = useState(false);
+  const [isPasswordLinkModalOpen, setIsPasswordLinkModalOpen] = useState(false);
+  const [isPasswordJoinNoticeOpen, setIsPasswordJoinNoticeOpen] = useState(false);
+  // API 연동 전 임시 초대 상태
+  const [passwordInvitations, setPasswordInvitations] = useState({});
+
+  const handlePasswordInviteClick = () => {
+    if (!projectData?.isAuthor) {
+      setIsPasswordJoinNoticeOpen(true);
+      return;
+    }
+    const invitation = passwordInvitations[postId];
+    if (invitation && invitation.expiresAt > Date.now()) {
+      setIsPasswordLinkModalOpen(true);
+    } else {
+      setIsPasswordModalOpen(true);
+    }
+  };
+
+  const handlePasswordJoinContinue = () => {
+    setIsPasswordJoinNoticeOpen(false);
+    navigate(`/readme/${postId}/password`);
+  };
+
+  const handlePasswordRegister = (password) => {
+    if (!projectData?.isAuthor || !/^[0-9]{4}$/.test(password)) return;
+    const expiresAt = Date.now() + 24 * 60 * 60 * 1000;
+    setPasswordInvitations((previous) => ({
+      ...previous,
+      [postId]: { password, expiresAt },
+    }));
+    window.alert(`비밀번호가 설정되었습니다.\n유효시간: ${formatInviteExpiry(expiresAt)}까지 (한국 시간)\n설정 시점부터 24시간 동안 사용할 수 있습니다.`);
+    setIsPasswordModalOpen(false);
+    setIsPasswordLinkModalOpen(true);
+  };
   const [selectedUser, setSelectedUser] = useState(null);
   const [modalPosition, setModalPosition] = useState(null);
 
@@ -191,11 +231,13 @@ function ProjectReadMePage() {
             </span>
           </div>
           <div className="project-readme-share-actions">
-            <button type="button" className="project-readme-share-btn project-readme-link-btn">
+            <button type="button" className="project-readme-share-btn project-readme-link-btn"
+              onClick={() => setIsShareModalOpen(true)} aria-haspopup="dialog">
               <img src={linkIcon} alt="" />
               링크 공유
             </button>
-            <button type="button" className="project-readme-share-btn">
+            <button type="button" className="project-readme-share-btn"
+              onClick={handlePasswordInviteClick} aria-haspopup="dialog">
               <img src={lockIcon} alt="" />
               비밀번호 초대
             </button>
@@ -271,6 +313,38 @@ function ProjectReadMePage() {
           </div>
         )}
       </div>
+
+      {isPasswordJoinNoticeOpen && !projectData.isAuthor && (
+        <PasswordJoinNoticeModal
+          onClose={() => setIsPasswordJoinNoticeOpen(false)}
+          onContinue={handlePasswordJoinContinue}
+        />
+      )}
+
+      {isPasswordModalOpen && projectData.isAuthor && (
+        <PasswordInviteModal
+          onClose={() => setIsPasswordModalOpen(false)}
+          onSubmit={handlePasswordRegister}
+        />
+      )}
+
+      {isPasswordLinkModalOpen && projectData.isAuthor && (
+        <ShareLinkModal
+          shareUrl={`${window.location.origin}${location.pathname}?invite=password`}
+          title="비밀번호 링크 공유"
+          description="해당 링크에서 비밀번호를 입력한 참가자는 지원자 검토 없이 바로 프로젝트에 참여합니다."
+          linkLabel="비밀번호 초대 링크"
+          expiresAt={passwordInvitations[postId]?.expiresAt}
+          onClose={() => setIsPasswordLinkModalOpen(false)}
+        />
+      )}
+
+      {isShareModalOpen && (
+        <ShareLinkModal
+          shareUrl={`${window.location.origin}${location.pathname}`}
+          onClose={() => setIsShareModalOpen(false)}
+        />
+      )}
 
       <ProfileModal 
         isOpen={isProfileModalOpen} 
