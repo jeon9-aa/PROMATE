@@ -1,7 +1,6 @@
 import GuardedForm from '../../components/GuardedForm/GuardedForm.jsx';
 import GuardedButton from '../../components/GuardedButton/GuardedButton.jsx';
 import { useState } from 'react';
-import apiClient from '../../api/apiClient';
 import { getCurrentUserId, saveGroup } from '../../utils/smallMeetings';
 import useProjectTitle from '../../utils/useProjectTitle';
 import { useLocation, useNavigate, useParams } from 'react-router-dom';
@@ -14,12 +13,10 @@ export default function SmallMeetingAddPage() {
   const { projectId } = useParams();
   const projectTitle = useProjectTitle(projectId, state?.projectTitle);
   const [saveError, setSaveError] = useState('');
-  const [isSubmitting, setIsSubmitting] = useState(false);
   const listPath = `/project/${projectId}/smallMeetingList`;
 
-  const handleSubmit = async (event) => {
+  const handleSubmit = (event) => {
     event.preventDefault();
-    if (isSubmitting) return;
     setSaveError('');
     const form = event.currentTarget;
     const formData = new FormData(form);
@@ -35,6 +32,7 @@ export default function SmallMeetingAddPage() {
     }
 
     const newGroup = {
+      id: Date.now(),
       projectId: String(projectId),
       title: formData.get('title').trim(),
       description: formData.get('description').trim(),
@@ -46,26 +44,11 @@ export default function SmallMeetingAddPage() {
       members: [{ userId: getCurrentUserId(), name: '나', role: '개설자' }],
     };
 
-    setIsSubmitting(true);
-    let response;
     try {
-      response = await apiClient.post(`/projects/${encodeURIComponent(projectId)}/subgroups`, {
-        name: newGroup.title,
-        year: Number(start.split('-')[0]),
-      });
+      saveGroup(newGroup);
     } catch {
-      setSaveError('소모임을 생성하지 못했습니다. 다시 시도해 주세요.');
-      setIsSubmitting(false);
+      setSaveError('소모임을 저장하지 못했습니다. 브라우저 저장소를 확인하고 다시 시도해 주세요.');
       return;
-    }
-
-    const id = (response.data?.result ?? response.data)?.id;
-    if (id != null) {
-      try {
-        saveGroup({ ...newGroup, id });
-      } catch {
-        // 서버에서 생성한 소모임은 로컬 저장소 오류와 관계없이 유지된다.
-      }
     }
 
     navigate(listPath, { state: { projectTitle } });
@@ -114,8 +97,6 @@ export default function SmallMeetingAddPage() {
 
           {saveError && <p role="alert">{saveError}</p>}
           <div className="small-meeting-add-actions">
-            <button className="small-meeting-add-cancel" type="button" onClick={() => navigate(listPath, { state: { projectTitle } })}>취소</button>
-            <button className="small-meeting-add-submit" type="submit" disabled={isSubmitting}>생성하기</button>
             <GuardedButton className="small-meeting-add-cancel" type="button" onClick={() => navigate(listPath, { state: { projectTitle } })}>취소</GuardedButton>
             <GuardedButton className="small-meeting-add-submit" type="submit">생성하기</GuardedButton>
           </div>
