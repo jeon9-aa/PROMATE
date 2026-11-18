@@ -41,10 +41,16 @@ export function readSavedGroups() {
   return groups;
 }
 
-export function getProjectGroups(projectId) {
+export function getProjectGroups(projectId, createdGroup) {
   let saved = [];
   try { saved = readSavedGroups(); } catch { /* Keep sample data available. */ }
-  return [...sampleGroups, ...saved.filter((group) => group && String(group.projectId) === String(projectId))];
+  const projectGroups = saved.filter((group) => group && String(group.projectId) === String(projectId));
+  if (createdGroup && String(createdGroup.projectId) === String(projectId) &&
+      !projectGroups.some((group) => String(group.id) === String(createdGroup.id))) {
+    projectGroups.push(createdGroup);
+  }
+  const projectGroupIds = new Set(projectGroups.map((group) => String(group.id)));
+  return [...sampleGroups.filter((group) => !projectGroupIds.has(String(group.id))), ...projectGroups];
 }
 
 export function saveGroup(group) {

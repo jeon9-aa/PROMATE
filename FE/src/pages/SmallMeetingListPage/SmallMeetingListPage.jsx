@@ -11,7 +11,7 @@ export default function SmallMeetingListPage() {
   const navigate = useNavigate();
   const { projectId } = useParams();
   const projectTitle = useProjectTitle(projectId, state?.projectTitle);
-  const groups = getProjectGroups(projectId);
+  const groups = getProjectGroups(projectId, state?.createdGroup);
 
   return (
     <div className="project-detail-page">
