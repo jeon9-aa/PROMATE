@@ -1,3 +1,4 @@
+import GuardedButton from '../GuardedButton/GuardedButton.jsx';
 import "./MainButton.css";
 
 function MainButton({
@@ -11,7 +12,7 @@ function MainButton({
   ...props
 }) {
   return (
-    <button
+    <GuardedButton
       type={type}
       className={`main-btn ${size} ${fullWidth ? "full-width" : ""} ${className}`.trim()}
       onClick={onClick}
@@ -19,7 +20,7 @@ function MainButton({
       {...props}
     >
       {children}
-    </button>
+    </GuardedButton>
   );
 }
 

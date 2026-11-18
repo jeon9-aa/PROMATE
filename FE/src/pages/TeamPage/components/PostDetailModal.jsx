@@ -1,3 +1,4 @@
+import GuardedButton from '../../../components/GuardedButton/GuardedButton.jsx';
 import React, { useState } from 'react';
 
 function PostDetailModal({
@@ -44,7 +45,7 @@ function PostDetailModal({
       >
         <div className="team-detail-header">
           <div className="team-detail-more-container">
-            <button
+            <GuardedButton
               type="button"
               className="team-detail-more-btn"
               aria-label="게시글 메뉴"
@@ -52,10 +53,10 @@ function PostDetailModal({
               onClick={() => setIsMenuOpen((prev) => !prev)}
             >
               <span className="team-detail-more-icon" />
-            </button>
+            </GuardedButton>
             {isMenuOpen && (
               <div className="team-detail-dropdown-menu">
-                <button
+                <GuardedButton
                   type="button"
                   className="team-detail-dropdown-item"
                   onClick={() => {
@@ -64,23 +65,23 @@ function PostDetailModal({
                   }}
                 >
                   수정
-                </button>
-                <button
+                </GuardedButton>
+                <GuardedButton
                   type="button"
                   className="team-detail-dropdown-item delete"
                   onClick={() => {
                     setIsMenuOpen(false);
-                    onDelete();
+                    return onDelete();
                   }}
                 >
                   삭제
-                </button>
+                </GuardedButton>
               </div>
             )}
           </div>
-          <button type="button" className="team-detail-close-btn" onClick={handleClose} aria-label="닫기">
+          <GuardedButton type="button" className="team-detail-close-btn" onClick={handleClose} aria-label="닫기">
             ✕
-          </button>
+          </GuardedButton>
         </div>
 
         <div className="team-detail-body">

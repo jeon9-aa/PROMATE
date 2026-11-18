@@ -1,3 +1,4 @@
+import GuardedButton from '../../components/GuardedButton/GuardedButton.jsx';
 import ProjectAvatar from '../../components/ProjectAvatar/ProjectAvatar';
 import React, { useState, useEffect, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
@@ -309,14 +310,14 @@ const ProfilePage = () => {
                       </div>
                   {isEditing && proj.isManual && proj.isEditable && (
                         <>
-                          <button
+                          <GuardedButton
                             className="proj-delete-btn"
                             onClick={() => setEditingProject(proj)}
-                          >✏</button>
-                          <button
+                          >✏</GuardedButton>
+                          <GuardedButton
                             className="proj-delete-btn"
                             onClick={() => handleDeleteProject(proj)}
-                          >✕</button>
+                          >✕</GuardedButton>
                         </>
                       )}
                     </div>
@@ -325,13 +326,13 @@ const ProfilePage = () => {
               ))}
 
             {isEditing && (
-              <button className="proj-add-row-btn" onClick={() => setIsAddModalOpen(true)}>
+              <GuardedButton className="proj-add-row-btn" onClick={() => setIsAddModalOpen(true)}>
                 <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
                   <line x1="12" y1="5" x2="12" y2="19" stroke="#ABABAB" strokeWidth="1.5" strokeLinecap="round"/>
                   <line x1="5" y1="12" x2="19" y2="12" stroke="#ABABAB" strokeWidth="1.5" strokeLinecap="round"/>
                 </svg>
                 <span className="proj-add-text">프로젝트 추가하기</span>
-              </button>
+              </GuardedButton>
             )}
           </div>
         </div>
@@ -339,8 +340,8 @@ const ProfilePage = () => {
         <div className="profile-actions">
           {isEditing ? (
             <>
-              <button className="btn-edit-cancel" onClick={() => setIsEditing(false)}>취소</button>
-              <button className="btn-edit-complete" onClick={handleEditComplete}>완료</button>
+              <GuardedButton className="btn-edit-cancel" onClick={() => setIsEditing(false)}>취소</GuardedButton>
+              <GuardedButton className="btn-edit-complete" onClick={handleEditComplete}>완료</GuardedButton>
             </>
           ) : (
             <MainButton size="md" onClick={() => { setIsEditing(true); setEditName(userInfo.name); }}>수정하기</MainButton>

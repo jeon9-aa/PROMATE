@@ -1,3 +1,4 @@
+import GuardedButton from '../../../components/GuardedButton/GuardedButton.jsx';
 import React, { useState, useEffect } from 'react';
 
 function TaskDetailModal({
@@ -62,7 +63,7 @@ function TaskDetailModal({
     };
 
     if (onUpdate) {
-      onUpdate(task.taskId, updatedData);
+      return onUpdate(task.taskId, updatedData);
     }
   };
 
@@ -87,34 +88,34 @@ function TaskDetailModal({
         <div className="team-detail-header">
           {isEditing ? (
             <div className="team-detail-header-actions">
-              <button type="button" className="team-detail-btn team-detail-cancel-btn" onClick={() => setIsEditing(false)}>취소</button>
-              <button type="button" className="team-detail-btn team-detail-save-btn" onClick={handleUpdateSubmit}>저장</button>
+              <GuardedButton type="button" className="team-detail-btn team-detail-cancel-btn" onClick={() => setIsEditing(false)}>취소</GuardedButton>
+              <GuardedButton type="button" className="team-detail-btn team-detail-save-btn" onClick={handleUpdateSubmit}>저장</GuardedButton>
             </div>
           ) : (
             <>
               <div className="team-detail-more-container">
-                <button
+                <GuardedButton
                   type="button"
                   className="team-detail-more-btn"
                   aria-label="태스크 메뉴"
                   onClick={() => setIsMenuOpen((prev) => !prev)}
                 >
                   <span className="team-detail-more-icon"></span>
-                </button>
+                </GuardedButton>
                 {isMenuOpen && (
                   <div className="team-detail-dropdown-menu">
-                    <button type="button" className="team-detail-dropdown-item" onClick={() => { setIsMenuOpen(false); setIsEditing(true); }}>
+                    <GuardedButton type="button" className="team-detail-dropdown-item" onClick={() => { setIsMenuOpen(false); setIsEditing(true); }}>
                       수정
-                    </button>
-                    <button type="button" className="team-detail-dropdown-item delete" onClick={() => { setIsMenuOpen(false); onDelete(); }}>
+                    </GuardedButton>
+                    <GuardedButton type="button" className="team-detail-dropdown-item delete" onClick={() => { setIsMenuOpen(false); return onDelete(); }}>
                       삭제
-                    </button>
+                    </GuardedButton>
                   </div>
                 )}
               </div>
-              <button type="button" className="team-detail-close-btn" onClick={onClose} aria-label="닫기">
+              <GuardedButton type="button" className="team-detail-close-btn" onClick={onClose} aria-label="닫기">
                 ✕
-              </button>
+              </GuardedButton>
             </>
           )}
         </div>
