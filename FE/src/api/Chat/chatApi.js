@@ -1,5 +1,18 @@
 import apiClient from '../apiClient';
 
+export async function markChatMessagesRead(chatRoomId, signal) {
+  await apiClient.patch(`/chat-rooms/${encodeURIComponent(chatRoomId)}/messages/read`, undefined, { signal });
+}
+
+export async function getChatMessages(chatRoomId, signal) {
+  const response = await apiClient.get(`/chat-rooms/${encodeURIComponent(chatRoomId)}/messages`, { signal });
+  if (!Array.isArray(response.data.data)) {
+    throw new Error('메시지 내역 응답 형식이 올바르지 않습니다.');
+  }
+  return response.data.data;
+}
+
+
 export const leaveChatRoom = async (chatRoomId) => {
   const response = await apiClient.delete(`/chat-rooms/${encodeURIComponent(chatRoomId)}/leave`);
   const data = response.data?.data;

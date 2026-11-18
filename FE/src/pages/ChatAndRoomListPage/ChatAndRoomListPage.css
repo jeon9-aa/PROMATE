@@ -449,3 +449,14 @@
     padding: 12px;
   }
 }
+.chat-connection-status {
+  margin: 0;
+  padding: 8px 16px;
+  color: #666;
+  font-size: 13px;
+}
+
+.chat-composer__send:disabled {
+  opacity: 0.45;
+  cursor: not-allowed;
+}

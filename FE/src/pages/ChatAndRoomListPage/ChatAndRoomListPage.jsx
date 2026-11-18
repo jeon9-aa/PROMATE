@@ -3,6 +3,8 @@ import { useLocation, useNavigate, useParams, useSearchParams } from 'react-rout
 import ChatRoomList from './components/ChatRoomList';
 import ChatPanel from './components/ChatPanel';
 import { getChatRoom, getChatRooms, leaveChatRoom } from '../../api/Chat/chatApi';
+import useChatSocket from './useChatSocket';
+import { mergeChatMessages } from './chatMessages';
 import './ChatAndRoomListPage.css';
 
 function toRoom(data, existing) {
@@ -45,6 +47,22 @@ export default function ChatAndRoomListPage() {
   const isLoading = shouldFetch && roomRequest?.key !== requestKey;
   const error = shouldFetch && roomRequest?.key === requestKey ? roomRequest.error : null;
   const room = rooms.find((item) => item.id === selectedId);
+  const liveRoomId = room && !isLoading && !error && /^[1-9]\d*$/.test(selectedId || '')
+    ? selectedId : null;
+  const socket = useChatSocket(liveRoomId, (id, incoming) => {
+    setRooms((previous) => previous.map((item) => {
+      if (item.id !== id) return item;
+      const messages = mergeChatMessages(item.messages, incoming);
+      const latest = messages.at(-1);
+      return {
+        ...item, messages,
+        lastMessage: latest?.text ?? item.lastMessage,
+        lastMessageAt: latest?.sentAt ?? item.lastMessageAt,
+      };
+    }));
+  }, (id) => {
+    setRooms((previous) => previous.map((item) => item.id === id ? { ...item, unread: 0 } : item));
+  });
 
   useEffect(() => {
     const controller = new AbortController();
@@ -97,10 +115,7 @@ export default function ChatAndRoomListPage() {
 
   function sendMessage() {
     const text = (drafts[selectedId] || '').trim();
-    if (!text || !room) return;
-    const message = { id: crypto.randomUUID(), text, sentAt: new Date().toISOString(), isMine: true };
-    setRooms((previous) => previous.map((item) => item.id === selectedId
-      ? { ...item, messages: [...item.messages, message] } : item));
+    if (!text || !room || leavingRoomId === selectedId || !socket.send(text)) return;
     setDrafts((previous) => ({ ...previous, [selectedId]: '' }));
   }
 
@@ -146,6 +161,10 @@ export default function ChatAndRoomListPage() {
         ) : <ChatPanel key={room?.id || 'empty'} room={room} draft={drafts[selectedId] || ''}
           onDraftChange={(value) => setDrafts((previous) => ({ ...previous, [selectedId]: value }))}
           onSend={sendMessage}
+          canSend={socket.ready && leavingRoomId !== selectedId}
+          historyLoading={socket.historyLoading}
+          historyError={socket.historyError}
+          status={socket.error || socket.readError || (socket.ready ? '' : '?? ??? ?? ????.')}
           onBack={() => navigate(roomId ? `/chat?${new URLSearchParams({ roomId })}` : '/chat')}
           onLeave={leaveRoom} isLeaving={leavingRoomId === selectedId} />}
       </div>
