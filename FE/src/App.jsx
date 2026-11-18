@@ -57,6 +57,7 @@ function App() {
       <Routes>
         <Route path="/login" element={<LoginPage />} />
         <Route path="/invite/password" element={<PasswordInviteLoginPage />} />
+        <Route path="/invite/:inviteToken" element={<PasswordInviteLoginPage />} />
         <Route path="/auth/kakao/callback" element={<AuthCallbackPage />} />
 
         <Route

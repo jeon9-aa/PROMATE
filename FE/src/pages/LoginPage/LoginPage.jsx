@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { useLocation } from "react-router-dom";
 import "./LoginPage.css";
 import LoginLogo from "./components/LoginLogo";
 import LoginForm from "./components/LoginForm";
@@ -6,12 +7,18 @@ import { getKakaoLoginUrl } from "../../api/Auth/kakaoAuthApi.js";
 
 function LoginPage() {
   const [isLoading, setIsLoading] = useState(false);
+  const { state } = useLocation();
 
   const kakaoHandleLogin = async () => {
     setIsLoading(true);
 
     try {
       const backendUrl = await getKakaoLoginUrl();
+      if (state?.inviteToken) {
+        sessionStorage.setItem("pendingProjectInviteToken", state.inviteToken);
+      } else {
+        sessionStorage.removeItem("pendingProjectInviteToken");
+      }
       window.location.href = backendUrl;
     } catch (error) {
       console.error("로그인 URL 요청 실패:", error);

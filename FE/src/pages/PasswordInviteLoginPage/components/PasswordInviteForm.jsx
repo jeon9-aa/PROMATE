@@ -1,14 +1,17 @@
 import { useRef, useState } from "react";
 import { useNavigate } from "react-router-dom";
+import { joinProjectByInvite } from "../../../api/Project/projectInviteApi.js";
 
-function PasswordInviteForm({ expectedPassword }) {
+function PasswordInviteForm({ inviteToken }) {
   const navigate = useNavigate();
   const [characters, setCharacters] = useState(["", "", "", ""]);
   const [feedback, setFeedback] = useState(null);
+  const [isSubmitting, setIsSubmitting] = useState(false);
   const inputs = useRef([]);
 
   const handleChange = (index, value) => {
-    const character = value.slice(-1);
+    if (!/^[0-9]?$/.test(value)) return;
+    const character = value;
     setCharacters((previous) => previous.map((item, position) => (
       position === index ? character : item
     )));
@@ -30,32 +33,41 @@ function PasswordInviteForm({ expectedPassword }) {
 
   const handlePaste = (event, index) => {
     event.preventDefault();
-    const pasted = Array.from(event.clipboardData.getData("text").trim()).slice(0, 4 - index);
-    if (!pasted.length) return;
+    const pasted = event.clipboardData.getData("text").trim();
+    if (!/^[0-9]{1,4}$/.test(pasted)) return;
+    const start = pasted.length === 4 ? 0 : index;
+    if (start + pasted.length > characters.length) return;
     setCharacters((previous) => previous.map((item, position) => (
-      position >= index && position < index + pasted.length ? pasted[position - index] : item
+      position >= start && position < start + pasted.length ? pasted[position - start] : item
     )));
     setFeedback(null);
-    inputs.current[Math.min(index + pasted.length, 3)]?.focus();
+    inputs.current[Math.min(start + pasted.length, 3)]?.focus();
   };
 
-  const handleSubmit = (event) => {
+  const handleSubmit = async (event) => {
     event.preventDefault();
+    if (isSubmitting) return;
+
     const emptyIndex = characters.findIndex((character) => !character);
     if (emptyIndex !== -1) {
-      setFeedback({ isError: true, message: "비밀번호 네 자리를 모두 입력해주세요." });
+      setFeedback({ isError: true, message: "비밀번호 숫자 4자리를 모두 입력해 주세요." });
       inputs.current[emptyIndex]?.focus();
       return;
     }
-    const isCorrect = characters.join("") === expectedPassword;
-    if (isCorrect) {
-      navigate("/login");
-      return;
+    setIsSubmitting(true);
+    setFeedback(null);
+    try {
+      const { projectId } = await joinProjectByInvite(inviteToken, characters.join(""));
+      navigate(`/project/${projectId}`, { replace: true });
+    } catch (error) {
+      const { code, message } = error.response?.data ?? {};
+      setFeedback({
+        isError: code === "INVITE_E004",
+        message: message || "초대 참여 요청을 처리할 수 없습니다. 잠시 후 다시 시도해 주세요.",
+      });
+    } finally {
+      setIsSubmitting(false);
     }
-    setFeedback({
-      isError: true,
-      message: "비밀번호가 일치하지 않습니다. 다시 입력해주세요.",
-    });
   };
 
   return (
@@ -71,7 +83,9 @@ function PasswordInviteForm({ expectedPassword }) {
             aria-invalid={feedback?.isError || false}
             aria-describedby={feedback ? "password-invite-feedback" : undefined}
             autoComplete="off"
+            inputMode="numeric"
             maxLength={1}
+            disabled={isSubmitting}
             value={character}
             onChange={(event) => handleChange(index, event.target.value)}
             onKeyDown={(event) => handleKeyDown(event, index)}
@@ -80,12 +94,14 @@ function PasswordInviteForm({ expectedPassword }) {
           />
         ))}
       </div>
-      <button className="password-invite-submit" type="submit">입장하기</button>
+      <button className="password-invite-submit" type="submit" disabled={isSubmitting}>
+        {isSubmitting ? "확인 중…" : "입장하기"}
+      </button>
       {feedback && (
         <p
           id="password-invite-feedback"
           className={`password-invite-feedback${feedback.isError ? " is-error" : ""}`}
-          role={feedback.isError ? "alert" : "status"}
+          role="alert"
         >
           {feedback.message}
         </p>
