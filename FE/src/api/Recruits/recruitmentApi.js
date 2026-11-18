@@ -1,4 +1,11 @@
 import apiClient from "../apiClient";
+import { getChatRooms } from "../Chat/chatApi";
+import { openRecruitmentChat } from "./openRecruitmentChat";
+
+export const getOrCreateChatRoom = (recruitmentId) => openRecruitmentChat(recruitmentId, {
+  getRooms: getChatRooms,
+  createRoom: createChatRoom,
+});
 
 export const createChatRoom = async (recruitmentId) => {
   const response = await apiClient.post(`/recruitments/${recruitmentId}/chat-rooms`);

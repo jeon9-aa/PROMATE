@@ -6,7 +6,7 @@ import lockIcon from '../../assets/icons/lockIcon.svg';
 import ProfileModal from '../../components/ProfileModal/ProfileModal';
 import ApplyModal from '../../components/ApplyModal/ApplyModal';
 import apiClient from '../../api/apiClient';
-import { createChatRoom } from '../../api/Recruits/recruitmentApi';
+import { getOrCreateChatRoom } from '../../api/Recruits/recruitmentApi';
 import Tag from '../../components/Tag/Tag';
 import './ProjectReadMePage.css';
 
@@ -57,7 +57,7 @@ function ProjectReadMePage() {
     chatRoomRequestPending.current = true;
     setIsCreatingChatRoom(true);
     try {
-      const { chatRoomId } = await createChatRoom(postId);
+      const { chatRoomId } = await getOrCreateChatRoom(postId);
       navigate(`/chat/${chatRoomId}`, {
         state: {
           createdRoom: {
@@ -72,7 +72,7 @@ function ProjectReadMePage() {
         },
       });
     } catch (error) {
-      alert(error.message || '채팅방 생성에 실패했습니다. 다시 시도해 주세요.');
+      alert(error.message || '채팅방 연결에 실패했습니다. 다시 시도해 주세요.');
     } finally {
       chatRoomRequestPending.current = false;
       setIsCreatingChatRoom(false);
@@ -265,7 +265,7 @@ function ProjectReadMePage() {
             )}
             <button type="button" className="project-readme-chat-btn"
               onClick={handleChatClick} disabled={isCreatingChatRoom} aria-busy={isCreatingChatRoom}>
-              {isCreatingChatRoom ? '채팅방 생성 중...' : '팀장과 채팅하기'}
+              {isCreatingChatRoom ? '채팅방 연결 중...' : '팀장과 채팅하기'}
             </button>
           </div>
         )}
