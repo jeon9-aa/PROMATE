@@ -3,7 +3,7 @@ import { ChevronLeft, LogOut, Menu, MessageCircle, Send } from 'lucide-react';
 import ProfileAvatar from '../../../components/ProfileAvatar/ProfileAvatar';
 import ChatMessage from './ChatMessage';
 
-export default function ChatPanel({ room, draft, onDraftChange, onSend, onBack, onLeave, canSend = true, status = '' }) {
+export default function ChatPanel({ room, draft, onDraftChange, onSend, onBack, onLeave, canSend = true, status = '', historyLoading = false, historyError = '' }) {
   const [menuOpen, setMenuOpen] = useState(false);
   const menuRef = useRef(null);
   const menuButtonRef = useRef(null);
@@ -45,8 +45,10 @@ export default function ChatPanel({ room, draft, onDraftChange, onSend, onBack, 
         </div>}
       </header>
       <div className="chat-panel__messages" ref={messagesRef} role="log" aria-label="대화 내용" aria-live="polite">
+        {historyLoading && <p className="chat-empty" role="status">이전 메시지를 불러오는 중입니다.</p>}
+        {historyError && <p className="chat-empty" role="alert">{historyError} 페이지를 새로고침해 다시 시도해 주세요.</p>}
         {room.messages.map((message) => <ChatMessage key={message.id} message={message} room={room} />)}
-        {!room.messages.length && <p className="chat-empty">첫 메시지를 보내보세요.</p>}
+        {!historyLoading && !historyError && !room.messages.length && <p className="chat-empty">첫 메시지를 보내보세요.</p>}
       </div>
       {status && <p className="chat-connection-status" role="status">{status}</p>}
       <form

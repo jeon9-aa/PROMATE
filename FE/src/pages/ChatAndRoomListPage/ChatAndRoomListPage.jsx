@@ -4,6 +4,7 @@ import ChatRoomList from './components/ChatRoomList';
 import ChatPanel from './components/ChatPanel';
 import { initialRooms } from './chatData';
 import useChatSocket from './useChatSocket';
+import { mergeChatMessages } from './chatMessages';
 import './ChatAndRoomListPage.css';
 
 const isMock = import.meta.env.VITE_USE_MOCK === 'true';
@@ -19,12 +20,12 @@ export default function ChatAndRoomListPage() {
   const room = rooms.find((item) => item.id === selectedId) || (liveRoomId ? {
     id: liveRoomId, projectName: '채팅방', name: liveRoomId, messages: [], unread: 0,
   } : undefined);
-  const socket = useChatSocket(liveRoomId, (id, message) => {
+  const socket = useChatSocket(liveRoomId, (id, incoming) => {
     setRooms((previous) => {
       const existing = previous.find((item) => item.id === id);
-      if (existing?.messages.some((item) => item.id === message.id)) return previous;
-      if (!existing) return [...previous, { id, projectName: '채팅방', name: id, unread: 0, messages: [message] }];
-      return previous.map((item) => item.id === id ? { ...item, messages: [...item.messages, message] } : item);
+      const messages = mergeChatMessages(existing?.messages || [], incoming);
+      if (!existing) return [...previous, { id, projectName: '채팅방', name: id, unread: 0, messages }];
+      return previous.map((item) => item.id === id ? { ...item, messages } : item);
     });
   });
 
@@ -63,6 +64,8 @@ export default function ChatAndRoomListPage() {
           onDraftChange={(value) => setDrafts((previous) => ({ ...previous, [selectedId]: value }))}
           onSend={sendMessage}
           canSend={isMock || socket.ready}
+          historyLoading={!isMock && socket.historyLoading}
+          historyError={isMock ? '' : socket.historyError}
           status={isMock ? '' : socket.error || (socket.ready ? '' : '채팅 서버에 연결 중입니다.')}
           onBack={() => navigate(roomId ? `/chat?${new URLSearchParams({ roomId })}` : '/chat')}
           onLeave={isMock ? leaveRoom : undefined} />

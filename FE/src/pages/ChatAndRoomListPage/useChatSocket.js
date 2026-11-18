@@ -3,11 +3,14 @@ import { Client } from '@stomp/stompjs';
 import SockJS from 'sockjs-client/dist/sockjs';
 import { getUserInfo } from '../../api/User/userProfileApi';
 import { useAuthStore } from '../../stores/useAuthStore';
+import { getChatMessages } from '../../api/Chat/chatApi';
+import { toChatMessage } from './chatMessages';
 
 export default function useChatSocket(roomId, onMessage) {
   const clientRef = useRef(null);
   const onMessageRef = useRef(onMessage);
   const [connection, setConnection] = useState({});
+  const [history, setHistory] = useState({});
   const isLoggedIn = useAuthStore((state) => state.isLoggedIn);
 
   useEffect(() => { onMessageRef.current = onMessage; }, [onMessage]);
@@ -16,6 +19,23 @@ export default function useChatSocket(roomId, onMessage) {
     if (!roomId || !isLoggedIn) return;
     let disposed = false;
     let userId;
+    let historyController;
+    async function loadHistory() {
+      historyController?.abort();
+      const controller = new AbortController();
+      historyController = controller;
+      setHistory({ roomId, loading: true, error: '' });
+      try {
+        const data = await getChatMessages(roomId, controller.signal);
+        if (disposed || controller.signal.aborted) return;
+        const messages = data.map((item) => toChatMessage(item, roomId, userId)).filter(Boolean);
+        onMessageRef.current(roomId, messages);
+        setHistory({ roomId, loading: false, error: '' });
+      } catch (error) {
+        if (disposed || controller.signal.aborted) return;
+        setHistory({ roomId, loading: false, error: error.message || '이전 메시지를 불러오지 못했습니다.' });
+      }
+    }
     const update = (ready, error = '') => {
       if (!disposed) setConnection({ roomId, ready, error });
     };
@@ -44,20 +64,17 @@ export default function useChatSocket(roomId, onMessage) {
               update(true, response.message || '메시지 전송에 실패했습니다.');
               return;
             }
-            const data = response.data;
-            if (!data || String(data.chatRoomId) !== roomId || data.messageId == null ||
-                typeof data.content !== 'string' || !Number.isFinite(Date.parse(data.createdAt))) return;
-            onMessageRef.current(roomId, {
-              id: String(data.messageId), text: data.content, sentAt: data.createdAt,
-              senderName: data.senderName, senderProfileImageUrl: data.senderProfileImageUrl,
-              isMine: userId != null && String(data.senderId) === String(userId),
-            });
+            const message = toChatMessage(response.data, roomId, userId);
+            if (!message) return;
+            onMessageRef.current(roomId, [message]);
             update(true);
           } catch {
             update(true, '메시지를 읽지 못했습니다.');
           }
         });
         update(true);
+        // 재연결 중 놓친 메시지도 구독 후 내역을 조회해 보충한다.
+        void loadHistory();
       },
       onStompError: (frame) => update(false, frame.headers.message || '채팅 서버에서 오류가 발생했습니다.'),
       onWebSocketClose: () => update(false, '연결이 끊어졌습니다. 다시 연결 중입니다.'),
@@ -66,10 +83,17 @@ export default function useChatSocket(roomId, onMessage) {
     clientRef.current = client;
     getUserInfo().then((response) => {
       userId = response.data?.userId ?? response.data?.id;
-      if (!disposed) client.activate();
-    }).catch(() => update(false, '사용자 정보를 확인하지 못했습니다. 페이지를 새로고침해 주세요.'));
+      if (!disposed) {
+        void loadHistory();
+        client.activate();
+      }
+    }).catch(() => {
+      update(false, '사용자 정보를 확인하지 못했습니다. 페이지를 새로고침해 주세요.');
+      if (!disposed) setHistory({ roomId, loading: false, error: '이전 메시지를 불러오지 못했습니다.' });
+    });
     return () => {
       disposed = true;
+      historyController?.abort();
       clientRef.current = null;
       void client.deactivate();
     };
@@ -91,5 +115,10 @@ export default function useChatSocket(roomId, onMessage) {
       return false;
     }
   }
-  return { send, ready, error: !isLoggedIn ? '로그인이 필요합니다.' : connection.roomId === roomId ? connection.error : '' };
+  return {
+    send, ready,
+    historyLoading: Boolean(roomId && isLoggedIn && (history.roomId !== roomId || history.loading)),
+    historyError: history.roomId === roomId ? history.error : '',
+    error: !isLoggedIn ? '로그인이 필요합니다.' : connection.roomId === roomId ? connection.error : '',
+  };
 }
