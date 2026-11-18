@@ -55,6 +55,7 @@ public class ProjectService {
                         .applicationId(apply.getId())
                         .recruitmentId(apply.getRecruit().getId())
                         .title(apply.getRecruit().getTitle())
+                        .recruitImageUrl(apply.getRecruit().getThumbnailUrl()) // 추가
                         .description(apply.getRecruit().getDescription())
                         .recruitCount(apply.getRecruit().getTotalSlots())
                         .status(apply.getStatus())
@@ -89,6 +90,7 @@ public class ProjectService {
                     return MyProjectResponseDTO.builder()
                             .projectId(project.getId())
                             .title(project.getTitle())
+                            .recruitImageUrl(project.getThumbnailUrl()) // 추가
                             .projectStatus(project.getStatus())
                             .startDate(project.getStartDate())
                             .endDate(project.getEndDate())
@@ -144,6 +146,7 @@ public class ProjectService {
                     return MyActivityResponseDTO.builder()
                             .projectId(member.getProject().getId())
                             .title(member.getProject().getTitle())
+                            .recruitImageUrl(member.getProject().getThumbnailUrl()) // 추가
                             .description(member.getProject().getDescription())
                             .startDate(member.getProject().getStartDate())
                             .endDate(member.getProject().getEndDate())

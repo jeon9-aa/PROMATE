@@ -467,7 +467,12 @@ public class ApplyService {
                     );
                 }).toList();
 
-        return new ApplicantListResponse(recruit.getId(), recruit.getTitle(), summaries.size(), summaries);
+        return new ApplicantListResponse(
+                recruit.getId(),
+                recruit.getTitle(),
+                recruit.getThumbnailUrl(), // 프로젝트 대표 이미지
+                summaries.size(),
+                summaries);
     }
 }
 
