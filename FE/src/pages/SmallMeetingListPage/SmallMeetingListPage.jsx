@@ -40,8 +40,9 @@ export default function SmallMeetingListPage() {
             </button>
           </div>
           {!currentList && <p role="status">소모임 목록을 불러오는 중입니다.</p>}
-          {currentList?.error && <p role="alert">소모임 목록을 불러오지 못했습니다.</p>}
-          {currentList?.groups?.length === 0 && <p>등록된 소모임이 없습니다.</p>}
+          {(currentList?.error || currentList?.groups?.length === 0) && (
+            <p className="small-meeting-list-empty" role="status">등록된 소모임이 없습니다.</p>
+          )}
           {currentList?.groups?.length > 0 && (
             <ul className="project-detail-list">
               {currentList.groups.map((subgroup) => (

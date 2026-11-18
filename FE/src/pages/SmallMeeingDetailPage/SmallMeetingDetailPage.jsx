@@ -59,7 +59,7 @@ export default function SmallMeetingDetailPage() {
               <span>{hasJoined ? '참여 완료' : isFull ? '마감' : '참여'}</span>
             </button>
           </div>
-          <p className="small-meeting-description">{group.description || 'React와 상태관리 라이브러리를 함께 공부해요. 매주 화요일 저녁에 온라인으로 모여 진행 상황을 공유합니다.'}</p>
+          {group.description && <p className="small-meeting-description">{group.description}</p>}
           <div className="small-meeting-meta">
             <span><Users size={16} aria-hidden="true" /> 모집 인원 {participants.length}/{maxMembers}</span>
             <span className="small-meeting-meta-divider" aria-hidden="true" />
