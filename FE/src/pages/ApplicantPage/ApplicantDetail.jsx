@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useLocation } from 'react-router-dom';
+import ProjectAvatar from '../../components/ProjectAvatar/ProjectAvatar';
 import Avatar from '../../components/Avatar/Avatar';
 import logoIcon from '../../assets/logoIcon.svg';
 import {
@@ -22,6 +23,7 @@ const ApplicantDetail = () => {
   const recruitmentId = state?.recruitmentId;
   const projectTitle = state?.projectTitle ?? '프로젝트';
 
+  const [recruitImageUrl, setRecruitImageUrl] = useState(state?.recruitImageUrl);
   const [activeTab, setActiveTab] = useState('PENDING');
   const [applicantMap, setApplicantMap] = useState({ PENDING: [], ACCEPTED: [], REJECTED: [] });
   const [selectedApplicant, setSelectedApplicant] = useState(null);
@@ -38,6 +40,11 @@ const ApplicantDetail = () => {
     ]).then(([pendingRes, acceptedRes, rejectedRes]) => {
       const extract = (res) =>
         res.status === 'fulfilled' ? (res.value.data?.data?.applicants ?? []) : [];
+
+      const imageResponse = [pendingRes, acceptedRes, rejectedRes].find((res) =>
+        res.status === 'fulfilled' && res.value.data?.data?.recruitImageUrl !== undefined
+      );
+      if (imageResponse) setRecruitImageUrl(imageResponse.value.data.data.recruitImageUrl);
 
       setApplicantMap({
         PENDING: extract(pendingRes),
@@ -90,7 +97,10 @@ const ApplicantDetail = () => {
 
   return (
     <div className="ad-page">
-      <h1 className="ad-title">지원자 검토 - {projectTitle}</h1>
+      <div className="ad-heading">
+        <ProjectAvatar src={recruitImageUrl} size="46px" />
+        <h1 className="ad-title">지원자 검토 - {projectTitle}</h1>
+      </div>
 
       <div className="ad-card">
         <div className="ad-tab-bar">

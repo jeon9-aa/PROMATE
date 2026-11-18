@@ -223,7 +223,7 @@
   flex-direction: row;
   align-items: center;
   gap: 24px;
-  height: 19px;
+  min-height: 19px;
 }
 
 .proj-title {

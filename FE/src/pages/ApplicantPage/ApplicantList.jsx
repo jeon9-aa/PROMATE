@@ -86,6 +86,7 @@ const ApplicantList = () => {
             <ApplicantBox
               key={targetId}
               title={recruitment.title}
+              avatarSrc={recruitment.recruitImageUrl}
               summary={CATEGORY_LABEL[recruitment.category] ?? recruitment.category}
               capacity={recruitment.maxMember}
               showBookmark={false}
@@ -105,6 +106,7 @@ const ApplicantList = () => {
                         state: {
                           recruitmentId: targetId,
                           projectTitle: recruitment.title,
+                          recruitImageUrl: recruitment.recruitImageUrl,
                         },
                       })
               }
