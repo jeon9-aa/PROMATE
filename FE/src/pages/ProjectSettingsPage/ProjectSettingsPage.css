@@ -218,13 +218,18 @@
 
 .project-settings-management .project-settings-delete {
   color: #de0000;
+}
+
+.project-settings-management .project-settings-delete,
+.project-settings-management .project-settings-end {
   padding: 8px 12px;
   margin: -8px -12px;
   border-radius: 5px;
   cursor: pointer;
 }
 
-.project-settings-management .project-settings-delete:hover {
+.project-settings-management .project-settings-delete:hover,
+.project-settings-management .project-settings-end:hover {
   background: #f8f9fa;
 }
 
@@ -326,6 +331,14 @@
 
 .project-settings-delete-dialog-actions .project-settings-delete-confirm:hover {
   background: #bd0000;
+}
+
+.project-settings-delete-dialog-actions .project-settings-end-confirm {
+  background: #fe9a57;
+}
+
+.project-settings-delete-dialog-actions .project-settings-end-confirm:hover {
+  background: #e8894c;
 }
 
 .project-settings-actions {

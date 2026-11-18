@@ -35,6 +35,15 @@ function formatDate(value) {
 export default function ProjectSettingsPage() {
   const deleteOverlayRef = useRef(null);
   const [deleteNotice, setDeleteNotice] = useState('');
+  const [confirmationType, setConfirmationType] = useState('delete');
+  const isEnding = confirmationType === 'end';
+  const confirmationLabel = isEnding ? '종료' : '삭제';
+
+  const openConfirmation = (type) => {
+    setConfirmationType(type);
+    setDeleteNotice('');
+    deleteOverlayRef.current?.showModal();
+  };
   const { projectId } = useParams();
   const { state } = useLocation();
   const projectTitle = useProjectTitle(projectId, state?.projectTitle);
@@ -73,19 +82,25 @@ export default function ProjectSettingsPage() {
           if (event.target === event.currentTarget) deleteOverlayRef.current?.close();
         }}>
         <div className="project-settings-delete-dialog">
-          <h2 id="project-settings-delete-title">프로젝트 삭제</h2>
+          <h2 id="project-settings-delete-title">프로젝트 {confirmationLabel}</h2>
           <div id="project-settings-delete-description" className="project-settings-delete-description">
-            <p>
-              테스크와 회의록 등의 <strong>이전 기록 모두 삭제</strong>되며
+            {isEnding ? (
+              <p>
+                태스크와 회의록 등의 기록은 남지만
+                <br />
+                <strong>더이상 추가 작성과 수정이 불가</strong>합니다.
+              </p>
+            ) : <p>
+              태스크와 회의록 등의 <strong>이전 기록 모두 삭제</strong>되며
               <br />
               <strong>더이상 추가 작성과 수정도 불가</strong>합니다.
-            </p>
-            <p className="project-settings-delete-review">삭제 후 팀원들 간 상호 평가가 시작됩니다.</p>
+            </p>}
+            <p className="project-settings-delete-review">{confirmationLabel} 후 팀원들 간 상호 평가가 시작됩니다.</p>
           </div>
           {deleteNotice && <p className="project-settings-delete-notice" role="status">{deleteNotice}</p>}
           <div className="project-settings-delete-dialog-actions">
             <MainButton className="project-settings-delete-cancel" onClick={() => deleteOverlayRef.current?.close()}>취소</MainButton>
-            <MainButton className="project-settings-delete-confirm" onClick={() => setDeleteNotice('프로젝트 삭제 기능은 준비 중입니다.')}>삭제</MainButton>
+            <MainButton className={isEnding ? 'project-settings-end-confirm' : 'project-settings-delete-confirm'} onClick={() => setDeleteNotice(`프로젝트 ${confirmationLabel} 기능은 준비 중입니다.`)}>{confirmationLabel}</MainButton>
           </div>
         </div>
       </dialog>
@@ -165,8 +180,8 @@ export default function ProjectSettingsPage() {
 
         <hr />
         <div className="project-settings-management">
-          <button type="button" aria-disabled="true" title="프로젝트 종료 기능은 준비 중입니다">프로젝트 종료</button>
-          <button type="button" className="project-settings-delete" onClick={() => { setDeleteNotice(''); deleteOverlayRef.current?.showModal(); }}>프로젝트 삭제</button>
+          <button type="button" className="project-settings-end" onClick={() => openConfirmation('end')}>프로젝트 종료</button>
+          <button type="button" className="project-settings-delete" onClick={() => openConfirmation('delete')}>프로젝트 삭제</button>
         </div>
         <div className="project-settings-actions">
           {isEditing ? (
