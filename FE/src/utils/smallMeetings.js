@@ -6,10 +6,15 @@ export function readSavedGroups() {
   return groups;
 }
 
-export function getProjectGroups(projectId) {
+export function getProjectGroups(projectId, createdGroup) {
   let saved = [];
   try { saved = readSavedGroups(); } catch { /* Storage unavailable. */ }
-  return saved.filter((group) => group && String(group.projectId) === String(projectId));
+  const projectGroups = saved.filter((group) => group && String(group.projectId) === String(projectId));
+  if (createdGroup && String(createdGroup.projectId) === String(projectId) &&
+      !projectGroups.some((group) => String(group.id) === String(createdGroup.id))) {
+    projectGroups.push(createdGroup);
+  }
+  return projectGroups;
 }
 
 export function saveGroup(group) {

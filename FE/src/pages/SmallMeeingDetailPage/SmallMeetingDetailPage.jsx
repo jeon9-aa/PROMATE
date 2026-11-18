@@ -16,8 +16,8 @@ export default function SmallMeetingDetailPage() {
   const userId = getCurrentUserId();
   const participantStorageKey = `promate-small-meeting-joined:${projectId || 'default'}:${meetingId}:${userId}`;
   const [joinedThisVisit, setJoinedThisVisit] = useState({});
+  const group = getProjectGroups(projectId, state?.group).find((item) => String(item.id) === String(meetingId));
   const subgroup = String(state?.subgroup?.id) === meetingId ? state.subgroup : null;
-  const group = getProjectGroups(projectId).find((item) => String(item.id) === String(meetingId));
   let joined = Boolean(joinedThisVisit[participantStorageKey]);
   try { joined ||= localStorage.getItem(participantStorageKey) === 'true'; } catch { /* Storage unavailable. */ }
   const members = group?.members ?? [];
