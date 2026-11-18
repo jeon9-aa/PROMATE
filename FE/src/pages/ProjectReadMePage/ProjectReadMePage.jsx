@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { useLocation, useNavigate, useParams } from 'react-router-dom';
 import logoGray from '../../assets/icons/logoGW.svg';
 import linkIcon from '../../assets/icons/linkIcon.svg';
@@ -6,6 +6,7 @@ import lockIcon from '../../assets/icons/lockIcon.svg';
 import ProfileModal from '../../components/ProfileModal/ProfileModal';
 import ApplyModal from '../../components/ApplyModal/ApplyModal';
 import apiClient from '../../api/apiClient';
+import { createChatRoom } from '../../api/Recruits/recruitmentApi';
 import Tag from '../../components/Tag/Tag';
 import './ProjectReadMePage.css';
 
@@ -42,6 +43,41 @@ function ProjectReadMePage() {
   const [applyJob, setApplyJob] = useState('');
   const [applyMotivation, setApplyMotivation] = useState('');
   const [isApplied, setIsApplied] = useState(false);
+  const [isCreatingChatRoom, setIsCreatingChatRoom] = useState(false);
+  const chatRoomRequestPending = useRef(false);
+
+  const handleChatClick = async () => {
+    if (chatRoomRequestPending.current) return;
+    const token = localStorage.getItem('accessToken');
+    if (!token || token === 'null' || token === 'undefined') {
+      alert('로그인이 필요한 서비스입니다.');
+      return;
+    }
+
+    chatRoomRequestPending.current = true;
+    setIsCreatingChatRoom(true);
+    try {
+      const { chatRoomId } = await createChatRoom(postId);
+      navigate(`/chat/${chatRoomId}`, {
+        state: {
+          createdRoom: {
+            id: String(chatRoomId),
+            projectName: projectData.title,
+            name: projectData.author?.nickname || '팀장',
+            avatarUrl: null,
+            memberCount: 2,
+            unread: 0,
+            messages: [],
+          },
+        },
+      });
+    } catch (error) {
+      alert(error.message || '채팅방 생성에 실패했습니다. 다시 시도해 주세요.');
+    } finally {
+      chatRoomRequestPending.current = false;
+      setIsCreatingChatRoom(false);
+    }
+  };
 
   useEffect(() => {
     const fetchProjectDetail = async () => {
@@ -227,8 +263,9 @@ function ProjectReadMePage() {
                 모집완료
               </button>
             )}
-            <button type="button" className="project-readme-chat-btn">
-              팀장과 채팅하기
+            <button type="button" className="project-readme-chat-btn"
+              onClick={handleChatClick} disabled={isCreatingChatRoom} aria-busy={isCreatingChatRoom}>
+              {isCreatingChatRoom ? '채팅방 생성 중...' : '팀장과 채팅하기'}
             </button>
           </div>
         )}
