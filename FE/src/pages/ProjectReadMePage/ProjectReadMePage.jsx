@@ -49,7 +49,7 @@ function ProjectReadMePage() {
 
   const handlePasswordInviteClick = () => {
     if (!projectData?.isAuthor) {
-      // 비밀번호 입력 페이지 나중에 연결 예정
+      setIsPasswordJoinNoticeOpen(true);
       return;
     }
     const invitation = passwordInvitations[postId];
