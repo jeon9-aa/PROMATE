@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useRef, useState } from 'react';
 import { useLocation, useParams } from 'react-router-dom';
 import MainButton from '../../components/MainButton/MainButton';
 import ProjectAvatar from '../../components/ProjectAvatar/ProjectAvatar';
@@ -33,6 +33,8 @@ function formatDate(value) {
 }
 
 export default function ProjectSettingsPage() {
+  const deleteOverlayRef = useRef(null);
+  const [deleteNotice, setDeleteNotice] = useState('');
   const { projectId } = useParams();
   const { state } = useLocation();
   const projectTitle = useProjectTitle(projectId, state?.projectTitle);
@@ -65,6 +67,28 @@ export default function ProjectSettingsPage() {
 
   return (
     <div className="project-settings-page">
+      <dialog ref={deleteOverlayRef} className="project-settings-delete-overlay"
+        aria-labelledby="project-settings-delete-title" aria-describedby="project-settings-delete-description"
+        onClick={(event) => {
+          if (event.target === event.currentTarget) deleteOverlayRef.current?.close();
+        }}>
+        <div className="project-settings-delete-dialog">
+          <h2 id="project-settings-delete-title">프로젝트 삭제</h2>
+          <div id="project-settings-delete-description" className="project-settings-delete-description">
+            <p>
+              테스크와 회의록 등의 <strong>이전 기록 모두 삭제</strong>되며
+              <br />
+              <strong>더이상 추가 작성과 수정도 불가</strong>합니다.
+            </p>
+            <p className="project-settings-delete-review">삭제 후 팀원들 간 상호 평가가 시작됩니다.</p>
+          </div>
+          {deleteNotice && <p className="project-settings-delete-notice" role="status">{deleteNotice}</p>}
+          <div className="project-settings-delete-dialog-actions">
+            <MainButton className="project-settings-delete-cancel" onClick={() => deleteOverlayRef.current?.close()}>취소</MainButton>
+            <MainButton className="project-settings-delete-confirm" onClick={() => setDeleteNotice('프로젝트 삭제 기능은 준비 중입니다.')}>삭제</MainButton>
+          </div>
+        </div>
+      </dialog>
       <header className="project-settings-header">
         <h1>{title} | 프로젝트 설정</h1>
       </header>
@@ -142,7 +166,7 @@ export default function ProjectSettingsPage() {
         <hr />
         <div className="project-settings-management">
           <button type="button" aria-disabled="true" title="프로젝트 종료 기능은 준비 중입니다">프로젝트 종료</button>
-          <button type="button" className="project-settings-delete" aria-disabled="true" title="프로젝트 삭제 기능은 준비 중입니다">프로젝트 삭제</button>
+          <button type="button" className="project-settings-delete" onClick={() => { setDeleteNotice(''); deleteOverlayRef.current?.showModal(); }}>프로젝트 삭제</button>
         </div>
         <div className="project-settings-actions">
           {isEditing ? (
