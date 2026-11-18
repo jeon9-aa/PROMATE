@@ -222,7 +222,10 @@
 
 .project-settings-actions {
   display: flex;
+  align-items: flex-end;
   justify-content: flex-end;
+  flex-wrap: wrap;
+  gap: 20px;
 }
 
 .project-settings-actions .project-settings-edit {
@@ -232,7 +235,79 @@
   font-weight: 700;
 }
 
-/* Disabled states and accessibility */
+/* 이미지 */
+.project-settings-image {
+  position: relative;
+  flex-shrink: 0;
+  width: 80px;
+  height: 80px;
+}
+
+.project-settings-image-add {
+  position: absolute;
+  right: 4px;
+  bottom: 4px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  background: #fe9a57;
+  color: #fff;
+  font-size: 20px;
+  font-weight: 700;
+  line-height: 1;
+  text-align: center;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.2);
+  pointer-events: none;
+}
+
+.project-settings-image .editable {
+  cursor: pointer;
+}
+
+.project-settings-card.is-editing input,
+.project-settings-card.is-editing textarea {
+  background: #f1f1f1;
+}
+
+.project-settings-domain-option {
+  padding: 0;
+  border: 0;
+  border-radius: 90px;
+  background: transparent;
+  cursor: pointer;
+}
+
+.project-settings-domain-option .common-tag {
+  pointer-events: none;
+}
+
+.project-settings-period input[type='date'] {
+  width: 154px;
+  max-width: 100%;
+  height: 37px;
+  padding: 8px;
+  font-size: 14px;
+  line-height: 17px;
+}
+
+.project-settings-unsaved {
+  margin: 0;
+  color: #de0000;
+  font-size: 14px;
+  line-height: 17px;
+}
+
+.project-settings-actions .project-settings-cancel {
+  background: #d9d9d9;
+}
+
+.project-settings-actions .project-settings-cancel:hover {
+  background: #ababab;
+}
+
 .project-settings-page [aria-disabled='true'] {
   cursor: default;
 }
