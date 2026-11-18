@@ -27,7 +27,7 @@
   line-height: 24px;
 }
 
-.project-share-modal > p:not(.project-share-status) {
+.project-share-modal > #project-share-description {
   margin: 0 0 20px;
   color: #ABABAB;
   font-size: 16px;
@@ -91,4 +91,15 @@
   color: #666666;
   font-size: 13px;
   line-height: 18px;
+}
+
+.project-share-expiry {
+  margin: 12px 0 0;
+  color: #666666;
+  font-size: 13px;
+  line-height: 20px;
+}
+
+.project-share-expiry + .project-share-status {
+  margin-top: 4px;
 }

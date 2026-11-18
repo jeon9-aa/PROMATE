@@ -108,7 +108,11 @@ export const demoHandlers = [
     const item = findRecruitment(params);
     return item ? ok(item) : missing();
   }),
-  http.get('*/recruitments/:recruitmentId/leader-profile', () => ok({ ...user, name: '김민서', completedTasks: 18, totalTasks: 24, pastProjects: [] })),
+  http.get('*/recruitments/:recruitmentId/leader-profile', ({ params }) => {
+    const item = findRecruitment(params);
+    if (!item) return missing();
+    return ok({ ...user, name: item.author.nickname, nickname: item.author.nickname, completedTasks: 18, totalTasks: 24, pastProjects: [] });
+  }),
   http.post('*/recruitments/:recruitmentId/bookmark', ({ params }) => {
     const item = findRecruitment(params);
     if (!item) return missing();

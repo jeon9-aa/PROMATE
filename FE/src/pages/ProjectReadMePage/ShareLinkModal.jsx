@@ -1,5 +1,6 @@
 import { useEffect, useRef, useState } from 'react';
 import { createPortal } from 'react-dom';
+import { formatInviteExpiry } from './formatInviteExpiry';
 import './ShareLinkModal.css';
 
 export default function ShareLinkModal({
@@ -8,6 +9,7 @@ export default function ShareLinkModal({
   title = '링크 공유',
   description = '해당 링크로 입장한 참가자는 지원자 검토 후 참여할 수 있습니다.',
   linkLabel = '공유 링크',
+  expiresAt,
 }) {
   const dialogRef = useRef(null);
   const inputRef = useRef(null);
@@ -62,6 +64,11 @@ export default function ShareLinkModal({
           <button type="button" onClick={handleCopy}>복사</button>
         </div>
       </div>
+      {expiresAt && (
+        <p className="project-share-expiry">
+          유효시간: <time dateTime={new Date(expiresAt).toISOString()}>{formatInviteExpiry(expiresAt)}</time>까지 (한국 시간)
+        </p>
+      )}
       <p className="project-share-status" role="status">{copyMessage}</p>
     </dialog>,
     document.body,

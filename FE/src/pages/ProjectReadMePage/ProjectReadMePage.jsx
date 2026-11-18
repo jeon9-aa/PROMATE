@@ -11,6 +11,7 @@ import { getOrCreateChatRoom } from '../../api/Recruits/recruitmentApi';
 import Tag from '../../components/Tag/Tag';
 import ShareLinkModal from './ShareLinkModal';
 import PasswordInviteModal from './PasswordInviteModal';
+import { formatInviteExpiry } from './formatInviteExpiry';
 import PasswordJoinNoticeModal from './PasswordJoinNoticeModal';
 import './ProjectReadMePage.css';
 
@@ -67,10 +68,12 @@ function ProjectReadMePage() {
 
   const handlePasswordRegister = (password) => {
     if (!projectData?.isAuthor || !/^[0-9]{4}$/.test(password)) return;
+    const expiresAt = Date.now() + 24 * 60 * 60 * 1000;
     setPasswordInvitations((previous) => ({
       ...previous,
-      [postId]: { password, expiresAt: Date.now() + 24 * 60 * 60 * 1000 },
+      [postId]: { password, expiresAt },
     }));
+    window.alert(`비밀번호가 설정되었습니다.\n유효시간: ${formatInviteExpiry(expiresAt)}까지 (한국 시간)\n설정 시점부터 24시간 동안 사용할 수 있습니다.`);
     setIsPasswordModalOpen(false);
     setIsPasswordLinkModalOpen(true);
   };
@@ -331,6 +334,7 @@ function ProjectReadMePage() {
           title="비밀번호 링크 공유"
           description="해당 링크에서 비밀번호를 입력한 참가자는 지원자 검토 없이 바로 프로젝트에 참여합니다."
           linkLabel="비밀번호 초대 링크"
+          expiresAt={passwordInvitations[postId]?.expiresAt}
           onClose={() => setIsPasswordLinkModalOpen(false)}
         />
       )}
