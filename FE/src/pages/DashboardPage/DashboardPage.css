@@ -5,6 +5,7 @@
   height: calc(100vh - 56px);
   background: linear-gradient(180deg, #F0F0F0 0%, #FFFFFF 100%);
   overflow-y: auto;
+  overscroll-behavior: none;
   padding: 19px 30px 20px;
   box-sizing: border-box;
 }

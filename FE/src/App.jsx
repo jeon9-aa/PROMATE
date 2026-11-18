@@ -27,7 +27,7 @@ import ChatAndRoomListPage from "./pages/ChatAndRoomListPage/ChatAndRoomListPage
 
 function AppLayout({ isMenuOpen, toggleMenu, closeMenu }) {
   return (
-    <div style={{ display: "flex", flexDirection: "column", minHeight: "100vh" }}>
+    <div className="app-layout">
       <Header onMenuClick={toggleMenu} />
       <div style={{ display: "flex", flex: 1, backgroundColor: "#F8F9FA" }}>
         <Sidebar isOpen={isMenuOpen} onClose={closeMenu} />
