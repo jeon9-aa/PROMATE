@@ -10,6 +10,7 @@ function LinkInviteLoginPage({
   teamName = "PRO:MATE",
   inviterName = "아무개",
   teamImageUrl,
+  isInviteInvalid = false,
 }) {
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState("");
@@ -33,15 +34,26 @@ function LinkInviteLoginPage({
     <main className="link-invite-login-page">
       <section className="link-invite-login-panel" aria-label="팀 초대 로그인">
         <InviteLoginLogo />
-        <InviteTeamCard
-          teamName={teamName}
-          inviterName={inviterName}
-          teamImageUrl={teamImageUrl}
-        />
-        <div className="link-invite-login-actions">
-          <LoginForm onLogin={handleLogin} isLoading={isLoading} />
-          {error && <p className="link-invite-login-error" role="alert">{error}</p>}
-        </div>
+        {isInviteInvalid ? (
+          <section className="invite-team-card" role="alert">
+            <h1 className="invite-team-name">초대 링크를 열 수 없어요</h1>
+            <p className="link-invite-login-error">
+              초대한 사람에게 새 링크를 요청해 주세요.
+            </p>
+          </section>
+        ) : (
+          <>
+            <InviteTeamCard
+              teamName={teamName}
+              inviterName={inviterName}
+              teamImageUrl={teamImageUrl}
+            />
+            <div className="link-invite-login-actions">
+              <LoginForm onLogin={handleLogin} isLoading={isLoading} />
+              {error && <p className="link-invite-login-error" role="alert">{error}</p>}
+            </div>
+          </>
+        )}
       </section>
     </main>
   );
