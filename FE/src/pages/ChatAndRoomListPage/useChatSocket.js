@@ -7,15 +7,17 @@ import { getChatMessages, markChatMessagesRead } from '../../api/Chat/chatApi';
 import { toChatMessage } from './chatMessages';
 import { createChatReadMarker } from './chatReadMarker';
 
-export default function useChatSocket(roomId, onMessage) {
+export default function useChatSocket(roomId, onMessage, onRead) {
   const clientRef = useRef(null);
   const onMessageRef = useRef(onMessage);
+  const onReadRef = useRef(onRead);
   const [connection, setConnection] = useState({});
   const [history, setHistory] = useState({});
   const [readStatus, setReadStatus] = useState({});
   const isLoggedIn = useAuthStore((state) => state.isLoggedIn);
 
   useEffect(() => { onMessageRef.current = onMessage; }, [onMessage]);
+  useEffect(() => { onReadRef.current = onRead; }, [onRead]);
 
   useEffect(() => {
     if (!roomId || !isLoggedIn) return;
@@ -25,7 +27,10 @@ export default function useChatSocket(roomId, onMessage) {
     const readMarker = createChatReadMarker({
       markRead: (signal) => markChatMessagesRead(roomId, signal),
       isVisible: () => document.visibilityState === 'visible',
-      onSuccess: () => setReadStatus({ roomId, error: '' }),
+      onSuccess: () => {
+        setReadStatus({ roomId, error: '' });
+        onReadRef.current?.(roomId);
+      },
       onError: () => setReadStatus({ roomId, error: '읽음 처리에 실패했습니다. 채팅방을 다시 열어 주세요.' }),
     });
     const handleVisibility = () => { void readMarker.flush(); };
