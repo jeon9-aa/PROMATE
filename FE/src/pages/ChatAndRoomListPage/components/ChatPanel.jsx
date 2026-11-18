@@ -38,7 +38,7 @@ export default function ChatPanel({ room, draft, onDraftChange, onSend, onBack, 
       <header className="chat-panel__header">
         <button type="button" className="chat-icon-button" aria-label="채팅방 목록으로" onClick={onBack}><ChevronLeft size={20} /></button>
         <ProfileAvatar src={room.avatarUrl} alt={`${room.name} 프로필`} size={40} />
-        <div className="chat-panel__identity"><h2>{room.projectName} · {room.name}</h2><span>멤버 {room.memberCount}명</span></div>
+        <div className="chat-panel__identity"><h2>{room.projectName} · {room.name}</h2>{room.memberCount != null && <span>멤버 {room.memberCount}명</span>}</div>
         <div className="chat-panel__menu" ref={menuRef}>
           <button ref={menuButtonRef} type="button" className="chat-icon-button" aria-label="채팅방 메뉴" aria-expanded={menuOpen} aria-controls="chat-room-actions" onClick={() => setMenuOpen(!menuOpen)}><Menu size={20} /></button>
           {menuOpen && <div id="chat-room-actions" className="chat-panel__dropdown"><button type="button" onClick={() => { setMenuOpen(false); onLeave(); }}><LogOut size={16} />채팅방 나가기</button></div>}
@@ -46,7 +46,7 @@ export default function ChatPanel({ room, draft, onDraftChange, onSend, onBack, 
       </header>
       <div className="chat-panel__messages" ref={messagesRef} role="log" aria-label="대화 내용" aria-live="polite">
         {room.messages.map((message) => <ChatMessage key={message.id} message={message} room={room} />)}
-        {!room.messages.length && <p className="chat-empty">첫 메시지를 보내보세요.</p>}
+        {!room.messages.length && <p className="chat-empty">{room.lastMessage ? '이전 대화 내역은 아직 불러올 수 없습니다.' : '첫 메시지를 보내보세요.'}</p>}
       </div>
       <form
         className="chat-composer"

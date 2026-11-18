@@ -8,6 +8,8 @@ export default function ChatRoomList({ rooms, selectedId, onSelect }) {
       <ul className="chat-room-list__items">
         {rooms.map((room) => {
           const latest = room.messages.at(-1);
+          const preview = latest?.text ?? room.lastMessage;
+          const previewAt = latest?.sentAt ?? room.lastMessageAt;
           return (
             <li key={room.id}>
               <button type="button" className={`chat-room-item${room.id === selectedId ? ' chat-room-item--active' : ''}`}
@@ -15,10 +17,10 @@ export default function ChatRoomList({ rooms, selectedId, onSelect }) {
                 <ProfileAvatar src={room.avatarUrl} alt={`${room.name} 프로필`} size={40} />
                 <span className="chat-room-item__content">
                   <strong>{room.projectName} · {room.name}</strong>
-                  <span>{latest?.text || '아직 메시지가 없습니다.'}</span>
+                  <span>{preview || '아직 메시지가 없습니다.'}</span>
                 </span>
                 <span className="chat-room-item__meta">
-                  {latest && <time dateTime={latest.sentAt}>{formatRoomTime(latest.sentAt)}</time>}
+                  {previewAt && <time dateTime={previewAt}>{formatRoomTime(previewAt)}</time>}
                   {room.unread > 0 && <span className="chat-room-item__badge" aria-label={`읽지 않은 메시지 ${room.unread}개`}>{room.unread}</span>}
                 </span>
               </button>
