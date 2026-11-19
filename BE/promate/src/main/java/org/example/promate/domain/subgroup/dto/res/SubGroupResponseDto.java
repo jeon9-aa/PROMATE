@@ -1,3 +1,4 @@
+
 package org.example.promate.domain.subgroup.dto.res;
 
 import lombok.Builder;
@@ -5,6 +6,7 @@ import lombok.Getter;
 import org.example.promate.domain.subgroup.enums.SubGroupRole;
 import org.example.promate.domain.subgroup.enums.SubStatus;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 
 public class SubGroupResponseDto {
@@ -15,6 +17,8 @@ public class SubGroupResponseDto {
         private Long subGroupId;
         private String name;
         private int currentCount;
+        private LocalDate startDate;
+        private LocalDate endDate;
     }
 
     @Getter
@@ -27,6 +31,8 @@ public class SubGroupResponseDto {
         private int currentCount;
         private Integer capacity;
         private boolean isJoined;
+        private LocalDate startDate;
+        private LocalDate endDate;
     }
 
     @Getter
@@ -41,6 +47,8 @@ public class SubGroupResponseDto {
         private boolean isJoined;
         private boolean isLeader;
         private LocalDateTime createdAt;
+        private LocalDate startDate;
+        private LocalDate endDate;
     }
 
     @Getter
@@ -53,6 +61,8 @@ public class SubGroupResponseDto {
         private Integer capacity;
         private SubStatus status;
         private LocalDateTime updatedAt;
+        private LocalDate startDate;
+        private LocalDate endDate;
     }
 
     @Getter
