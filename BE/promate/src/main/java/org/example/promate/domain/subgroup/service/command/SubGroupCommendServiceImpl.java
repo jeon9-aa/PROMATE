@@ -3,6 +3,7 @@ package org.example.promate.domain.subgroup.service.command;
 import lombok.RequiredArgsConstructor;
 import org.example.promate.domain.project.code.MemberErrorCode;
 import org.example.promate.domain.project.code.ProjectErrorCode;
+import org.example.promate.domain.project.entity.Member;
 import org.example.promate.domain.project.entity.Project;
 import org.example.promate.domain.project.exception.MemberException;
 import org.example.promate.domain.project.exception.ProjectException;
@@ -52,11 +53,10 @@ public class SubGroupCommendServiceImpl implements SubGroupCommendService {
         Project project = projectRepository.findById(projectId)
                 .orElseThrow(() -> new ProjectException(ProjectErrorCode.ID_NOT_FOUND));
 
-        log.info("[소모임 생성] userId={}, projectId={}, isMember={}", userId, projectId);
-
         // 3. 프로젝트 멤버 여부 검증
         boolean isMember = memberRepository.existsByUserIdAndProjectId(userId, projectId);
 
+        log.info("[소모임 생성] userId={}, projectId={}, isMember={}", userId, projectId, isMember);
 
         if (!isMember) {
             throw new MemberException(MemberErrorCode.MEMBER_FORBIDDEN_NOT_PROJECT_MEMBER);
