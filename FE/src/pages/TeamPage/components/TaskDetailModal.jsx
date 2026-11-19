@@ -1,3 +1,4 @@
+import DateInput from '../../../components/DatePicker/DateInput.jsx';
 import GuardedButton from '../../../components/GuardedButton/GuardedButton.jsx';
 import React, { useState, useEffect } from 'react';
 
@@ -151,8 +152,7 @@ function TaskDetailModal({
                   </div>
                   <div className="team-detail-info-row" style={{ width: '100%', gap: '16px' }}>
                     <span className="team-detail-info-label">마감일</span>
-                    <input
-                      type="date"
+                    <DateInput
                       className="team-detail-edit-input"
                       value={editDueDate}
                       onChange={(e) => setEditDueDate(e.target.value)}
