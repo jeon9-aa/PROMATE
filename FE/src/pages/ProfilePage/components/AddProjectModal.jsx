@@ -1,3 +1,4 @@
+import DateInput from '../../../components/DatePicker/DateInput.jsx';
 import GuardedButton from '../../../components/GuardedButton/GuardedButton.jsx';
 import React, { useState } from 'react';
 import ReactDOM from 'react-dom';
@@ -111,8 +112,7 @@ const AddProjectModal = ({ onClose, onAdd, initialValues }) => {
             <div className="add-modal-date-range">
               <div className="add-modal-custom-date">
                 <div className="add-modal-date-display">{formatDateWithDay(startDate)}</div>
-                <input
-                  type="date"
+                <DateInput
                   className="add-modal-hidden-date"
                   value={startDate}
                   max={endDate && endDate < today ? endDate : today}
@@ -122,8 +122,7 @@ const AddProjectModal = ({ onClose, onAdd, initialValues }) => {
               <span className="add-modal-date-sep">~</span>
               <div className="add-modal-custom-date">
                 <div className="add-modal-date-display">{formatDateWithDay(endDate)}</div>
-                <input
-                  type="date"
+                <DateInput
                   className="add-modal-hidden-date"
                   value={endDate}
                   min={startDate || undefined}
