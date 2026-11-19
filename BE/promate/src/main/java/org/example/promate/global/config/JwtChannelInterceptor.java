@@ -85,12 +85,6 @@ public class JwtChannelInterceptor implements ChannelInterceptor {
 
             Principal principal = accessor.getUser();
 
-            System.out.println(
-                    "[STOMP] command=" + command
-                            + ", destination=" + accessor.getDestination()
-                            + ", user=" + (principal == null ? "null" : principal.getName())
-            ); // 로그
-
             if (principal == null) {
                 throw new ChatMessageException(
                         ChatMessageErrorCode.WEBSOCKET_UNAUTHORIZED
@@ -142,11 +136,7 @@ public class JwtChannelInterceptor implements ChannelInterceptor {
             }
 
             Long userId = Long.valueOf(principal.getName());
-
-            System.out.println(
-                    "[STOMP] participant check: chatRoomId="
-                            + chatRoomId + ", userId=" + userId
-            ); // 로그
+            
 
 
             // 3. 채팅방 참여자 검증
