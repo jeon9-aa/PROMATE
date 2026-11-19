@@ -62,7 +62,8 @@ function TeamCreatePage() {
   const [description, setDescription] = useState("");
   const [recruitImageUrl, setRecruitImageUrl] = useState("");
   const [isCreated, setIsCreated] = useState(false);
-  const isSubmitEnabled = !isCreated && projectName.trim() !== "" && description.trim() !== "";
+  const isRecruitCountValid = Number.isInteger(Number(recruitCount)) && Number(recruitCount) >= 1 && Number(recruitCount) <= 99;
+  const isSubmitEnabled = !isCreated && projectName.trim() !== "" && description.trim() !== "" && isRecruitCountValid;
 
   const handleCancel = () => {
     setProjectName("");
@@ -121,7 +122,7 @@ function TeamCreatePage() {
         title: projectName,
         description: description,
         category: selectedDomain,
-        totalSlots: parseInt(recruitCount, 10),
+        totalSlots: Number(recruitCount),
         startDate: startDate,
         endDate: endDate,
         recruitImageUrl: recruitImageUrl || null,
@@ -198,18 +199,21 @@ function TeamCreatePage() {
           <label className="teammaking-form-label" htmlFor="recruit-count">
             모집 인원
           </label>
-          <select
+          <input
             id="recruit-count"
-            className="recruit-count-select"
+            className="recruit-count-input"
+            type="number"
+            min="1"
+            max="99"
+            step="1"
             value={recruitCount}
             onChange={(event) => setRecruitCount(event.target.value)}
-          >
-            {Array.from({ length: 10 }, (_, index) => String(index + 1)).map((count) => (
-              <option key={count} value={count}>
-                {count}명
-              </option>
-            ))}
-          </select>
+            aria-describedby="recruit-count-help"
+            aria-invalid={!isRecruitCountValid}
+          />
+          <span id="recruit-count-help" className="recruit-count-help">
+            모집 인원을 1~99명 사이의 정수로 입력해 주세요.
+          </span>
         </div>
         <ProjectPeriodField
           startDate={startDate}
