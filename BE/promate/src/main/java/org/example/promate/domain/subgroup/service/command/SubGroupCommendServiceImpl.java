@@ -27,6 +27,8 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import lombok.extern.slf4j.Slf4j;
 
+import java.time.LocalDate;
+
 @Slf4j
 @Service
 @RequiredArgsConstructor
@@ -39,79 +41,84 @@ public class SubGroupCommendServiceImpl implements SubGroupCommendService {
     private final SubGroupRepository subGroupRepository;
     private final SubGroupMemberRepository subGroupMemberRepository;
 
+
     @Override
     public SubGroupResponseDto.CreatedSubGroup createSubGroup(Long userId, Long projectId, SubGroupRequestDto.CreateSubGroup dto) {
         // 1. 사용자 존재 여부 검증
         User user = userRepository.findById(userId)
-                .orElseThrow(() ->
-                        new UserException(UserErrorCode.USER_NOT_FOUND)
-                );
+                .orElseThrow(() -> new UserException(UserErrorCode.USER_NOT_FOUND));
 
         // 2. 프로젝트 존재 여부 검증
         Project project = projectRepository.findById(projectId)
-                .orElseThrow(() ->
-                        new ProjectException(ProjectErrorCode.ID_NOT_FOUND)
-                );
+                .orElseThrow(() -> new ProjectException(ProjectErrorCode.ID_NOT_FOUND));
 
+        // 3. 프로젝트 멤버 여부 검증
+        boolean isMember = memberRepository.existsByUserIdAndProjectId(userId, projectId);
 
-        log.info("프로젝트 멤버 검증 시작");
-        log.info("userId = {}", userId);
-        log.info("projectId = {}", projectId);
+        log.info("[소모임 생성] userId={}, projectId={}, isMember={}", userId, projectId, isMember);
 
-        boolean exists = memberRepository.existsByUserIdAndProjectId(
-                userId, projectId
-        );
-
-        log.info("프로젝트 멤버 존재 여부 = {}", exists);
-
-        if (!exists) {
-            throw new MemberException(
-                    MemberErrorCode.MEMBER_FORBIDDEN_NOT_PROJECT_MEMBER
-            );
+        if (!isMember) {
+            throw new MemberException(MemberErrorCode.MEMBER_FORBIDDEN_NOT_PROJECT_MEMBER);
         }
 
+        // 4. 모집 인원 검증
+        if (dto.getCapacity() == null || dto.getCapacity() < 1) {
+            throw new SubGroupException(SubGroupErrorCode.SUBGROUP_INVALID_CAPACITY);
+        }
 
-//        // 3. 프로젝트 멤버 여부 검증
-//        if (!memberRepository.existsByUserIdAndProjectId(userId, projectId)) {
-//            throw new MemberException(
-//                    MemberErrorCode.MEMBER_FORBIDDEN_NOT_PROJECT_MEMBER
-//            );
-//        }
+        // 5. 프로젝트 전체 정원 초과 검증
+        if (dto.getCapacity() > project.getTotalSlots()) {
+            throw new SubGroupException(SubGroupErrorCode.SUBGROUP_CAPACITY_EXCEEDS_PROJECT);
+        }
 
-        // 4. 소모임 엔티티 생성
+        // 6. 소모임 시작일 및 종료일 필수 검증
+        if (dto.getStartDate() == null || dto.getEndDate() == null) {
+            throw new SubGroupException(SubGroupErrorCode.SUBGROUP_INVALID_DATE);
+        }
+
+        // 7. 소모임 종료일이 시작일보다 빠른 경우
+        if (dto.getEndDate().isBefore(dto.getStartDate())) {
+            throw new SubGroupException(SubGroupErrorCode.SUBGROUP_INVALID_DATE_RANGE);
+        }
+
+        // 8. 프로젝트 시작일보다 소모임 시작일이 빠른 경우
+        if (project.getStartDate() != null && dto.getStartDate().isBefore(project.getStartDate())) {
+            throw new SubGroupException(SubGroupErrorCode.SUBGROUP_INVALID_DATE);
+        }
+
+        // 9. 프로젝트 종료일보다 소모임 종료일이 늦은 경우
+        if (project.getEndDate() != null && dto.getEndDate().isAfter(project.getEndDate())) {
+            throw new SubGroupException(SubGroupErrorCode.SUBGROUP_INVALID_DATE);
+        }
+
+        // 10. 소모임 엔티티 생성
         SubGroup subGroup = SubGroupConverter.toSubGroup(dto, project);
 
-        // 5. 생성자(리더)를 현재 인원에 반영
+        // 11. 생성자를 현재 인원에 포함
         subGroup.increaseCurrentCount();
 
-        // 6. 정원에 도달하면 모집 완료
-        if (subGroup.getCapacity() != null
-                && subGroup.getCurrentCount() >= subGroup.getCapacity()) {
+        // 12. 정원 도달 시 모집 완료
+        if (subGroup.getCurrentCount() >= subGroup.getCapacity()) {
             subGroup.complete();
         }
 
-        // 7. 소모임 저장
+        // 13. 소모임 저장
         subGroupRepository.save(subGroup);
 
-        // 8. 생성자를 소모임 리더로 등록
-        SubGroupMember leader = SubGroupConverter.toSubGroupMember(
-                subGroup,
-                user,
-                SubGroupRole.LEADER
-        );
+        // 14. 생성자를 소모임 리더로 등록
+        SubGroupMember leader = SubGroupConverter.toSubGroupMember(subGroup, user, SubGroupRole.LEADER);
 
         subGroupMemberRepository.save(leader);
 
-        // 9. 응답 반환
+        // 15. 응답 반환
         return SubGroupConverter.toCreatedSubGroup(subGroup);
     }
 
     @Override
     public SubGroupResponseDto.UpdatedSubGroup updateSubGroup(Long userId, Long projectId, Long subgroupId, SubGroupRequestDto.UpdateSubGroup dto) {
         // 1. 프로젝트 존재 여부 검증
-        if (!projectRepository.existsById(projectId)) {
-            throw new ProjectException(ProjectErrorCode.ID_NOT_FOUND);
-        }
+        Project project = projectRepository.findById(projectId)
+                .orElseThrow(() -> new ProjectException(ProjectErrorCode.ID_NOT_FOUND));
 
         // 2. 프로젝트 멤버 여부 검증
         if (!memberRepository.existsByUserIdAndProjectId(userId, projectId)) {
@@ -127,31 +134,64 @@ public class SubGroupCommendServiceImpl implements SubGroupCommendService {
             throw new SubGroupException(SubGroupErrorCode.SUBGROUP_FORBIDDEN_NOT_LEADER);
         }
 
-        // 5. 수정 요청값 검증
+        // 5. 소모임 이름 검증
         if (dto.getName() != null && dto.getName().isBlank()) {
             throw new SubGroupException(SubGroupErrorCode.SUBGROUP_INVALID_NAME);
         }
 
-        // 6. 현재 인원보다 정원을 작게 수정하는지 검증
-        if (dto.getCapacity() != null && dto.getCapacity() < subGroup.getCurrentCount()) {
-            throw new SubGroupException(SubGroupErrorCode.SUBGROUP_INVALID_CAPACITY);
+        // 6. 모집 인원 검증
+        if (dto.getCapacity() != null) {
+
+            // 최소 1명 이상, 현재 인원 이상
+            if (dto.getCapacity() < 1 || dto.getCapacity() < subGroup.getCurrentCount()) {
+                throw new SubGroupException(SubGroupErrorCode.SUBGROUP_INVALID_CAPACITY);
+            }
+
+            // 프로젝트 전체 정원 초과 방지
+            if (dto.getCapacity() > project.getTotalSlots()) {
+                throw new SubGroupException(SubGroupErrorCode.SUBGROUP_CAPACITY_EXCEEDS_PROJECT);
+            }
         }
 
-        // 7. 엔티티 수정
-        subGroup.update(dto.getName(), dto.getDescription(), dto.getCapacity());
+        // 7. 수정할 날짜 결정 (null이면 기존 날짜 유지)
+        LocalDate startDate = dto.getStartDate() != null ? dto.getStartDate() : subGroup.getStartDate();
 
-        // 8. 정원 변경에 따른 모집 상태 갱신
-        Integer capacity = subGroup.getCapacity();
+        LocalDate endDate = dto.getEndDate() != null ? dto.getEndDate() : subGroup.getEndDate();
 
-        if (capacity != null && subGroup.getCurrentCount() >= capacity) {
+        // 8. 시작일 및 종료일 필수 검증
+        if (startDate == null || endDate == null) {
+            throw new SubGroupException(SubGroupErrorCode.SUBGROUP_INVALID_DATE);
+        }
+
+        // 9. 종료일이 시작일보다 빠른 경우
+        if (endDate.isBefore(startDate)) {
+            throw new SubGroupException(SubGroupErrorCode.SUBGROUP_INVALID_DATE_RANGE);
+        }
+
+        // 10. 프로젝트 시작일보다 소모임 시작일이 빠른 경우
+        if (project.getStartDate() != null && startDate.isBefore(project.getStartDate())) {
+            throw new SubGroupException(SubGroupErrorCode.SUBGROUP_INVALID_DATE);
+        }
+
+        // 11. 프로젝트 종료일보다 소모임 종료일이 늦은 경우
+        if (project.getEndDate() != null && endDate.isAfter(project.getEndDate())) {
+            throw new SubGroupException(SubGroupErrorCode.SUBGROUP_INVALID_DATE);
+        }
+
+        // 12. 엔티티 수정
+        subGroup.update(dto.getName(), dto.getDescription(), dto.getCapacity(), startDate, endDate);
+
+        // 13. 정원 변경에 따른 모집 상태 갱신
+        if (subGroup.getCurrentCount() >= subGroup.getCapacity()) {
             subGroup.complete();
         } else {
             subGroup.recruit();
         }
 
-        // 9. Converter로 응답 변환
+        // 14. 응답 반환
         return SubGroupConverter.toUpdatedSubGroup(subGroup);
     }
+
 
     @Override
     public void deleteSubGroup(Long userId, Long projectId, Long subgroupId) {

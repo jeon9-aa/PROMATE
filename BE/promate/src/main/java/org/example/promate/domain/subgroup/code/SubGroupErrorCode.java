@@ -18,6 +18,9 @@ public enum SubGroupErrorCode implements BaseErrorCode {
     SUBGROUP_NOT_JOINED(HttpStatus.NOT_FOUND, "SUBGROUP_E008", "참여하지 않은 소모임입니다."),
     SUBGROUP_LEADER_CANNOT_LEAVE(HttpStatus.FORBIDDEN, "SUBGROUP_E008","소모임 리더는 탈퇴할 수 없습니다. 소모임을 삭제해 주세요."),
     OVER_ONE_PEOPLE(HttpStatus.BAD_REQUEST, "SUBGROUP_E009","소모임 멤버는 한 명 이상이어야 합니다."),
+    SUBGROUP_CAPACITY_EXCEEDS_PROJECT(HttpStatus.BAD_REQUEST, "SUBGROUP_E010", "소모임 최대 인원은 프로젝트 전체 모집 인원을 초과할 수 없습니다."),
+    SUBGROUP_INVALID_DATE(HttpStatus.BAD_REQUEST, "SUBGROUP_E011", "소모임 기간은 프로젝트 기간 내에 있어야 합니다."),
+    SUBGROUP_INVALID_DATE_RANGE(HttpStatus.BAD_REQUEST, "SUBGROUP_E012", "소모임 종료일은 시작일보다 빠를 수 없습니다."),
     ;
 
     private final HttpStatus status;
