@@ -1,3 +1,5 @@
+import '../../components/TeamPageMenu/ProjectTitleButton.css';
+import TeamPageMenu from '../../components/TeamPageMenu/TeamPageMenu.jsx';
 import GuardedForm from '../../components/GuardedForm/GuardedForm.jsx';
 import GuardedButton from '../../components/GuardedButton/GuardedButton.jsx';
 import React, { useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState } from 'react';
@@ -244,7 +246,7 @@ function BoardDetailPage() {
           <h1 id="board-detail-heading" className="board-detail__page-title">
             <GuardedButton
               type="button"
-              className="board-detail__title-button"
+              className="board-detail__title-button project-title-button" data-tooltip="팀페이지로 이동"
               onClick={() => navigate(`/project/${projectId}`, {
                 state: {
                   projectTitle,
@@ -256,25 +258,7 @@ function BoardDetailPage() {
             </GuardedButton>
           </h1>
 
-          {!isLoading && !error && post && (
-            <div className="board-detail__menu" ref={menuRef}>
-              <GuardedButton
-                type="button"
-                className="board-detail__menu-button"
-                aria-label="게시글 메뉴"
-                aria-expanded={isMenuOpen}
-                onClick={() => setIsMenuOpen((open) => !open)}
-              >
-                <Ellipsis size={24} />
-              </GuardedButton>
-              {isMenuOpen && (
-                <div className="board-detail__menu-popup">
-                  <GuardedButton type="button" onClick={openEditPage}>수정</GuardedButton>
-                  <GuardedButton type="button" className="board-detail__delete" onClick={handleDelete}>삭제</GuardedButton>
-                </div>
-              )}
-            </div>
-          )}
+          <TeamPageMenu projectId={projectId} projectTitle={projectTitle} dueDate={location.state?.dueDate} currentPage="board" />
         </header>
 
         {isLoading && <div className="board-detail__status">게시글을 불러오는 중...</div>}
@@ -283,7 +267,26 @@ function BoardDetailPage() {
         {!isLoading && !error && post && (
           <div className="board-detail__cards">
             <article className="board-detail__post-card">
-              <h2 className="board-detail__post-title">{post.title}</h2>
+              <div className="board-detail__post-header">
+                <h2 className="board-detail__post-title">{post.title}</h2>
+                <div className="board-detail__menu" ref={menuRef}>
+                  <GuardedButton
+                    type="button"
+                    className="board-detail__menu-button"
+                    aria-label="게시글 메뉴"
+                    aria-expanded={isMenuOpen}
+                    onClick={() => setIsMenuOpen((open) => !open)}
+                  >
+                    <Ellipsis size={24} />
+                  </GuardedButton>
+                  {isMenuOpen && (
+                    <div className="board-detail__menu-popup">
+                      <GuardedButton type="button" onClick={openEditPage}>수정</GuardedButton>
+                      <GuardedButton type="button" className="board-detail__delete" onClick={handleDelete}>삭제</GuardedButton>
+                    </div>
+                  )}
+                </div>
+              </div>
               <div className="board-detail__post-meta">
                 <span>{post.writerName ?? post.authorName ?? '작성자'}</span>
                 <time dateTime={post.createdAt}>{formatDate(post.createdAt)}</time>

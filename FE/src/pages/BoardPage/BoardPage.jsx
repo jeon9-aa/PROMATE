@@ -1,6 +1,8 @@
+import '../../components/TeamPageMenu/ProjectTitleButton.css';
+import TeamPageMenu from '../../components/TeamPageMenu/TeamPageMenu.jsx';
 import GuardedButton from '../../components/GuardedButton/GuardedButton.jsx';
 import React, { useCallback, useEffect, useState } from 'react';
-import { Ellipsis, MessageCircle, SquarePen } from 'lucide-react';
+import { MessageCircle, SquarePen } from 'lucide-react';
 import { useLocation, useNavigate, useSearchParams } from 'react-router-dom';
 import {
   getProjectPosts,
@@ -123,7 +125,7 @@ function BoardPage() {
           <h1 id="project-board-title" className="project-board__title">
             <GuardedButton
               type="button"
-              className="project-board__title-button"
+              className="project-board__title-button project-title-button" data-tooltip="팀페이지로 이동"
               onClick={() => navigate(`/project/${projectId}`, {
                 state: {
                   projectTitle,
@@ -134,9 +136,7 @@ function BoardPage() {
               {projectTitle ? `${projectTitle} | 게시판` : '게시판'}
             </GuardedButton>
           </h1>
-          <span className="project-board__more" aria-hidden="true">
-            <Ellipsis size={24} aria-hidden="true" />
-          </span>
+          <TeamPageMenu projectId={projectId} projectTitle={projectTitle} dueDate={location.state?.dueDate} currentPage="board" />
         </header>
 
         <div className="project-board__toolbar">

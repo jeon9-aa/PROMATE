@@ -8,7 +8,7 @@ import SummaryCard from '../../components/SummaryCard/SummaryCard';
 import moreIcon from '../../assets/moreIcon.svg';
 import NewTaskModal from '../../components/NewTaskModal/NewTaskModal.jsx';
 import TaskDetailModal from './components/TaskDetailModal.jsx';
-import TeamPageMenu from './components/TeamPageMenu.jsx';
+import TeamPageMenu from '../../components/TeamPageMenu/TeamPageMenu.jsx';
 import { 
   getProjectMembers, 
   getProjectTasks, 
@@ -63,6 +63,12 @@ function TeamPage() {
 
   const idToFetch = Number(projectId);
   const projectDueDate = location.state?.dueDate || '마감일 미정';
+
+  useEffect(() => {
+    if (location.hash !== '#calendar') return;
+    calendarRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    calendarRef.current?.focus({ preventScroll: true });
+  }, [location.hash, location.key]);
 
   const completedTasksCount = tasks.filter(task => task.status === 'DONE').length;
   const pendingTasksCount = tasks.filter(task => task.status !== 'DONE').length;
@@ -258,6 +264,7 @@ function TeamPage() {
       <div className={`team-page-grid ${isTaskExpanded ? 'team-task-expanded' : ''}`}>
         <section
           className="team-card team-progress-card team-card-clickable"
+          data-tooltip="태스크 페이지로 이동"
           role="button"
           tabIndex={0}
           onClick={() => openTaskBoard('all')}
@@ -352,6 +359,7 @@ function TeamPage() {
 
         <div
           className="team-card team-metric-card team-metric-card-urgent team-card-clickable"
+          data-tooltip="태스크 페이지(진행 중)로 이동"
           role="button"
           tabIndex={0}
           onClick={() => openTaskBoard('IN_PROGRESS')}
@@ -366,6 +374,7 @@ function TeamPage() {
         </div>
         <div
           className="team-card team-metric-card team-metric-card-completed team-card-clickable"
+          data-tooltip="태스크(완료) 페이지로 이동"
           role="button"
           tabIndex={0}
           onClick={() => openTaskBoard('DONE')}
@@ -379,7 +388,7 @@ function TeamPage() {
           <SummaryCard title="완료한 태스크" count={completedTasksCount} isAllEmpty={true} />
         </div>
 
-        <div className="team-calendar" ref={calendarRef} tabIndex={-1}>
+        <div id="calendar" className="team-calendar" ref={calendarRef} tabIndex={-1}>
           <Calendar projectId={idToFetch} projectTitle={projectTitle} />
         </div>
 

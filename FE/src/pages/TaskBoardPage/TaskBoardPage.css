@@ -24,7 +24,8 @@
 }
 
 .task-board__toolbar {
-  width: min(100%, 720px);
+  width: 100%;
+  max-width: 1000px;
   display: grid;
   grid-template-columns: minmax(0, 540px) auto;
   align-items: center;
@@ -102,7 +103,8 @@
 }
 
 .task-board__list {
-  width: min(100%, 720px);
+  width: 100%;
+  max-width: 1000px;
   display: flex;
   flex-direction: column;
   gap: 10px;
@@ -156,9 +158,13 @@
 
 .task-board__actions {
   flex: 0 0 auto;
+  position: relative;
+  top: -8px;
   display: inline-flex;
   align-items: center;
   gap: 8px;
+  padding-right: 6px;
+  box-sizing: border-box;
 }
 
 .task-board__action-button,
@@ -168,7 +174,7 @@
   height: 28px;
   border-radius: 999px;
   font-family: 'Pretendard', sans-serif;
-  font-size: 15px;
+  font-size: 14px;
   font-weight: 700;
   line-height: 1;
   border: none;
@@ -177,6 +183,7 @@
 .task-board__action-button {
   padding: 0 12px;
   border: 0;
+  border-radius: 6px;
   color: #ffffff;
   cursor: pointer;
   transition: transform 0.18s ease, opacity 0.18s ease;
@@ -253,5 +260,15 @@
   .task-board__actions {
     width: 100%;
     justify-content: flex-end;
+    top: 0;
   }
 }
+
+.task-board__header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+}
+
+.task-board__header .task-board__title { margin-bottom: 0; }

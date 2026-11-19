@@ -1,3 +1,5 @@
+import '../../components/TeamPageMenu/ProjectTitleButton.css';
+import TeamPageMenu from '../../components/TeamPageMenu/TeamPageMenu.jsx';
 import DateInput from '../../components/DatePicker/DateInput.jsx';
 import GuardedForm from '../../components/GuardedForm/GuardedForm.jsx';
 import GuardedButton from '../../components/GuardedButton/GuardedButton.jsx';
@@ -79,8 +81,13 @@ export default function SmallMeetingAddPage() {
     <div className="small-meeting-add-page">
       <div className="small-meeting-add-content">
         <header className="small-meeting-add-header">
-          <h1>{projectTitle} <span aria-hidden="true">|</span> 소모임</h1>
-          <GuardedButton className="small-meeting-add-more" type="button" aria-label="더 보기">···</GuardedButton>
+          <h1>
+            <GuardedButton type="button" className="project-title-button" data-tooltip="팀페이지로 이동" disabled={isSubmitting}
+              onClick={() => navigate(`/project/${projectId}`, { state: { projectTitle, dueDate: state?.dueDate } })}>
+              {projectTitle} <span aria-hidden="true">|</span> 소모임
+            </GuardedButton>
+          </h1>
+          <TeamPageMenu projectId={projectId} projectTitle={projectTitle} dueDate={state?.dueDate} currentPage="meetings" disabled={isSubmitting} />
         </header>
 
         <GuardedForm className="small-meeting-add-card" onSubmit={handleSubmit}>
