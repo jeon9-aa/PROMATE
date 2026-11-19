@@ -13,6 +13,7 @@ public class DashboardResponseDTO {
     public static class MyProjectDTO {
         private Long projectId;
         private String title;
+        private String recruitImageUrl; // 프로젝트 대표 이미지
         private LocalDate endDate;
         private String dueStatus; // 프로젝트 마감일 기준 상태(임박, 여유)
     }

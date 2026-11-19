@@ -11,6 +11,7 @@ public record RecruitResponse(
         Long recruitmentId,
         String title,
         String description,     // 추가 <- 북마크된 모집글용
+        String recruitImageUrl, // 프로젝트 대표 이미지
         Category category,
         LocalDateTime createdAt,
         LocalDateTime updatedAt,
@@ -40,6 +41,7 @@ public record RecruitResponse(
                 recruit.getId(),
                 recruit.getTitle(),
                 recruit.getDescription(),
+                recruit.getThumbnailUrl(), // 프로젝트 대표 이미지
                 recruit.getCategory(),
                 recruit.getCreatedAt(),
                 recruit.getUpdatedAt(),

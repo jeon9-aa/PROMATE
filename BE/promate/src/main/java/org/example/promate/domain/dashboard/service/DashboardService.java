@@ -34,6 +34,7 @@ public class DashboardService {
                     return DashboardResponseDTO.MyProjectDTO.builder()
                             .projectId(project.getId())
                             .title(project.getTitle())
+                            .recruitImageUrl(project.getThumbnailUrl()) // 프로젝트 대표 이미지
                             .endDate(project.getEndDate())
                             .dueStatus(getDueStatus(project.getEndDate()))
                             .build();

@@ -7,6 +7,7 @@ import java.util.List;
 public record ApplicantListResponse(
         Long recruitmentId,
         String title,
+        String recruitImageUrl, // 프로젝트 대표 이미지
         int totalApplicantCount,
         List<ApplicantSummary> applicants
 ) {

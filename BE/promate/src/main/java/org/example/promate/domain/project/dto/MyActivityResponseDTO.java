@@ -10,6 +10,7 @@ import java.time.LocalDate;
 public class MyActivityResponseDTO {
     private Long projectId;
     private String title;
+    private String recruitImageUrl; // 프로젝트 대표 이미지
     private Double averageReviewScore;
     private String description; // 프로젝트 설명
     private LocalDate startDate;
