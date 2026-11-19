@@ -3,6 +3,7 @@ import { useLocation, useParams } from 'react-router-dom';
 import MainButton from '../../components/MainButton/MainButton';
 import ProjectAvatar from '../../components/ProjectAvatar/ProjectAvatar';
 import Tag from '../../components/Tag/Tag';
+import TeamPageMenu from '../../components/TeamPageMenu/TeamPageMenu.jsx';
 import useProjectTitle from '../../utils/useProjectTitle';
 import ProjectMembersPanel from './ProjectMembersPanel';
 import './ProjectSettingsPage.css';
@@ -106,6 +107,7 @@ export default function ProjectSettingsPage() {
       </dialog>
       <header className="project-settings-header">
         <h1>{title} | 프로젝트 설정</h1>
+        <TeamPageMenu projectId={projectId} projectTitle={title} dueDate={project.endDate} currentPage="settings" />
       </header>
 
       <div className="project-settings-tabs" role="tablist" aria-label="프로젝트 설정"

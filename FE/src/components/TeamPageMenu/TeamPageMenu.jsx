@@ -53,6 +53,7 @@ export default function TeamPageMenu({ projectId, projectTitle, dueDate, current
             { key: 'calendar', label: '캘린더', path: `/project/${projectId}#calendar` },
             { key: 'board', label: '게시판', path: `/board?projectId=${projectId}` },
             { key: 'meetings', label: '소모임', path: `/project/${projectId}/smallMeetingList` },
+            { key: 'settings', label: '설정', path: `/project/${projectId}/settings` },
           ].map(({ key, label, path }) => (
             <GuardedButton key={key} type="button"
               className={currentPage === key ? 'team-page-menu__current' : undefined}
@@ -65,7 +66,6 @@ export default function TeamPageMenu({ projectId, projectTitle, dueDate, current
               {label}
             </GuardedButton>
           ))}
-          <GuardedButton type="button" disabled title="설정 기능은 준비 중입니다">설정</GuardedButton>
         </nav>
       )}
     </div>
