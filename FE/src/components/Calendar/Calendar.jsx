@@ -7,16 +7,46 @@ import themeSettingsIcon from '../../assets/icons/themeSettingsIcon.svg';
 import AddEventModal from '../AddEventModal/AddEventModal';
 import EventDetailModal from '../EventDetailModal/EventDetailModal';
 import apiClient from '../../api/apiClient';
+import CalendarThemeModal from './CalendarThemeModal';
+import { CALENDAR_THEMES, assignProjectColors, getEventTextColor, readThemePreferences } from './calendarThemes';
+import { getCurrentUserId } from '../../utils/smallMeetings';
 
 const WEEKDAYS = ['SUN', 'MON', 'TUE', 'WED', 'THU', 'FRI', 'SAT'];
 
-function Calendar({ showAddButton = true, showThemeButton = false, projectId, projectTitle: fallbackProjectTitle }) {
+function Calendar({ showAddButton = true, showThemeButton = false, projects = [], projectId, projectTitle: fallbackProjectTitle }) {
   const [currentDate, setCurrentDate] = useState(new Date());
   const [events, setEvents] = useState([]);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [hasError, setHasError] = useState(false);
   const [selectedEvent, setSelectedEvent] = useState(null);
   const [isLoggedIn, setIsLoggedIn] = useState(true);
+  const [isThemeModalOpen, setIsThemeModalOpen] = useState(false);
+  const [themeStorageKey] = useState(() => `promate-calendar-theme:${getCurrentUserId()}`);
+  const [themePreferences, setThemePreferences] = useState(() => readThemePreferences(themeStorageKey));
+  const activeTheme = CALENDAR_THEMES.find((theme) => theme.id === themePreferences.themeId);
+  const useProjectTheme = showThemeButton && !projectId;
+  const calendarProjects = useMemo(() => {
+    const byId = new Map();
+    projects.forEach((project) => {
+      if (project.id != null) byId.set(String(project.id), { id: String(project.id), title: project.title });
+    });
+    events.forEach((event) => {
+      if (event.projectId != null && !byId.has(String(event.projectId))) {
+        byId.set(String(event.projectId), { id: String(event.projectId), title: event.projectTitle });
+      }
+    });
+    return [...byId.values()];
+  }, [projects, events]);
+  const projectColors = useMemo(() => assignProjectColors(
+    calendarProjects.map((project) => project.id), themePreferences.seed,
+  ), [calendarProjects, themePreferences.seed]);
+
+  useEffect(() => {
+    if (!useProjectTheme) return;
+    try {
+      localStorage.setItem(themeStorageKey, JSON.stringify(themePreferences));
+    } catch { /* storage에 접근할 수 없으면 선택한 테마를 메모리에만 유지 */ }
+  }, [useProjectTheme, themeStorageKey, themePreferences]);
 
   const year = currentDate.getFullYear();
   const month = currentDate.getMonth();
@@ -86,7 +116,7 @@ function Calendar({ showAddButton = true, showThemeButton = false, projectId, pr
     };
 
     fetchEvents();
-  }, [projectId, year, month]);
+  }, [projectId, fallbackProjectTitle, year, month]);
 
   const days = useMemo(() => getCalendarDays(year, month), [year, month]);
 
@@ -200,7 +230,7 @@ function Calendar({ showAddButton = true, showThemeButton = false, projectId, pr
         {(showAddButton || showThemeButton) && (
           <div className="calendar-header-right">
             {showThemeButton && (
-              <GuardedButton className="theme-settings-btn-header" type="button">
+              <GuardedButton className="theme-settings-btn-header" type="button" onClick={() => setIsThemeModalOpen(true)} aria-haspopup="dialog">
                 <img src={themeSettingsIcon} width={20} height={20} alt="" aria-hidden="true" />
                 <span>테마 설정</span>
               </GuardedButton>
@@ -273,6 +303,13 @@ function Calendar({ showAddButton = true, showThemeButton = false, projectId, pr
                   {day && <span className="day-number">{day}</span>}
 
                   {dayEvents.map((event) => {
+                    const colorIndex = projectColors.get(String(event.projectId));
+                    const background = useProjectTheme && colorIndex !== undefined ? activeTheme.colors[colorIndex] : null;
+                    const themeStyle = background ? {
+                      '--calendar-event-background': background,
+                      '--calendar-event-color': getEventTextColor(background),
+                      '--calendar-event-border': background,
+                    } : {};
                     const isSegmentStart = isEventSegmentStart(
                       event,
                       year,
@@ -298,12 +335,13 @@ function Calendar({ showAddButton = true, showThemeButton = false, projectId, pr
                         style={
                           isSegmentStart
                             ? {
+                                ...themeStyle,
                                 width: `calc(${eventSpan * 100}% + ${
                                   eventSpan - 1
                                 }px)`,
                                 cursor: 'pointer',
                               }
-                            : { cursor: 'pointer' }
+                            : { ...themeStyle, cursor: 'pointer' }
                         }
                         onClick={(e) => {
                           e.stopPropagation();
@@ -320,6 +358,18 @@ function Calendar({ showAddButton = true, showThemeButton = false, projectId, pr
           </div>
         </div>
       </div>
+
+      {useProjectTheme && isThemeModalOpen && (
+        <CalendarThemeModal
+          themeId={themePreferences.themeId}
+          projects={calendarProjects}
+          onClose={() => setIsThemeModalOpen(false)}
+          onApply={(themeId, seed) => {
+            setThemePreferences({ themeId, seed });
+            setIsThemeModalOpen(false);
+          }}
+        />
+      )}
 
       <AddEventModal
         isOpen={isModalOpen}
