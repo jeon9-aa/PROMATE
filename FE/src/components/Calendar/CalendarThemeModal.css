@@ -194,7 +194,96 @@
 }
 
 @media (max-width: 480px) {
+  .calendar-theme-modal {
+    width: calc(100vw - 24px);
+    max-height: calc(100dvh - 24px);
+  }
+
   .calendar-theme-content {
-    padding: 24px 20px 20px;
+    padding: 18px 16px 12px;
+  }
+
+  .calendar-theme-content h2 {
+    margin-bottom: 6px;
+    font-size: 18px;
+    line-height: 24px;
+  }
+
+  .calendar-theme-content p {
+    font-size: 12px;
+    line-height: 1.4;
+  }
+
+  .calendar-theme-options {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 8px;
+    margin: 14px 0;
+  }
+
+  .calendar-theme-option {
+    min-width: 0;
+    gap: 8px;
+    padding: 10px 8px;
+  }
+
+  .calendar-theme-option-title {
+    gap: 6px;
+    font-size: 14px;
+    line-height: 18px;
+  }
+
+  .calendar-theme-option-title small {
+    padding: 1px 4px;
+    font-size: 10px;
+  }
+
+  .calendar-theme-swatches {
+    gap: 3px;
+  }
+
+  .calendar-theme-swatches > span {
+    height: 18px;
+    border-radius: 3px;
+  }
+
+  .calendar-theme-preview h3 {
+    margin-bottom: 6px;
+    font-size: 13px;
+  }
+
+  .calendar-theme-preview > div {
+    max-height: 84px;
+    overflow-y: auto;
+    gap: 4px;
+  }
+
+  .calendar-theme-preview span {
+    padding: 5px 4px;
+    font-size: 11px;
+    line-height: 16px;
+  }
+
+  .calendar-theme-content .calendar-theme-hint {
+    margin-top: 8px;
+    font-size: 11px;
+  }
+
+  .calendar-theme-actions {
+    position: sticky;
+    bottom: 0;
+    gap: 12px;
+    margin-top: 10px;
+    padding: 6px 0;
+    background: #fff;
+  }
+
+  .calendar-theme-actions button {
+    height: 40px;
+    padding: 8px 20px;
+    font-size: 14px;
+  }
+
+  .calendar-theme-actions button:last-child {
+    font-size: 16px;
   }
 }
