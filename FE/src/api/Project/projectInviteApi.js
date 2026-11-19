@@ -44,7 +44,10 @@ export async function joinProjectByInvite(inviteToken, password) {
     { password },
   );
 
-  if (response?.isSuccess !== true || response.data?.projectId == null) {
+  if (response?.isSuccess !== true) {
+    throw new Error(response?.message || "프로젝트 초대 참여에 실패했습니다.");
+  }
+  if (!Number.isInteger(response.data?.projectId) || response.data.projectId <= 0) {
     throw new Error("프로젝트 참여 결과를 확인할 수 없습니다.");
   }
 
