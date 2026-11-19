@@ -15,7 +15,7 @@ import java.util.List;
 
 @RestController
 @RequiredArgsConstructor
-@RequestMapping("/projects/{projectId}/subgroup")
+@RequestMapping("/projects/{projectId}/subgroups")
 public class SubGroupController {
     private final SubGroupCommendService subGroupCommendService;
     private final SubGroupQueryService subGroupQueryService;
