@@ -1,3 +1,4 @@
+import DateInput from '../../components/DatePicker/DateInput.jsx';
 import GuardedForm from '../../components/GuardedForm/GuardedForm.jsx';
 import GuardedButton from '../../components/GuardedButton/GuardedButton.jsx';
 import { useState } from 'react';
@@ -107,9 +108,9 @@ export default function SmallMeetingAddPage() {
               <fieldset className="small-meeting-add-field small-meeting-add-period">
                 <legend>소모임 기간</legend>
                 <div className="small-meeting-add-date-range">
-                  <input aria-label="시작일" name="startDate" type="date" onChange={(event) => event.currentTarget.form.elements.endDate.setCustomValidity('')} required />
+                  <DateInput aria-label="시작일" name="startDate" onChange={(event) => event.currentTarget.form.elements.endDate.setCustomValidity('')} required />
                   <span aria-hidden="true">~</span>
-                  <input aria-label="종료일" name="endDate" type="date" onChange={(event) => event.currentTarget.setCustomValidity('')} required />
+                  <DateInput aria-label="종료일" name="endDate" onChange={(event) => event.currentTarget.setCustomValidity('')} required />
                 </div>
               </fieldset>
             </div>
