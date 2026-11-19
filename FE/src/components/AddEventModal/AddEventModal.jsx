@@ -1,3 +1,4 @@
+import DateInput from '../DatePicker/DateInput.jsx';
 import GuardedButton from '../GuardedButton/GuardedButton.jsx';
 import React, { useState } from 'react';
 import ReactDOM from 'react-dom';
@@ -20,6 +21,7 @@ function AddEventModal({ isOpen, onClose, onAddEvent }) {
   const [isSubmitting, setIsSubmitting] = useState(false);
 
   const formatDateWithDay = (dateString) => {
+    if (!dateString) return '날짜 선택';
     const [year, month, day] = dateString.split('-').map(Number);
     const date = new Date(year, month - 1, day);
 
@@ -42,6 +44,11 @@ function AddEventModal({ isOpen, onClose, onAddEvent }) {
   const handleSubmit = async () => {
     if (!title.trim()) {
       alert('제목을 입력해주세요.');
+      return;
+    }
+
+    if (!startDate || !endDate) {
+      alert('날짜를 선택해주세요.');
       return;
     }
 
@@ -110,8 +117,7 @@ function AddEventModal({ isOpen, onClose, onAddEvent }) {
                 <div className="aem-date-display">
                   {formatDateWithDay(startDate)}
                 </div>
-                <input
-                  type="date"
+                <DateInput
                   className="aem-hidden-input"
                   value={startDate}
                   onChange={(e) => setStartDate(e.target.value)}
@@ -125,8 +131,7 @@ function AddEventModal({ isOpen, onClose, onAddEvent }) {
                 <div className="aem-date-display">
                   {formatDateWithDay(endDate)}
                 </div>
-                <input
-                  type="date"
+                <DateInput
                   className="aem-hidden-input"
                   value={endDate}
                   onChange={(e) => setEndDate(e.target.value)}
