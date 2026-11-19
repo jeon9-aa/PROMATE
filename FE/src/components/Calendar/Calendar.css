@@ -72,7 +72,8 @@
   cursor: pointer;
 }
 
-.add-event-btn-header {
+.add-event-btn-header,
+.theme-settings-btn-header {
   display: flex;
   align-items: center;
   padding: 0px 10px 0px 5px;
@@ -84,17 +85,26 @@
   transition: background-color 0.2s ease-in-out;
 }
 
-.add-event-btn-header:hover {
+.add-event-btn-header:hover,
+.theme-settings-btn-header:hover {
   background-color: #FFEBDE;
   height: 29px;
 }
 
-.add-event-btn-header span {
+.add-event-btn-header span,
+.theme-settings-btn-header span {
   font-family: 'Pretendard';
   font-weight: 700;
   font-size: 16px;
   line-height: 19px;
   color: #ff6600;
+}
+
+.theme-settings-btn-header {
+  height: 29px;
+  color: #ff6600;
+  white-space: nowrap;
+  flex-shrink: 0;
 }
 
 .calendar-body {
