@@ -108,13 +108,13 @@ function ProjectReadMePage() {
     chatRoomRequestPending.current = true;
     setIsCreatingChatRoom(true);
     try {
-      const { chatRoomId } = await getOrCreateChatRoom(postId);
+      const { chatRoomId, chatPartnerName } = await getOrCreateChatRoom(postId);
       navigate(`/chat/${chatRoomId}`, {
         state: {
           createdRoom: {
             id: String(chatRoomId),
             projectName: projectData.title,
-            name: projectData.author?.nickname || '팀장',
+            name: chatPartnerName || projectData.author?.nickname || '팀장',
             avatarUrl: null,
             memberCount: 2,
             unread: 0,
