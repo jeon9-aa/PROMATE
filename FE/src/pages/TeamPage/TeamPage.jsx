@@ -264,6 +264,7 @@ function TeamPage() {
       <div className={`team-page-grid ${isTaskExpanded ? 'team-task-expanded' : ''}`}>
         <section
           className="team-card team-progress-card team-card-clickable"
+          data-tooltip="태스크 페이지로 이동"
           role="button"
           tabIndex={0}
           onClick={() => openTaskBoard('all')}
@@ -358,6 +359,7 @@ function TeamPage() {
 
         <div
           className="team-card team-metric-card team-metric-card-urgent team-card-clickable"
+          data-tooltip="태스크 페이지(진행 중)로 이동"
           role="button"
           tabIndex={0}
           onClick={() => openTaskBoard('IN_PROGRESS')}
@@ -372,6 +374,7 @@ function TeamPage() {
         </div>
         <div
           className="team-card team-metric-card team-metric-card-completed team-card-clickable"
+          data-tooltip="태스크(완료) 페이지로 이동"
           role="button"
           tabIndex={0}
           onClick={() => openTaskBoard('DONE')}

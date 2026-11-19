@@ -42,8 +42,37 @@
 }
 
 .team-card-clickable {
+  position: relative;
   cursor: pointer;
   transition: transform 0.18s ease, box-shadow 0.18s ease;
+}
+
+.team-card-clickable[data-tooltip]::after {
+  content: attr(data-tooltip);
+  position: absolute;
+  top: calc(100% + 6px);
+  left: 50%;
+  z-index: 10;
+  padding: 5px 8px;
+  border-radius: 4px;
+  background-color: #333333;
+  color: #FFFFFF;
+  font-family: 'Pretendard', sans-serif;
+  font-size: 12px;
+  line-height: 1;
+  white-space: nowrap;
+  opacity: 0;
+  visibility: hidden;
+  transform: translateX(-50%) translateY(-2px);
+  transition: opacity 0.15s ease, transform 0.15s ease, visibility 0.15s ease;
+  pointer-events: none;
+}
+
+.team-card-clickable[data-tooltip]:hover::after,
+.team-card-clickable[data-tooltip]:focus-visible::after {
+  opacity: 1;
+  visibility: visible;
+  transform: translateX(-50%) translateY(0);
 }
 
 .team-card-clickable:hover {
