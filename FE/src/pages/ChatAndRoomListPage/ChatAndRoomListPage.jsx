@@ -14,7 +14,7 @@ function toRoom(data, existing) {
     recruitId: data.recruitId,
     projectName: data.recruitTitle,
     chatPartnerId: data.chatPartnerId,
-    name: existing?.name || '채팅 상대',
+    name: data.chatPartnerName || existing?.name || '채팅 상대',
     avatarUrl: data.chatPartnerProfileImageUrl,
     lastMessage: data.lastMessage,
     lastMessageAt: data.lastMessageAt,
