@@ -1,3 +1,4 @@
+import DateInput from '../DatePicker/DateInput.jsx';
 import GuardedButton from '../GuardedButton/GuardedButton.jsx';
 import React, { useState, useEffect } from 'react';
 import ReactDOM from 'react-dom';
@@ -223,9 +224,9 @@ function EventDetailModal({ event, onClose, onDeleteEvent, onUpdateEvent }) {
                 <div className="edm-info-row">
                   <span className="edm-info-label">날짜</span>
                   <div className="edm-edit-date-group">
-                    <input type="date" className="edm-edit-date" value={editStartDate} onChange={(e) => setEditStartDate(e.target.value)} />
+                    <DateInput className="edm-edit-date" value={editStartDate} onChange={(e) => setEditStartDate(e.target.value)} />
                     <span>~</span>
-                    <input type="date" className="edm-edit-date" value={editEndDate} onChange={(e) => setEditEndDate(e.target.value)} />
+                    <DateInput className="edm-edit-date" value={editEndDate} onChange={(e) => setEditEndDate(e.target.value)} />
                   </div>
                 </div>
                 <div className="edm-divider" />
