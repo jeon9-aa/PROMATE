@@ -76,13 +76,12 @@
 .theme-settings-btn-header {
   display: flex;
   align-items: center;
-  padding: 0px 10px 0px 5px;
+  padding: 0px 10px 0px 8px;
   gap: 7px;
   border-radius: 5px;
   background: none;
   border: none;
   cursor: pointer;
-  transition: background-color 0.2s ease-in-out;
 }
 
 .add-event-btn-header:hover,
