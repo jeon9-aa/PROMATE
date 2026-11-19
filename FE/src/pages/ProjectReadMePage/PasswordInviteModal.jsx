@@ -3,7 +3,7 @@ import { createPortal } from 'react-dom';
 import { Clock } from 'lucide-react';
 import './PasswordInviteModal.css';
 
-export default function PasswordInviteModal({ onClose, onSubmit }) {
+export default function PasswordInviteModal({ onClose, onSubmit, isSubmitting = false }) {
   const dialogRef = useRef(null);
   const [password, setPassword] = useState('');
 
@@ -22,7 +22,7 @@ export default function PasswordInviteModal({ onClose, onSubmit }) {
 
   const handleSubmit = (event) => {
     event.preventDefault();
-    if (!/^[0-9]{4}$/.test(password)) return;
+    if (isSubmitting || !/^[0-9]{4}$/.test(password)) return;
     onSubmit(password);
   };
 
@@ -62,13 +62,16 @@ export default function PasswordInviteModal({ onClose, onSubmit }) {
             autoComplete="new-password"
             placeholder="숫자 4자리를 입력해 주세요."
             value={password}
+            disabled={isSubmitting}
             onChange={(event) => setPassword(event.target.value.replace(/[^0-9]/g, '').slice(0, 4))}
             required
           />
         </div>
         <div className="project-password-actions">
-          <button type="button" className="project-password-cancel" onClick={onClose}>취소</button>
-          <button type="submit" className="project-password-submit">비밀번호 등록</button>
+          <button type="button" className="project-password-cancel" onClick={onClose} disabled={isSubmitting}>취소</button>
+          <button type="submit" className="project-password-submit" disabled={isSubmitting} aria-busy={isSubmitting}>
+            {isSubmitting ? '초대 링크 생성 중...' : '비밀번호 등록'}
+          </button>
         </div>
       </form>
     </dialog>,

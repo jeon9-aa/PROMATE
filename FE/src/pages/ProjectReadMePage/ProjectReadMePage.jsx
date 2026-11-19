@@ -11,7 +11,7 @@ import { getOrCreateChatRoom } from '../../api/Recruits/recruitmentApi';
 import Tag from '../../components/Tag/Tag';
 import ShareLinkModal from './ShareLinkModal';
 import PasswordInviteModal from './PasswordInviteModal';
-import { formatInviteExpiry } from './formatInviteExpiry';
+import { createProjectInvite } from '../../api/Project/projectInviteApi';
 import PasswordJoinNoticeModal from './PasswordJoinNoticeModal';
 import './ProjectReadMePage.css';
 
@@ -45,8 +45,9 @@ function ProjectReadMePage() {
   const [isPasswordModalOpen, setIsPasswordModalOpen] = useState(false);
   const [isPasswordLinkModalOpen, setIsPasswordLinkModalOpen] = useState(false);
   const [isPasswordJoinNoticeOpen, setIsPasswordJoinNoticeOpen] = useState(false);
-  // API 연동 전 임시 초대 상태
   const [passwordInvitations, setPasswordInvitations] = useState({});
+  const [isCreatingInvite, setIsCreatingInvite] = useState(false);
+  const inviteRequestPending = useRef(false);
 
   const handlePasswordInviteClick = () => {
     if (!projectData?.isAuthor) {
@@ -54,7 +55,7 @@ function ProjectReadMePage() {
       return;
     }
     const invitation = passwordInvitations[postId];
-    if (invitation && invitation.expiresAt > Date.now()) {
+    if (invitation && new Date(invitation.expiresAt).getTime() > Date.now()) {
       setIsPasswordLinkModalOpen(true);
     } else {
       setIsPasswordModalOpen(true);
@@ -66,16 +67,25 @@ function ProjectReadMePage() {
     navigate('/invite/password');
   };
 
-  const handlePasswordRegister = (password) => {
-    if (!projectData?.isAuthor || !/^[0-9]{4}$/.test(password)) return;
-    const expiresAt = Date.now() + 24 * 60 * 60 * 1000;
-    setPasswordInvitations((previous) => ({
-      ...previous,
-      [postId]: { password, expiresAt },
-    }));
-    window.alert(`비밀번호가 설정되었습니다.\n유효시간: ${formatInviteExpiry(expiresAt)}까지 (한국 시간)\n설정 시점부터 24시간 동안 사용할 수 있습니다.`);
-    setIsPasswordModalOpen(false);
-    setIsPasswordLinkModalOpen(true);
+  const handlePasswordRegister = async (password) => {
+    if (inviteRequestPending.current || !projectData?.isAuthor || !/^[0-9]{4}$/.test(password)) return;
+    if (projectData.projectId == null) {
+      window.alert('프로젝트 ID를 확인할 수 없습니다. 다시 시도해 주세요.');
+      return;
+    }
+    inviteRequestPending.current = true;
+    setIsCreatingInvite(true);
+    try {
+      const invitation = await createProjectInvite(projectData.projectId, password);
+      setPasswordInvitations((previous) => ({ ...previous, [postId]: invitation }));
+      setIsPasswordModalOpen(false);
+      setIsPasswordLinkModalOpen(true);
+    } catch (error) {
+      window.alert(error.message || '초대 링크 생성에 실패했습니다. 다시 시도해 주세요.');
+    } finally {
+      inviteRequestPending.current = false;
+      setIsCreatingInvite(false);
+    }
   };
   const [selectedUser, setSelectedUser] = useState(null);
   const [modalPosition, setModalPosition] = useState(null);
@@ -323,14 +333,15 @@ function ProjectReadMePage() {
 
       {isPasswordModalOpen && projectData.isAuthor && (
         <PasswordInviteModal
-          onClose={() => setIsPasswordModalOpen(false)}
+          onClose={() => { if (!inviteRequestPending.current) setIsPasswordModalOpen(false); }}
           onSubmit={handlePasswordRegister}
+          isSubmitting={isCreatingInvite}
         />
       )}
 
       {isPasswordLinkModalOpen && projectData.isAuthor && (
         <ShareLinkModal
-          shareUrl={`${window.location.origin}${location.pathname}?invite=password`}
+          shareUrl={passwordInvitations[postId]?.inviteUrl}
           title="비밀번호 링크 공유"
           description="해당 링크에서 비밀번호를 입력한 참가자는 지원자 검토 없이 바로 프로젝트에 참여합니다."
           linkLabel="비밀번호 초대 링크"
