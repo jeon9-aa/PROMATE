@@ -5,6 +5,7 @@ import Sidebar from "./components/SideBar/Sidebar";
 import Header from "./components/Header/Header";
 import ComingSoonPage from "./pages/ComingSoonPage.jsx";
 import LoginPage from "./pages/LoginPage/LoginPage.jsx";
+import LinkInviteLoginPage from "./pages/LinkInviteLoginPage/components/LinkInviteLoginPage.jsx";
 import PasswordInviteLoginPage from "./pages/PasswordInviteLoginPage/PasswordInviteLoginPage.jsx";
 import AuthCallbackPage from "./pages/AuthCallbackPage/AuthCallbackPage.jsx";
 import TeamCreatePage from "./pages/TeamCreatePage/TeamCreatePage.jsx";
@@ -57,6 +58,7 @@ function App() {
     <BrowserRouter>
       <Routes>
         <Route path="/login" element={<LoginPage />} />
+        <Route path="/invite/login" element={<LinkInviteLoginPage />} />
         <Route path="/invite/password" element={<PasswordInviteLoginPage />} />
         <Route path="/invite/:inviteToken" element={<PasswordInviteLoginPage />} />
         <Route path="/auth/kakao/callback" element={<AuthCallbackPage />} />

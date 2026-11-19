@@ -1,0 +1,49 @@
+.link-invite-login-actions {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  width: 100%;
+  min-height: 84px;
+  gap: 20px;
+}
+
+.link-invite-login-page .login-form {
+  width: 100%;
+  margin: 0;
+}
+
+.link-invite-login-page .kakao-login-btn {
+  width: 100%;
+  min-width: 0;
+  height: 40px;
+  margin: 0;
+  padding: 12px 16px;
+}
+
+.link-invite-login-page .kakao-login-content {
+  gap: 9px;
+}
+
+.link-invite-login-page .kakao-icon {
+  width: 22px;
+  height: 20px;
+  object-fit: contain;
+}
+
+.link-invite-login-page .kakao-login-text {
+  font-size: 13px;
+  line-height: 16px;
+}
+
+.link-invite-login-page .kakao-login-btn:focus-visible {
+  outline: 2px solid #371d1e;
+  outline-offset: 4px;
+}
+
+.link-invite-login-error {
+  margin: 0;
+  font-size: 14px;
+  line-height: 20px;
+  text-align: center;
+  color: #b42318;
+}
