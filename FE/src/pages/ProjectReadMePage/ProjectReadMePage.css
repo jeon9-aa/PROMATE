@@ -117,7 +117,6 @@
   font-weight: 700;
   line-height: 21px;
   cursor: pointer;
-  transition: background-color 0.2s ease;
 }
 
 .project-readme-chat-btn {
@@ -169,7 +168,6 @@
   background-color: #DE0000;
   color: #FFFFFF;
   cursor: pointer;
-  transition: background-color 0.2s ease;
 }
 
 .project-readme-delete-btn:hover {
@@ -244,7 +242,6 @@
 
 .project-readme-team-member-name.clickable {
   cursor: pointer;
-  transition: background-color 0.2s ease, transform 0.2s ease;
   border-radius: 8px;
 }
 

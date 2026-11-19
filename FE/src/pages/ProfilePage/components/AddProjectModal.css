@@ -173,7 +173,6 @@
   color: #FFFFFF;
   cursor: pointer;
   flex-shrink: 0;
-  transition: background 0.15s;
 }
 .add-modal-btn-cancel:hover { background: #c4c4c4; }
 
@@ -193,7 +192,6 @@
   line-height: 21px;
   color: #FFFFFF;
   cursor: pointer;
-  transition: background 0.15s;
 }
 .add-modal-btn-add:hover { background: #f08040; }
 

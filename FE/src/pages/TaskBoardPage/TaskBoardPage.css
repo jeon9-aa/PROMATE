@@ -61,7 +61,6 @@
   flex-shrink: 0;
   white-space: nowrap;
   cursor: pointer;
-  transition: color 0.18s ease, border-color 0.18s ease, background-color 0.18s ease;
 }
 
 .task-board__tab:hover {
@@ -186,7 +185,6 @@
   border-radius: 6px;
   color: #ffffff;
   cursor: pointer;
-  transition: transform 0.18s ease, opacity 0.18s ease;
 }
 
 .task-board__action-button--cancel {
