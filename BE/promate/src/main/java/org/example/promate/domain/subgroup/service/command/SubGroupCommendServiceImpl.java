@@ -25,7 +25,9 @@ import org.example.promate.domain.user.exception.UserException;
 import org.example.promate.domain.user.repository.UserRepository;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import lombok.extern.slf4j.Slf4j;
 
+@Slf4j
 @Service
 @RequiredArgsConstructor
 @Transactional
@@ -51,12 +53,30 @@ public class SubGroupCommendServiceImpl implements SubGroupCommendService {
                         new ProjectException(ProjectErrorCode.ID_NOT_FOUND)
                 );
 
-        // 3. 프로젝트 멤버 여부 검증
-        if (!memberRepository.existsByUserIdAndProjectId(userId, projectId)) {
+
+        log.info("프로젝트 멤버 검증 시작");
+        log.info("userId = {}", userId);
+        log.info("projectId = {}", projectId);
+
+        boolean exists = memberRepository.existsByUserIdAndProjectId(
+                userId, projectId
+        );
+
+        log.info("프로젝트 멤버 존재 여부 = {}", exists);
+
+        if (!exists) {
             throw new MemberException(
                     MemberErrorCode.MEMBER_FORBIDDEN_NOT_PROJECT_MEMBER
             );
         }
+
+
+//        // 3. 프로젝트 멤버 여부 검증
+//        if (!memberRepository.existsByUserIdAndProjectId(userId, projectId)) {
+//            throw new MemberException(
+//                    MemberErrorCode.MEMBER_FORBIDDEN_NOT_PROJECT_MEMBER
+//            );
+//        }
 
         // 4. 소모임 엔티티 생성
         SubGroup subGroup = SubGroupConverter.toSubGroup(dto, project);
