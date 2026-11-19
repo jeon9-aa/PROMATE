@@ -1,7 +1,8 @@
+import TeamPageMenu from '../../components/TeamPageMenu/TeamPageMenu.jsx';
 import GuardedButton from '../../components/GuardedButton/GuardedButton.jsx';
 import React, { useEffect, useMemo, useState } from 'react';
 import { useSearchParams, useLocation } from 'react-router-dom';
-import { getProjectTasks, updateTaskStatus, deleteProjectTask, getProjectMembers, createProjectTask, getTaskDetail } from '../../api/TeamPage.js';
+import { getProjectTasks, updateProjectTask, updateTaskStatus, deleteProjectTask, getProjectMembers, createProjectTask, getTaskDetail } from '../../api/TeamPage.js';
 import NewTaskModal from '../../components/NewTaskModal/NewTaskModal.jsx';
 import TaskDetailModal from '../TeamPage/components/TaskDetailModal.jsx';
 import writeIcon from '../../assets/icons/writeIcon.svg';
@@ -154,9 +155,12 @@ function TaskBoardPage() {
   return (
     <section className="task-board" aria-labelledby="task-board-title">
       <div className="task-board__content">
+        <header className="task-board__header">
         <h1 id="task-board-title" className="task-board__title">
           {projectTitle} - 태스크 보드
         </h1>
+          <TeamPageMenu projectId={projectId} projectTitle={projectTitle} dueDate={location.state?.dueDate} currentPage="tasks" />
+        </header>
 
         <div className="task-board__toolbar">
           <nav className="task-board__tabs" aria-label="태스크 상태 필터">
