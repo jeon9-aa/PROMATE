@@ -118,7 +118,7 @@ public class RecruitService {
                 recruit.getTitle(),
                 recruit.getDescription(),
                 recruit.getCategory(),
-                "RECRUITING", // 임시 상태값
+                recruit.getStatus().name(),
                 recruit.getThumbnailUrl(),
                 recruit.getCreatedAt(),
                 recruit.getUpdatedAt(),

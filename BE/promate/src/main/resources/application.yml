@@ -48,3 +48,6 @@ logging:
   level:
     org.hibernate.SQL: WARN
     org.hibernate.orm.jdbc.bind: OFF
+
+app:
+  frontend-url: https://https://promate-nd-six.vercel.app
