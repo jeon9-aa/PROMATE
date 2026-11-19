@@ -63,7 +63,7 @@ function ProjectReadMePage() {
 
   const handlePasswordJoinContinue = () => {
     setIsPasswordJoinNoticeOpen(false);
-    navigate(`/readme/${postId}/password`);
+    navigate('/invite/password');
   };
 
   const handlePasswordRegister = (password) => {
