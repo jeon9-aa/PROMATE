@@ -106,8 +106,9 @@
     min-height: calc(100dvh - 56px);
     height: auto;
     padding: 20px 16px;
-    overflow-x: hidden;
-    overflow-y: auto;
+    overflow-x: clip;
+    overflow-y: visible;
+    overscroll-behavior: auto;
   }
 
   .dashboard-content {

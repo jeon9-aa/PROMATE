@@ -9,10 +9,10 @@ body {
   color: #1a1a1a;
 }
 
-.page-wrapper {
+.teammaking-page {
   width: 100%;
-  height: calc(100vh - 56px);
-  overflow: hidden;
+  min-height: calc(100vh - 56px);
+  min-height: calc(100dvh - 56px);
   background-color: #f8f8f8;
   padding: 19px 30px 20px;
   background: linear-gradient(180deg, #f0f0f0 0%, #ffffff 100%);
@@ -512,8 +512,8 @@ body {
 }
 
 @media (max-width: 768px) {
-  .page-wrapper {
-    padding: 16px 14px 0;
+  .teammaking-page {
+    padding: 16px 14px 20px;
   }
 
   .teammaking-page-title {
@@ -526,7 +526,8 @@ body {
 
   .card {
     width: 100%;
-    height: 585px;
+    height: auto;
+    min-height: 585px;
     border-radius: 9px;
     padding: 22px 18px;
   }
@@ -646,9 +647,8 @@ body {
   }
 
   .bottom-bar {
-    position: absolute;
-    right: 18px;
-    bottom: 12px;
+    position: static;
+    margin-top: 20px;
   }
 
   .teammaking-actions {

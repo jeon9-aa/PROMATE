@@ -142,7 +142,7 @@ function TeamCreatePage() {
   if (!canAccess) return null;
 
   return (
-    <div className="page-wrapper">
+    <div className="teammaking-page">
       <h1 className="teammaking-page-title">프로젝트 생성</h1>
       <div className="card">
         <div className="teammaking-image-field">
