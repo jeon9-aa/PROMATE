@@ -157,7 +157,7 @@
 }
 
 .project-settings-field textarea {
-  height: 100px;
+  height: 80px;
   padding: 10px 12px;
   resize: none;
 }
@@ -356,6 +356,15 @@
   font-weight: 700;
 }
 
+.project-settings-card:not(.is-editing) .project-settings-actions .project-settings-edit {
+  position: relative;
+  top: -65px;
+}
+
+.project-settings-card:not(.is-editing) .project-settings-actions {
+  margin-bottom: -65px;
+}
+
 /* 이미지 */
 .project-settings-image {
   position: relative;
@@ -496,8 +505,7 @@
 }
 
 .project-settings-page :focus-visible {
-  outline: 2px solid #ff6600;
-  outline-offset: 3px;
+  outline: none;
 }
 
 .project-settings-sr-only {
@@ -550,6 +558,14 @@
 
   .project-settings-management {
     gap: 24px;
+  }
+
+  .project-settings-card:not(.is-editing) .project-settings-actions .project-settings-edit {
+    top: -54px;
+  }
+
+  .project-settings-card:not(.is-editing) .project-settings-actions {
+    margin-bottom: -54px;
   }
 }
 
