@@ -1,3 +1,4 @@
+import DateInput from '../DatePicker/DateInput.jsx';
 import GuardedButton from '../GuardedButton/GuardedButton.jsx';
 import React, { useState, useEffect } from 'react';
 import './NewTaskModal.css';
@@ -82,8 +83,7 @@ function NewTaskModal({ isOpen, onClose, onSubmit, projectId, members = [] }) {
 
           <div className="task-modal-field">
             <label className="task-modal-label">마감일 <span style={{ color: '#E53E3E' }}>*</span></label>
-            <input
-              type="date"
+            <DateInput
               className="task-modal-input"
               value={dueDate}
               onChange={(e) => setDueDate(e.target.value)}
