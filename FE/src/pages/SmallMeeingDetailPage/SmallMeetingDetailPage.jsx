@@ -1,3 +1,4 @@
+import TeamPageMenu from '../../components/TeamPageMenu/TeamPageMenu.jsx';
 import GuardedButton from '../../components/GuardedButton/GuardedButton.jsx';
 import { useState } from 'react';
 import { useLocation, useNavigate, useParams } from 'react-router-dom';
@@ -43,6 +44,7 @@ export default function SmallMeetingDetailPage() {
       <div className="small-meeting-detail-content">
         <header className="small-meeting-detail-header">
           <h1>{projectTitle} <span aria-hidden="true">|</span> 소모임</h1>
+          <TeamPageMenu projectId={projectId} projectTitle={projectTitle} dueDate={state?.dueDate} currentPage="meetings" />
         </header>
         {subgroup ? (
           <article className="small-meeting-card">
