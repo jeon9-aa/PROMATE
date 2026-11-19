@@ -51,7 +51,10 @@ export default function SmallMeetingAddPage() {
     try {
       response = await apiClient.post(`/projects/${encodeURIComponent(projectId)}/subgroups`, {
         name: newGroup.title,
-        year: Number(start.split('-')[0]),
+        description: newGroup.description,
+        capacity: newGroup.capacity,
+        startDate: start,
+        endDate: end,
       });
     } catch {
       setSaveError('소모임을 생성하지 못했습니다. 다시 시도해 주세요.');
@@ -59,7 +62,7 @@ export default function SmallMeetingAddPage() {
       return;
     }
 
-    const id = (response.data?.result ?? response.data)?.id;
+    const id = response.data?.data?.subGroupId;
     if (id != null) {
       try {
         saveGroup({ ...newGroup, id });
