@@ -1,6 +1,7 @@
+import TeamPageMenu from '../../components/TeamPageMenu/TeamPageMenu.jsx';
 import GuardedButton from '../../components/GuardedButton/GuardedButton.jsx';
 import React, { useCallback, useEffect, useState } from 'react';
-import { Ellipsis, MessageCircle, SquarePen } from 'lucide-react';
+import { MessageCircle, SquarePen } from 'lucide-react';
 import { useLocation, useNavigate, useSearchParams } from 'react-router-dom';
 import {
   getProjectPosts,
@@ -134,9 +135,7 @@ function BoardPage() {
               {projectTitle ? `${projectTitle} | 게시판` : '게시판'}
             </GuardedButton>
           </h1>
-          <span className="project-board__more" aria-hidden="true">
-            <Ellipsis size={24} aria-hidden="true" />
-          </span>
+          <TeamPageMenu projectId={projectId} projectTitle={projectTitle} dueDate={location.state?.dueDate} currentPage="board" />
         </header>
 
         <div className="project-board__toolbar">
