@@ -220,15 +220,15 @@
   height: auto;
   flex-shrink: 0;
   padding: 1px 6px;
-  background: #ffebde;
-  border-left: 1px solid #ff6600;
+  background: var(--calendar-event-background, #ffebde);
+  border-left: 1px solid var(--calendar-event-border, #ff6600);
   box-sizing: border-box;
   font-family: 'Pretendard';
   font-weight: 600;
   font-size: 10px;
   line-height: 12px;
   letter-spacing: -0.005em;
-  color: #ff6600;
+  color: var(--calendar-event-color, #ff6600);
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;

@@ -203,7 +203,7 @@ function DashboardPage() {
         </div>
 
         <div className="dashboard-detail-row">
-          <Calendar showAddButton={false} showThemeButton />
+          <Calendar showAddButton={false} showThemeButton projects={dashboardData.projects} />
 
           <div className="status-section">
             <div className="section-header">
