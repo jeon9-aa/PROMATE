@@ -196,9 +196,14 @@ function TeamCreatePage() {
           </div>
         </div>
         <div className="form-field recruit-count-field">
-          <label className="teammaking-form-label" htmlFor="recruit-count">
-            모집 인원
-          </label>
+          <div className="recruit-count-label-row">
+            <label className="teammaking-form-label" htmlFor="recruit-count">
+              모집 인원
+            </label>
+            <span id="recruit-count-help" className="recruit-count-help">
+              모집 인원을 1~99명 사이의 정수로 입력해 주세요.
+            </span>
+          </div>
           <input
             id="recruit-count"
             className="recruit-count-input"
@@ -211,9 +216,6 @@ function TeamCreatePage() {
             aria-describedby="recruit-count-help"
             aria-invalid={!isRecruitCountValid}
           />
-          <span id="recruit-count-help" className="recruit-count-help">
-            모집 인원을 1~99명 사이의 정수로 입력해 주세요.
-          </span>
         </div>
         <ProjectPeriodField
           startDate={startDate}
