@@ -37,7 +37,7 @@ public class SubGroupQueryServiceImpl implements SubGroupQueryService{
         }
 
         // 2. 프로젝트 멤버 여부 검증
-        if (!memberRepository.existsByUserIdAndProjectId(userId, projectId)) {
+        if (!memberRepository.existsByProjectIdAndUserIdAndIsDeletedFalse(projectId, userId)) {
             throw new MemberException(MemberErrorCode.MEMBER_FORBIDDEN_NOT_PROJECT_MEMBER);
         }
 
@@ -61,7 +61,7 @@ public class SubGroupQueryServiceImpl implements SubGroupQueryService{
         }
 
         // 2. 프로젝트 멤버 여부 검증
-        if (!memberRepository.existsByUserIdAndProjectId(userId, projectId)) {
+        if (!memberRepository.existsByProjectIdAndUserIdAndIsDeletedFalse(projectId, userId)) {
             throw new MemberException(MemberErrorCode.MEMBER_FORBIDDEN_NOT_PROJECT_MEMBER);
         }
 

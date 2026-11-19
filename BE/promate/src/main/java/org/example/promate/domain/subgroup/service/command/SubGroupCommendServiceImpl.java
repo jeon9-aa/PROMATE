@@ -54,7 +54,7 @@ public class SubGroupCommendServiceImpl implements SubGroupCommendService {
                 .orElseThrow(() -> new ProjectException(ProjectErrorCode.ID_NOT_FOUND));
 
         // 3. 프로젝트 멤버 여부 검증
-        boolean isMember = memberRepository.existsByUserIdAndProjectId(userId, projectId);
+        boolean isMember = memberRepository.existsByProjectIdAndUserIdAndIsDeletedFalse(projectId, userId);
 
         log.info("[소모임 생성] userId={}, projectId={}, isMember={}", userId, projectId, isMember);
 
@@ -122,7 +122,7 @@ public class SubGroupCommendServiceImpl implements SubGroupCommendService {
                 .orElseThrow(() -> new ProjectException(ProjectErrorCode.ID_NOT_FOUND));
 
         // 2. 프로젝트 멤버 여부 검증
-        if (!memberRepository.existsByUserIdAndProjectId(userId, projectId)) {
+        if (!memberRepository.existsByProjectIdAndUserIdAndIsDeletedFalse(projectId, userId)) {
             throw new MemberException(MemberErrorCode.MEMBER_FORBIDDEN_NOT_PROJECT_MEMBER);
         }
 
@@ -202,7 +202,7 @@ public class SubGroupCommendServiceImpl implements SubGroupCommendService {
         }
 
         // 2. 프로젝트 멤버 여부 검증
-        if (!memberRepository.existsByUserIdAndProjectId(userId, projectId)) {
+        if (!memberRepository.existsByProjectIdAndUserIdAndIsDeletedFalse(projectId, userId)) {
             throw new MemberException(MemberErrorCode.MEMBER_FORBIDDEN_NOT_PROJECT_MEMBER);
         }
 
@@ -230,7 +230,7 @@ public class SubGroupCommendServiceImpl implements SubGroupCommendService {
         }
 
         // 2. 프로젝트 멤버 여부 검증
-        if (!memberRepository.existsByUserIdAndProjectId(userId, projectId)) {
+        if (!memberRepository.existsByProjectIdAndUserIdAndIsDeletedFalse(projectId, userId)) {
             throw new MemberException(MemberErrorCode.MEMBER_FORBIDDEN_NOT_PROJECT_MEMBER);
         }
 
@@ -286,7 +286,7 @@ public class SubGroupCommendServiceImpl implements SubGroupCommendService {
         }
 
         // 2. 프로젝트 멤버 여부 검증
-        if (!memberRepository.existsByUserIdAndProjectId(userId, projectId)) {
+        if (!memberRepository.existsByProjectIdAndUserIdAndIsDeletedFalse(projectId, userId)) {
             throw new MemberException(MemberErrorCode.MEMBER_FORBIDDEN_NOT_PROJECT_MEMBER);
         }
 
