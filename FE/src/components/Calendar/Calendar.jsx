@@ -3,13 +3,14 @@ import React, { useMemo, useState, useEffect } from 'react';
 import './Calendar.css';
 import calendarIcon from '../../assets/CalendarIcon.svg';
 import plusIcon from '../../assets/icons/plusIcon.svg';
+import themeSettingsIcon from '../../assets/icons/themeSettingsIcon.svg';
 import AddEventModal from '../AddEventModal/AddEventModal';
 import EventDetailModal from '../EventDetailModal/EventDetailModal';
 import apiClient from '../../api/apiClient';
 
 const WEEKDAYS = ['SUN', 'MON', 'TUE', 'WED', 'THU', 'FRI', 'SAT'];
 
-function Calendar({ showAddButton = true, projectId, projectTitle: fallbackProjectTitle }) {
+function Calendar({ showAddButton = true, showThemeButton = false, projectId, projectTitle: fallbackProjectTitle }) {
   const [currentDate, setCurrentDate] = useState(new Date());
   const [events, setEvents] = useState([]);
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -196,12 +197,20 @@ function Calendar({ showAddButton = true, projectId, projectTitle: fallbackProje
           )}
         </div>
 
-        {showAddButton && (
+        {(showAddButton || showThemeButton) && (
           <div className="calendar-header-right">
+            {showThemeButton && (
+              <GuardedButton className="theme-settings-btn-header" type="button">
+                <img src={themeSettingsIcon} width={20} height={20} alt="" aria-hidden="true" />
+                <span>테마 설정</span>
+              </GuardedButton>
+            )}
+            {showAddButton && (
             <GuardedButton className="add-event-btn-header" type="button" onClick={handleOpenModal}>
               <img src={plusIcon} alt="일정 추가 아이콘" />
               <span>일정 추가</span>
             </GuardedButton>
+            )}
           </div>
         )}
       </div>
