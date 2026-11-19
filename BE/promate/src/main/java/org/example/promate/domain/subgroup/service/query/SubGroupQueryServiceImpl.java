@@ -1,6 +1,7 @@
 package org.example.promate.domain.subgroup.service.query;
 
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.example.promate.domain.project.code.MemberErrorCode;
 import org.example.promate.domain.project.code.ProjectErrorCode;
 import org.example.promate.domain.project.exception.MemberException;
@@ -20,6 +21,7 @@ import org.springframework.stereotype.Service;
 
 import java.util.List;
 
+@Slf4j
 @Service
 @RequiredArgsConstructor
 public class SubGroupQueryServiceImpl implements SubGroupQueryService{
@@ -31,6 +33,8 @@ public class SubGroupQueryServiceImpl implements SubGroupQueryService{
 
     @Override
     public List<SubGroupResponseDto.SubGroupInfo> getAll(Long userId, Long projectId) {
+        log.info("[소모임 조회 시작] userId={}, projectId={}", userId, projectId);
+
         // 1. 프로젝트 존재 검증
         if (!projectRepository.existsById(projectId)) {
             throw new ProjectException(ProjectErrorCode.ID_NOT_FOUND);
