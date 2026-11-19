@@ -1,0 +1,66 @@
+.team-page-menu {
+  position: relative;
+  flex-shrink: 0;
+}
+
+.team-page-menu__trigger {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 32px;
+  height: 32px;
+  padding: 0;
+  border: 0;
+  border-radius: 6px;
+  background: transparent;
+  color: #000;
+  cursor: pointer;
+}
+
+.team-page-menu__popover {
+  position: absolute;
+  top: calc(100% + 4px);
+  right: 0;
+  z-index: 20;
+  width: 160px;
+  padding: 4px;
+  border-radius: 10px;
+  background: #fff;
+  box-shadow: 0 3px 14px rgba(0, 0, 0, 0.12);
+}
+
+.team-page-menu__popover button {
+  display: block;
+  width: 100%;
+  padding: 9px 12px;
+  border: 0;
+  background: transparent;
+  color: #888;
+  font: 400 12px/1.25 'Pretendard', sans-serif;
+  text-align: left;
+  cursor: pointer;
+}
+
+.team-page-menu__popover .team-page-menu__current {
+  color: #ff6b00;
+  font-weight: 700;
+  border-bottom: 1px solid #eee;
+  margin-bottom: 2px;
+}
+
+.team-page-menu__trigger:hover,
+.team-page-menu__popover button:hover:not(:disabled) {
+  background: #e9ecef;
+}
+
+.team-page-menu__trigger:focus-visible,
+.team-page-menu__popover button:focus-visible {
+  outline: 2px solid #fe9a57;
+  outline-offset: 2px;
+}
+
+.team-page-menu__popover button:disabled {
+  color: #aaa;
+  cursor: not-allowed;
+}
+
