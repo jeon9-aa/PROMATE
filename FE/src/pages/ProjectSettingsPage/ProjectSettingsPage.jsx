@@ -1,5 +1,7 @@
 import { useRef, useState } from 'react';
-import { useLocation, useParams } from 'react-router-dom';
+import { useLocation, useNavigate, useParams } from 'react-router-dom';
+import GuardedButton from '../../components/GuardedButton/GuardedButton.jsx';
+import '../../components/TeamPageMenu/ProjectTitleButton.css';
 import MainButton from '../../components/MainButton/MainButton';
 import ProjectAvatar from '../../components/ProjectAvatar/ProjectAvatar';
 import Tag from '../../components/Tag/Tag';
@@ -34,6 +36,7 @@ function formatDate(value) {
 }
 
 export default function ProjectSettingsPage() {
+  const navigate = useNavigate();
   const deleteOverlayRef = useRef(null);
   const [deleteNotice, setDeleteNotice] = useState('');
   const [confirmationType, setConfirmationType] = useState('delete');
@@ -106,7 +109,12 @@ export default function ProjectSettingsPage() {
         </div>
       </dialog>
       <header className="project-settings-header">
-        <h1>{title} | 프로젝트 설정</h1>
+        <h1>
+          <GuardedButton type="button" className="project-title-button" data-tooltip="팀페이지로 이동"
+            onClick={() => navigate(`/project/${projectId}`, { state: { projectTitle: title, dueDate: project.endDate } })}>
+            {title} | 프로젝트 설정
+          </GuardedButton>
+        </h1>
         <TeamPageMenu projectId={projectId} projectTitle={title} dueDate={project.endDate} currentPage="settings" />
       </header>
 
