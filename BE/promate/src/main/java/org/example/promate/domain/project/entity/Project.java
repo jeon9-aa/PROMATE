@@ -9,6 +9,7 @@ import org.example.promate.domain.recruit.code.RecruitErrorCode;
 import org.example.promate.domain.recruit.dto.request.RecruitUpdateRequest;
 import org.example.promate.domain.recruit.entity.Recruit;
 import org.example.promate.domain.recruit.enums.Category;
+import org.example.promate.domain.subgroup.entity.SubGroup;
 import org.example.promate.domain.user.entity.User;
 import org.example.promate.domain.workspace.entity.*;
 import org.example.promate.global.ApiPayload.exception.GeneralException;
@@ -83,6 +84,10 @@ public class Project extends BaseTimeEntity {
     @OneToMany(mappedBy = "project", fetch = FetchType.LAZY)
     @Builder.Default
     private List<Post> posts = new ArrayList<>();
+
+    @OneToMany(mappedBy = "project", fetch = FetchType.LAZY)
+    @Builder.Default
+    private List<SubGroup> subGroups = new ArrayList<>();
 
     public void updateStatus(ProjectStatus status) {
         this.status = status;
