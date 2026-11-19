@@ -1,3 +1,4 @@
+import '../../components/TeamPageMenu/ProjectTitleButton.css';
 import TeamPageMenu from '../../components/TeamPageMenu/TeamPageMenu.jsx';
 import GuardedButton from '../../components/GuardedButton/GuardedButton.jsx';
 import React, { useCallback, useEffect, useState } from 'react';
@@ -124,7 +125,7 @@ function BoardPage() {
           <h1 id="project-board-title" className="project-board__title">
             <GuardedButton
               type="button"
-              className="project-board__title-button"
+              className="project-board__title-button project-title-button" data-tooltip="팀페이지로 이동"
               onClick={() => navigate(`/project/${projectId}`, {
                 state: {
                   projectTitle,

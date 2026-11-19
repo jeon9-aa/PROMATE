@@ -1,3 +1,4 @@
+import '../../components/TeamPageMenu/ProjectTitleButton.css';
 import TeamPageMenu from '../../components/TeamPageMenu/TeamPageMenu.jsx';
 import { useEffect, useState } from 'react';
 import GuardedButton from '../../components/GuardedButton/GuardedButton.jsx';
@@ -33,7 +34,12 @@ export default function SmallMeetingListPage() {
     <div className="project-detail-page">
       <div className="project-detail-content">
         <header className="project-detail-header">
-          <h1>{projectTitle} <span aria-hidden="true">|</span> 소모임</h1>
+          <h1>
+            <GuardedButton type="button" className="project-title-button" data-tooltip="팀페이지로 이동"
+              onClick={() => navigate(`/project/${projectId}`, { state: { projectTitle, dueDate: state?.dueDate } })}>
+              {projectTitle} <span aria-hidden="true">|</span> 소모임
+            </GuardedButton>
+          </h1>
           <TeamPageMenu projectId={projectId} projectTitle={projectTitle} dueDate={state?.dueDate} currentPage="meetings" />
         </header>
         <section aria-label="소모임 목록">

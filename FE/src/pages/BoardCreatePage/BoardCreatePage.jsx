@@ -1,3 +1,4 @@
+import '../../components/TeamPageMenu/ProjectTitleButton.css';
 import TeamPageMenu from '../../components/TeamPageMenu/TeamPageMenu.jsx';
 import GuardedForm from '../../components/GuardedForm/GuardedForm.jsx';
 import GuardedButton from '../../components/GuardedButton/GuardedButton.jsx';
@@ -84,7 +85,7 @@ export default function BoardCreatePage() {
       <div className="board-detail__content">
         <header className="board-detail__page-header">
           <h1 id="board-create-heading" className="board-detail__page-title">
-            <GuardedButton type="button" className="board-detail__title-button" disabled={isSubmitting}
+            <GuardedButton type="button" className="board-detail__title-button project-title-button" data-tooltip="팀페이지로 이동" disabled={isSubmitting}
               onClick={() => navigate(isValidProject ? `/project/${projectId}` : '/project', { state: navigationState })}>
               {projectTitle ? `${projectTitle} | 게시판` : '게시판'}
             </GuardedButton>
