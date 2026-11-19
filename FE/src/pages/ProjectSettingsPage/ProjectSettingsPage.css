@@ -74,6 +74,7 @@
 
 /* 정보 카드 */
 .project-settings-card {
+  box-sizing: border-box;
   width: 100%;
   max-width: 1000px;
   padding: 30px 40px;
@@ -372,14 +373,6 @@
   background: #e8894c;
 }
 
-.project-settings-actions {
-  display: flex;
-  align-items: flex-end;
-  justify-content: flex-end;
-  flex-wrap: wrap;
-  gap: 20px;
-}
-
 .project-settings-actions .project-settings-edit {
   height: 41px;
   padding: 10px 24px;
@@ -581,14 +574,6 @@
   .project-settings-management {
     gap: 24px;
   }
-
-  .project-settings-card:not(.is-editing) .project-settings-actions .project-settings-edit {
-    top: -54px;
-  }
-
-  .project-settings-card:not(.is-editing) .project-settings-actions {
-    margin-bottom: -54px;
-  }
 }
 
 /* Member management */
@@ -745,5 +730,8 @@
     width: 100%;
   }
 
+  #project-settings-info {
+    padding: 24px 20px;
+  }
 
 }
