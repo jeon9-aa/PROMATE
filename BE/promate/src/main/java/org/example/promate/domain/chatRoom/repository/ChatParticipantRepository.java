@@ -16,7 +16,7 @@ public interface ChatParticipantRepository extends JpaRepository<ChatParticipant
     Optional<ChatParticipant> findByChatRoom_IdAndParticipant_IdNot(Long chatRoomId, Long participantId);
 
     // N+1 문제 해결을 위한 DTO Projection
-    @Query("SELECT new org.example.promate.domain.chatRoom.dto.res.ChatRoomResDto$ChatRoomDto(cr.id, r.id, r.title, partner.id, partner.profileImageUrl) " +
+    @Query("SELECT new org.example.promate.domain.chatRoom.dto.res.ChatRoomResDto$ChatRoomDto(cr.id, r.id, r.title, partner.id, partner.name, partner.profileImageUrl) " +
             "FROM ChatParticipant cp " +
             "JOIN cp.chatRoom cr " +
             "JOIN cr.recruit r " +

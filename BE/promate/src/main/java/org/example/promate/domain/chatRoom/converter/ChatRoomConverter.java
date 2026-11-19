@@ -61,6 +61,7 @@ public class ChatRoomConverter {
                 .recruitId(recruit.getId())
                 .recruitTitle(recruit.getTitle())
                 .chatPartnerId(chatPartner.getId())
+                .chatPartnerName(chatPartner.getName())
                 .chatPartnerProfileImageUrl(chatPartner.getProfileImageUrl())
                 .build();
     }

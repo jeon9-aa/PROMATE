@@ -29,7 +29,7 @@ public class ChatRoomResDto {
     }
 
     @Getter
-    @JsonPropertyOrder({"chatRoomId", "recruitId", "recruitTitle", "chatPartnerId", "chatPartnerProfileImageUrl", "lastMessage", "lastMessageAt", "unreadCount"})
+    @JsonPropertyOrder({"chatRoomId", "recruitId", "recruitTitle", "chatPartnerId", "chatPartnerName", "chatPartnerProfileImageUrl", "lastMessage", "lastMessageAt", "unreadCount"})
     public static class ChatRoomDto {
 
         private Long chatRoomId;
@@ -40,6 +40,7 @@ public class ChatRoomResDto {
 
         // 상대방 정보
         private Long chatPartnerId;
+        private String chatPartnerName;
         private String chatPartnerProfileImageUrl;
 
         // 메시지 합칠 때 추가
@@ -56,11 +57,12 @@ public class ChatRoomResDto {
         }
 
         @Builder
-        public ChatRoomDto(Long chatRoomId, Long recruitId, String recruitTitle, Long chatPartnerId, String chatPartnerProfileImageUrl) {
+        public ChatRoomDto(Long chatRoomId, Long recruitId, String recruitTitle, Long chatPartnerId, String chatPartnerName, String chatPartnerProfileImageUrl) {
             this.chatRoomId = chatRoomId;
             this.recruitId = recruitId;
             this.recruitTitle = recruitTitle;
             this.chatPartnerId = chatPartnerId;
+            this.chatPartnerName = chatPartnerName;
             this.chatPartnerProfileImageUrl = chatPartnerProfileImageUrl;
         }
 
