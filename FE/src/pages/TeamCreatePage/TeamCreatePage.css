@@ -64,7 +64,6 @@ body {
   overflow: hidden;
   cursor: pointer;
   font-family: inherit;
-  transition: box-shadow 0.2s ease;
 }
 
 .teammaking-logo-box:hover {
@@ -121,7 +120,6 @@ body {
   font-family: inherit;
   font-size: 12px;
   cursor: pointer;
-  transition: border-color 0.2s ease, color 0.2s ease, background-color 0.2s ease;
 }
 
 .teammaking-image-reset:hover {
@@ -159,11 +157,11 @@ body {
   font-size: 14px;
   color: #1a1a1a;
   outline: none;
-  transition: background-color 0.2s ease, box-shadow 0.2s ease;
 }
 
 .text-input:focus {
-  box-shadow: 0 0 0 2px rgba(243, 132, 30, 0.25);
+  outline: none;
+  border-color: #fe9a57;
 }
 
 .text-input::placeholder {
@@ -237,8 +235,8 @@ body {
   box-sizing: border-box;
 }
 
-.period-date-picker:focus-visible .period-date-display {
-  box-shadow: 0 0 0 2px rgba(243, 132, 30, 0.25);
+.period-date-picker:focus-within .period-date-display {
+  outline: 1px solid #fe9a57;
 }
 
 .period-separator {
@@ -415,13 +413,12 @@ body {
   outline: none;
   line-height: 1.4;
   font-family: inherit;
-  transition: background-color 0.2s ease, box-shadow 0.2s ease;
 }
 
-.recruit-count-select {
+.recruit-count-input {
   width: 160px;
   height: 32px;
-  padding: 0 34px 0 11px;
+  padding: 0 11px;
   border: 1px solid #bcbcbc;
   border-radius: 3px;
   background-color: #f3f3f3;
@@ -429,16 +426,22 @@ body {
   font-family: inherit;
   font-size: 14px;
   outline: none;
-  cursor: pointer;
-  transition: background-color 0.2s ease, box-shadow 0.2s ease;
+  cursor: text;
 }
 
-.recruit-count-select:focus {
-  box-shadow: 0 0 0 2px rgba(243, 132, 30, 0.25);
+.recruit-count-input:focus {
+  outline: none;
+  border-color: #fe9a57;
+}
+
+.recruit-count-help {
+  font-size: 12px;
+  color: #666;
 }
 
 .textarea-input:focus {
-  box-shadow: 0 0 0 2px rgba(243, 132, 30, 0.25);
+  outline: none;
+  border-color: #fe9a57;
 }
 
 .textarea-input::placeholder {
@@ -477,7 +480,6 @@ body {
   line-height: 21px;
   cursor: pointer;
   font-family: "Pretendard", sans-serif;
-  transition: background 0.15s;
   white-space: nowrap;
 }
 
@@ -503,7 +505,6 @@ body {
   line-height: 21px;
   cursor: pointer;
   font-family: "Pretendard", sans-serif;
-  transition: background 0.15s;
   white-space: nowrap;
 }
 
@@ -558,7 +559,7 @@ body {
     font-size: 14px;
   }
 
-  .recruit-count-select {
+  .recruit-count-input {
     width: 140px;
     height: 32px;
   }
