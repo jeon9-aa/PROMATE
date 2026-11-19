@@ -216,7 +216,7 @@ function TaskBoardPage() {
                       handleDeleteTask(task.taskId);
                     }}
                   >
-                    삭제하기
+                    삭제
                   </GuardedButton>
                   <GuardedButton
                     type="button"
