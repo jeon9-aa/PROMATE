@@ -10,6 +10,7 @@ import org.springframework.messaging.simp.SimpMessageType;
 import org.springframework.messaging.simp.stomp.StompCommand;
 import org.springframework.messaging.simp.stomp.StompHeaderAccessor;
 import org.springframework.messaging.support.ChannelInterceptor;
+import org.springframework.messaging.support.MessageHeaderAccessor;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.stereotype.Component;
 
@@ -33,8 +34,14 @@ public class JwtChannelInterceptor implements ChannelInterceptor {
             Message<?> message,
             MessageChannel channel
     ) {
+        // StompHeaderAccessor accessor =
+        //        StompHeaderAccessor.wrap(message);
+
         StompHeaderAccessor accessor =
-                StompHeaderAccessor.wrap(message);
+                MessageHeaderAccessor.getAccessor(
+                        message,
+                        StompHeaderAccessor.class
+                ); // 수정
 
         StompCommand command = accessor.getCommand();
 
@@ -141,7 +148,7 @@ public class JwtChannelInterceptor implements ChannelInterceptor {
                             + chatRoomId + ", userId=" + userId
             ); // 로그
 
-            
+
             // 3. 채팅방 참여자 검증
             ChatParticipant participant = chatParticipantRepository
                     .findByChatRoom_IdAndParticipant_Id(
