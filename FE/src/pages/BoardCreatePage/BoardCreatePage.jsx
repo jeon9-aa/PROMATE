@@ -1,3 +1,4 @@
+import TeamPageMenu from '../../components/TeamPageMenu/TeamPageMenu.jsx';
 import GuardedForm from '../../components/GuardedForm/GuardedForm.jsx';
 import GuardedButton from '../../components/GuardedButton/GuardedButton.jsx';
 import { useEffect, useRef, useState } from 'react';
@@ -88,6 +89,7 @@ export default function BoardCreatePage() {
               {projectTitle ? `${projectTitle} | 게시판` : '게시판'}
             </GuardedButton>
           </h1>
+          <TeamPageMenu projectId={projectId} projectTitle={projectTitle} dueDate={location.state?.dueDate} currentPage="board" disabled={isSubmitting} />
         </header>
 
         <GuardedForm className="board-create__form" onSubmit={handleSubmit} aria-labelledby="board-create-form-title" aria-busy={isSubmitting}>
