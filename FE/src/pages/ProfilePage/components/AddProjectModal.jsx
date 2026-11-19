@@ -1,3 +1,5 @@
+import DateInput from '../../../components/DatePicker/DateInput.jsx';
+import GuardedButton from '../../../components/GuardedButton/GuardedButton.jsx';
 import React, { useState } from 'react';
 import ReactDOM from 'react-dom';
 import './AddProjectModal.css';
@@ -11,6 +13,7 @@ const getTodayString = () => {
 };
 
 const formatDateWithDay = (dateString) => {
+  if (!dateString) return '날짜 선택';
   const [year, month, day] = dateString.split('-').map(Number);
   const date = new Date(year, month - 1, day);
   const formattedMonth = String(month).padStart(2, '0');
@@ -27,6 +30,7 @@ const AddProjectModal = ({ onClose, onAdd, initialValues }) => {
   const [startDate, setStartDate] = useState(initialValues?.startDate ?? getTodayString());
   const [endDate, setEndDate] = useState(initialValues?.endDate ?? getTodayString());
   const isEditMode = !!initialValues;
+  const today = getTodayString();
 
   const handleClose = () => {
     setProjectName('');
@@ -37,12 +41,25 @@ const AddProjectModal = ({ onClose, onAdd, initialValues }) => {
     onClose();
   };
 
-  const handleAdd = () => {
+  const handleAdd = async () => {
     if (!projectName.trim()) {
       alert('프로젝트 이름을 입력해주세요.');
       return;
     }
-    onAdd({
+    if (!startDate) {
+      alert('시작 날짜를 입력해주세요.');
+      return;
+    }
+    const currentDate = getTodayString();
+    if (startDate > currentDate || (endDate && endDate > currentDate)) {
+      alert('프로젝트 날짜는 오늘까지만 입력할 수 있습니다.');
+      return;
+    }
+    if (endDate && startDate > endDate) {
+      alert('시작 날짜는 완료 날짜보다 늦을 수 없습니다.');
+      return;
+    }
+    await onAdd({
       projectName: projectName.trim(),
       description: description.trim(),
       role: role.trim() || null,
@@ -95,20 +112,21 @@ const AddProjectModal = ({ onClose, onAdd, initialValues }) => {
             <div className="add-modal-date-range">
               <div className="add-modal-custom-date">
                 <div className="add-modal-date-display">{formatDateWithDay(startDate)}</div>
-                <input
-                  type="date"
+                <DateInput
                   className="add-modal-hidden-date"
                   value={startDate}
+                  max={endDate && endDate < today ? endDate : today}
                   onChange={(e) => setStartDate(e.target.value)}
                 />
               </div>
               <span className="add-modal-date-sep">~</span>
               <div className="add-modal-custom-date">
                 <div className="add-modal-date-display">{formatDateWithDay(endDate)}</div>
-                <input
-                  type="date"
+                <DateInput
                   className="add-modal-hidden-date"
                   value={endDate}
+                  min={startDate || undefined}
+                  max={today}
                   onChange={(e) => setEndDate(e.target.value)}
                 />
               </div>
@@ -116,8 +134,8 @@ const AddProjectModal = ({ onClose, onAdd, initialValues }) => {
           </div>
 
           <div className="add-modal-actions">
-            <button className="add-modal-btn-cancel" onClick={handleClose}>취소</button>
-            <button className="add-modal-btn-add" onClick={handleAdd}>{isEditMode ? '수정 완료' : '프로젝트 추가'}</button>
+            <GuardedButton className="add-modal-btn-cancel" onClick={handleClose}>취소</GuardedButton>
+            <GuardedButton className="add-modal-btn-add" onClick={handleAdd}>{isEditMode ? '수정 완료' : '프로젝트 추가'}</GuardedButton>
           </div>
 
         </div>

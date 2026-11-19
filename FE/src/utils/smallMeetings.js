@@ -1,38 +1,3 @@
-export const sampleGroups = [
-  {
-    id: 1,
-    title: '프론트엔드 스터디',
-    owner: '아무개',
-    start: '2026-03-17',
-    end: '',
-    closed: false,
-    members: [
-      { userId: 'sample-1-owner', name: '김은비', role: '개설자' },
-      { userId: 'sample-1-member', name: '김철수', role: '참여자' },
-    ],
-  },
-  {
-    id: 2,
-    title: '중간고사 스터디',
-    owner: '아무개',
-    start: '2026-03-17',
-    end: '',
-    closed: false,
-    members: [
-      { userId: 'sample-2-owner', name: '김영희', role: '개설자' },
-    ],
-  },
-  {
-    id: 3,
-    title: '디자인시스템 스터디',
-    owner: '아무개',
-    start: '2026-03-17',
-    end: '2026-07-23',
-    closed: true,
-    members: [],
-  },
-];
-
 const storageKey = 'promate-small-meetings';
 
 export function readSavedGroups() {
@@ -41,10 +6,15 @@ export function readSavedGroups() {
   return groups;
 }
 
-export function getProjectGroups(projectId) {
+export function getProjectGroups(projectId, createdGroup) {
   let saved = [];
-  try { saved = readSavedGroups(); } catch { /* Keep sample data available. */ }
-  return [...sampleGroups, ...saved.filter((group) => group && String(group.projectId) === String(projectId))];
+  try { saved = readSavedGroups(); } catch { /* Storage unavailable. */ }
+  const projectGroups = saved.filter((group) => group && String(group.projectId) === String(projectId));
+  if (createdGroup && String(createdGroup.projectId) === String(projectId) &&
+      !projectGroups.some((group) => String(group.id) === String(createdGroup.id))) {
+    projectGroups.push(createdGroup);
+  }
+  return projectGroups;
 }
 
 export function saveGroup(group) {

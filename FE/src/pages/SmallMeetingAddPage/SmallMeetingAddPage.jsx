@@ -1,4 +1,10 @@
+import '../../components/TeamPageMenu/ProjectTitleButton.css';
+import TeamPageMenu from '../../components/TeamPageMenu/TeamPageMenu.jsx';
+import DateInput from '../../components/DatePicker/DateInput.jsx';
+import GuardedForm from '../../components/GuardedForm/GuardedForm.jsx';
+import GuardedButton from '../../components/GuardedButton/GuardedButton.jsx';
 import { useState } from 'react';
+import apiClient from '../../api/apiClient';
 import { getCurrentUserId, saveGroup } from '../../utils/smallMeetings';
 import useProjectTitle from '../../utils/useProjectTitle';
 import { useLocation, useNavigate, useParams } from 'react-router-dom';
@@ -11,10 +17,12 @@ export default function SmallMeetingAddPage() {
   const { projectId } = useParams();
   const projectTitle = useProjectTitle(projectId, state?.projectTitle);
   const [saveError, setSaveError] = useState('');
+  const [isSubmitting, setIsSubmitting] = useState(false);
   const listPath = `/project/${projectId}/smallMeetingList`;
 
-  const handleSubmit = (event) => {
+  const handleSubmit = async (event) => {
     event.preventDefault();
+    if (isSubmitting) return;
     setSaveError('');
     const form = event.currentTarget;
     const formData = new FormData(form);
@@ -30,7 +38,6 @@ export default function SmallMeetingAddPage() {
     }
 
     const newGroup = {
-      id: Date.now(),
       projectId: String(projectId),
       title: formData.get('title').trim(),
       description: formData.get('description').trim(),
@@ -42,11 +49,29 @@ export default function SmallMeetingAddPage() {
       members: [{ userId: getCurrentUserId(), name: '나', role: '개설자' }],
     };
 
+    setIsSubmitting(true);
+    let response;
     try {
-      saveGroup(newGroup);
+      response = await apiClient.post(`/projects/${encodeURIComponent(projectId)}/subgroups`, {
+        name: newGroup.title,
+        description: newGroup.description,
+        capacity: newGroup.capacity,
+        startDate: start,
+        endDate: end,
+      });
     } catch {
-      setSaveError('소모임을 저장하지 못했습니다. 브라우저 저장소를 확인하고 다시 시도해 주세요.');
+      setSaveError('소모임을 생성하지 못했습니다. 다시 시도해 주세요.');
+      setIsSubmitting(false);
       return;
+    }
+
+    const id = response.data?.data?.subGroupId;
+    if (id != null) {
+      try {
+        saveGroup({ ...newGroup, id });
+      } catch {
+        // 서버에서 생성한 소모임은 로컬 저장소 오류와 관계없이 유지된다.
+      }
     }
 
     navigate(listPath, { state: { projectTitle } });
@@ -56,11 +81,16 @@ export default function SmallMeetingAddPage() {
     <div className="small-meeting-add-page">
       <div className="small-meeting-add-content">
         <header className="small-meeting-add-header">
-          <h1>{projectTitle} <span aria-hidden="true">|</span> 소모임</h1>
-          <button className="small-meeting-add-more" type="button" aria-label="더 보기">···</button>
+          <h1>
+            <GuardedButton type="button" className="project-title-button" data-tooltip="팀페이지로 이동" disabled={isSubmitting}
+              onClick={() => navigate(`/project/${projectId}`, { state: { projectTitle, dueDate: state?.dueDate } })}>
+              {projectTitle} <span aria-hidden="true">|</span> 소모임
+            </GuardedButton>
+          </h1>
+          <TeamPageMenu projectId={projectId} projectTitle={projectTitle} dueDate={state?.dueDate} currentPage="meetings" disabled={isSubmitting} />
         </header>
 
-        <form className="small-meeting-add-card" onSubmit={handleSubmit}>
+        <GuardedForm className="small-meeting-add-card" onSubmit={handleSubmit}>
           <div className="small-meeting-add-fields">
             <label className="small-meeting-add-field small-meeting-add-field-name">
               <span>소모임 이름</span>
@@ -85,9 +115,9 @@ export default function SmallMeetingAddPage() {
               <fieldset className="small-meeting-add-field small-meeting-add-period">
                 <legend>소모임 기간</legend>
                 <div className="small-meeting-add-date-range">
-                  <input aria-label="시작일" name="startDate" type="date" onChange={(event) => event.currentTarget.form.elements.endDate.setCustomValidity('')} required />
+                  <DateInput aria-label="시작일" name="startDate" onChange={(event) => event.currentTarget.form.elements.endDate.setCustomValidity('')} required />
                   <span aria-hidden="true">~</span>
-                  <input aria-label="종료일" name="endDate" type="date" onChange={(event) => event.currentTarget.setCustomValidity('')} required />
+                  <DateInput aria-label="종료일" name="endDate" onChange={(event) => event.currentTarget.setCustomValidity('')} required />
                 </div>
               </fieldset>
             </div>
@@ -95,14 +125,14 @@ export default function SmallMeetingAddPage() {
 
           {saveError && <p role="alert">{saveError}</p>}
           <div className="small-meeting-add-actions">
-            <button className="small-meeting-add-cancel" type="button" onClick={() => navigate(listPath, { state: { projectTitle } })}>취소</button>
-            <button className="small-meeting-add-submit" type="submit">생성하기</button>
+            <GuardedButton className="small-meeting-add-cancel" type="button" onClick={() => navigate(listPath, { state: { projectTitle } })}>취소</GuardedButton>
+            <GuardedButton className="small-meeting-add-submit" type="submit" disabled={isSubmitting}>생성하기</GuardedButton>
           </div>
-        </form>
+        </GuardedForm>
 
-        <button className="small-meeting-add-back" type="button" onClick={() => navigate(listPath, { state: { projectTitle } })}>
+        <GuardedButton className="small-meeting-add-back" type="button" onClick={() => navigate(listPath, { state: { projectTitle } })}>
           <ArrowLeft size={16} aria-hidden="true" /> 목록
-        </button>
+        </GuardedButton>
       </div>
     </div>
   );

@@ -1,3 +1,5 @@
+import DateInput from '../DatePicker/DateInput.jsx';
+import GuardedButton from '../GuardedButton/GuardedButton.jsx';
 import React, { useState, useEffect } from 'react';
 import './NewTaskModal.css';
 
@@ -18,7 +20,7 @@ function NewTaskModal({ isOpen, onClose, onSubmit, projectId, members = [] }) {
 
   if (!isOpen) return null;
 
-  const handleSubmit = () => {
+  const handleSubmit = async () => {
     if (!title.trim() || !managerId || !dueDate) {
       alert('태스크 제목, 담당자, 마감일은 필수 입력 항목입니다.');
       return;
@@ -31,7 +33,7 @@ function NewTaskModal({ isOpen, onClose, onSubmit, projectId, members = [] }) {
       dueDate,
     };
     
-    if (onSubmit) onSubmit(newTask);
+    if (onSubmit) await onSubmit(newTask);
     onClose();
   };
 
@@ -81,8 +83,7 @@ function NewTaskModal({ isOpen, onClose, onSubmit, projectId, members = [] }) {
 
           <div className="task-modal-field">
             <label className="task-modal-label">마감일 <span style={{ color: '#E53E3E' }}>*</span></label>
-            <input
-              type="date"
+            <DateInput
               className="task-modal-input"
               value={dueDate}
               onChange={(e) => setDueDate(e.target.value)}
@@ -91,8 +92,8 @@ function NewTaskModal({ isOpen, onClose, onSubmit, projectId, members = [] }) {
         </div>
 
         <div className="task-modal-actions">
-          <button className="task-btn-cancel" onClick={onClose}>취소</button>
-          <button className="task-btn-submit" onClick={handleSubmit}>태스크 추가</button>
+          <GuardedButton className="task-btn-cancel" onClick={onClose}>취소</GuardedButton>
+          <GuardedButton className="task-btn-submit" onClick={handleSubmit}>태스크 추가</GuardedButton>
         </div>
       </div>
     </div>

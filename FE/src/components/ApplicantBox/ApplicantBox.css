@@ -12,7 +12,6 @@
   background: #FFFFFF;
   border-left: 3px solid #FE9A57;
   border-radius: 0px 10px 10px 0px;
-  transition: background-color 0.2s ease-in-out;
 }
 
 .applicant-box:hover {
@@ -108,7 +107,6 @@
   border-radius: 5px;
   cursor: pointer;
   padding: 0;
-  transition: filter 0.2s ease-in-out;
 }
 
 .applicant-bookmark-btn:hover {
@@ -135,7 +133,6 @@
   font-size: 15px;
   line-height: 19px;
   cursor: pointer;
-  transition: color 0.2s ease-in-out;
   box-sizing: border-box;
   flex-shrink: 0;
 }

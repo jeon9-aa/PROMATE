@@ -1,3 +1,4 @@
+import GuardedButton from '../GuardedButton/GuardedButton.jsx';
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
 import './Sidebar.css';
@@ -67,9 +68,9 @@ function Sidebar({ isOpen, onClose }) {
 
         <hr className="divider" />
 
-        <button className="new-project-btn" onClick={handleNewProjectClick}>
+        <GuardedButton className="new-project-btn" onClick={handleNewProjectClick}>
           + 새 프로젝트 생성
-        </button>
+        </GuardedButton>
 
       </aside>
     </>

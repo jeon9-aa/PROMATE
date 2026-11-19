@@ -45,7 +45,6 @@
   border: none;
   cursor: pointer;
   border-radius: 30%;
-  transition: background-color 0.2s ease-in-out;
 }
 
 .profile-close-x-btn:hover {

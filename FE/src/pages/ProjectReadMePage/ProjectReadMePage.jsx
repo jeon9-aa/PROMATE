@@ -1,10 +1,18 @@
-import React, { useState, useEffect } from 'react';
+import GuardedButton from '../../components/GuardedButton/GuardedButton.jsx';
+import React, { useState, useEffect, useRef } from 'react';
 import { useLocation, useNavigate, useParams } from 'react-router-dom';
 import logoGray from '../../assets/icons/logoGW.svg';
+import linkIcon from '../../assets/icons/linkIcon.svg';
+import lockIcon from '../../assets/icons/lockIcon.svg';
 import ProfileModal from '../../components/ProfileModal/ProfileModal';
 import ApplyModal from '../../components/ApplyModal/ApplyModal';
 import apiClient from '../../api/apiClient';
+import { getOrCreateChatRoom } from '../../api/Recruits/recruitmentApi';
 import Tag from '../../components/Tag/Tag';
+import ShareLinkModal from './ShareLinkModal';
+import PasswordInviteModal from './PasswordInviteModal';
+import { createProjectInvite } from '../../api/Project/projectInviteApi';
+import PasswordJoinNoticeModal from './PasswordJoinNoticeModal';
 import './ProjectReadMePage.css';
 
 const categoryMap = {
@@ -33,6 +41,52 @@ function ProjectReadMePage() {
   const [isLoading, setIsLoading] = useState(true);
 
   const [isProfileModalOpen, setIsProfileModalOpen] = useState(false);
+  const [isShareModalOpen, setIsShareModalOpen] = useState(false);
+  const [isPasswordModalOpen, setIsPasswordModalOpen] = useState(false);
+  const [isPasswordLinkModalOpen, setIsPasswordLinkModalOpen] = useState(false);
+  const [isPasswordJoinNoticeOpen, setIsPasswordJoinNoticeOpen] = useState(false);
+  const [passwordInvitations, setPasswordInvitations] = useState({});
+  const [isCreatingInvite, setIsCreatingInvite] = useState(false);
+  const inviteRequestPending = useRef(false);
+
+  const handlePasswordInviteClick = () => {
+    if (!projectData?.isAuthor) {
+      setIsPasswordJoinNoticeOpen(true);
+      return;
+    }
+    const invitation = passwordInvitations[postId];
+    if (invitation && new Date(invitation.expiresAt).getTime() > Date.now()) {
+      setIsPasswordLinkModalOpen(true);
+    } else {
+      setIsPasswordModalOpen(true);
+    }
+  };
+
+  const handlePasswordJoinContinue = () => {
+    setIsPasswordJoinNoticeOpen(false);
+    navigate('/invite/password');
+  };
+
+  const handlePasswordRegister = async (password) => {
+    if (inviteRequestPending.current || !projectData?.isAuthor || !/^[0-9]{4}$/.test(password)) return;
+    if (projectData.projectId == null) {
+      window.alert('프로젝트 ID를 확인할 수 없습니다. 다시 시도해 주세요.');
+      return;
+    }
+    inviteRequestPending.current = true;
+    setIsCreatingInvite(true);
+    try {
+      const invitation = await createProjectInvite(projectData.projectId, password);
+      setPasswordInvitations((previous) => ({ ...previous, [postId]: invitation }));
+      setIsPasswordModalOpen(false);
+      setIsPasswordLinkModalOpen(true);
+    } catch (error) {
+      window.alert(error.message || '초대 링크 생성에 실패했습니다. 다시 시도해 주세요.');
+    } finally {
+      inviteRequestPending.current = false;
+      setIsCreatingInvite(false);
+    }
+  };
   const [selectedUser, setSelectedUser] = useState(null);
   const [modalPosition, setModalPosition] = useState(null);
 
@@ -40,6 +94,41 @@ function ProjectReadMePage() {
   const [applyJob, setApplyJob] = useState('');
   const [applyMotivation, setApplyMotivation] = useState('');
   const [isApplied, setIsApplied] = useState(false);
+  const [isCreatingChatRoom, setIsCreatingChatRoom] = useState(false);
+  const chatRoomRequestPending = useRef(false);
+
+  const handleChatClick = async () => {
+    if (chatRoomRequestPending.current) return;
+    const token = localStorage.getItem('accessToken');
+    if (!token || token === 'null' || token === 'undefined') {
+      alert('로그인이 필요한 서비스입니다.');
+      return;
+    }
+
+    chatRoomRequestPending.current = true;
+    setIsCreatingChatRoom(true);
+    try {
+      const { chatRoomId, chatPartnerName } = await getOrCreateChatRoom(postId);
+      navigate(`/chat/${chatRoomId}`, {
+        state: {
+          createdRoom: {
+            id: String(chatRoomId),
+            projectName: projectData.title,
+            name: chatPartnerName || projectData.author?.nickname || '팀장',
+            avatarUrl: null,
+            memberCount: 2,
+            unread: 0,
+            messages: [],
+          },
+        },
+      });
+    } catch (error) {
+      alert(error.message || '채팅방 연결에 실패했습니다. 다시 시도해 주세요.');
+    } finally {
+      chatRoomRequestPending.current = false;
+      setIsCreatingChatRoom(false);
+    }
+  };
 
   useEffect(() => {
     const fetchProjectDetail = async () => {
@@ -142,14 +231,26 @@ function ProjectReadMePage() {
         <div className="project-readme-header-row">
           <h1 className="project-readme-title">{projectData.title}</h1>
           <div className="project-readme-date-container">
-            <span className="project-readme-created-at">
-              작성일: {projectData.createdAt?.split('T')[0]}
-            </span>
             {projectData.startDate && projectData.endDate && (
               <span className="project-readme-created-at">
                 프로젝트 기간: {projectData.startDate} ~ {projectData.endDate}
               </span>
             )}
+            <span className="project-readme-created-at">
+              모집글 작성일: {projectData.createdAt?.split('T')[0]}
+            </span>
+          </div>
+          <div className="project-readme-share-actions">
+            <button type="button" className="project-readme-share-btn project-readme-link-btn"
+              onClick={() => setIsShareModalOpen(true)} aria-haspopup="dialog">
+              <img src={linkIcon} alt="" />
+              링크 공유
+            </button>
+            <button type="button" className="project-readme-share-btn"
+              onClick={handlePasswordInviteClick} aria-haspopup="dialog">
+              <img src={lockIcon} alt="" />
+              비밀번호 초대
+            </button>
           </div>
         </div>
 
@@ -193,31 +294,68 @@ function ProjectReadMePage() {
 
         {projectData.isAuthor ? (
           <div className="project-readme-apply-container">
-            <button 
+            <GuardedButton
               className="project-readme-delete-btn"
               onClick={handleDelete}
             >
               삭제
-            </button>
+            </GuardedButton>
           </div>
         ) : (
-          <div className="project-readme-apply-container">
+          <div className="project-readme-apply-container project-readme-participant-actions">
             {projectData.status === "RECRUITING" ? (
-              <button 
+              <GuardedButton
                 className={`project-readme-apply-btn ${isApplied ? 'reviewing' : 'apply'}`}
                 onClick={() => !isApplied && handleApplyClick()}
                 disabled={isApplied}
               >
                 {isApplied ? '지원완료' : '지원하기'}
-              </button>
+              </GuardedButton>
             ) : (
-              <button className="project-readme-apply-btn reviewing" disabled style={{ cursor: 'default' }}>
+              <GuardedButton className="project-readme-apply-btn reviewing" disabled style={{ cursor: 'default' }}>
                 모집완료
-              </button>
+              </GuardedButton>
             )}
+            <button type="button" className="project-readme-chat-btn"
+              onClick={handleChatClick} disabled={isCreatingChatRoom} aria-busy={isCreatingChatRoom}>
+              {isCreatingChatRoom ? '채팅방 연결 중...' : '팀장과 채팅하기'}
+            </button>
           </div>
         )}
       </div>
+
+      {isPasswordJoinNoticeOpen && !projectData.isAuthor && (
+        <PasswordJoinNoticeModal
+          onClose={() => setIsPasswordJoinNoticeOpen(false)}
+          onContinue={handlePasswordJoinContinue}
+        />
+      )}
+
+      {isPasswordModalOpen && projectData.isAuthor && (
+        <PasswordInviteModal
+          onClose={() => { if (!inviteRequestPending.current) setIsPasswordModalOpen(false); }}
+          onSubmit={handlePasswordRegister}
+          isSubmitting={isCreatingInvite}
+        />
+      )}
+
+      {isPasswordLinkModalOpen && projectData.isAuthor && (
+        <ShareLinkModal
+          shareUrl={passwordInvitations[postId]?.inviteUrl}
+          title="비밀번호 링크 공유"
+          description="해당 링크에서 비밀번호를 입력한 참가자는 지원자 검토 없이 바로 프로젝트에 참여합니다."
+          linkLabel="비밀번호 초대 링크"
+          expiresAt={passwordInvitations[postId]?.expiresAt}
+          onClose={() => setIsPasswordLinkModalOpen(false)}
+        />
+      )}
+
+      {isShareModalOpen && (
+        <ShareLinkModal
+          shareUrl={`${window.location.origin}${location.pathname}`}
+          onClose={() => setIsShareModalOpen(false)}
+        />
+      )}
 
       <ProfileModal 
         isOpen={isProfileModalOpen} 

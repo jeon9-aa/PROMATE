@@ -5,6 +5,7 @@
   height: calc(100vh - 56px);
   background: linear-gradient(180deg, #F0F0F0 0%, #FFFFFF 100%);
   overflow-y: auto;
+  overscroll-behavior: none;
   padding: 19px 30px 20px;
   box-sizing: border-box;
 }
@@ -105,8 +106,9 @@
     min-height: calc(100dvh - 56px);
     height: auto;
     padding: 20px 16px;
-    overflow-x: hidden;
-    overflow-y: auto;
+    overflow-x: clip;
+    overflow-y: visible;
+    overscroll-behavior: auto;
   }
 
   .dashboard-content {

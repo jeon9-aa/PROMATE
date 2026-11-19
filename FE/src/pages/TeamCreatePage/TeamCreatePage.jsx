@@ -1,6 +1,7 @@
-import { useState } from "react";
+import GuardedButton from '../../components/GuardedButton/GuardedButton.jsx';
+import { useEffect, useRef, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { useRef } from "react";
+import { useAuthStore } from "../../stores/useAuthStore.js";
 import logoIcon from "../../assets/logoIcon.svg";
 import FormActions from "./components/FormActions.jsx";
 import ProjectDescriptionField from "./components/ProjectDescriptionField.jsx";
@@ -39,6 +40,18 @@ const getTodayValue = () => {
 function TeamCreatePage() {
   const navigate = useNavigate();
   const imageInputRef = useRef(null);
+  const hasShownLoginAlert = useRef(false);
+  const isLoggedIn = useAuthStore((state) => state.isLoggedIn);
+  const token = localStorage.getItem("accessToken")?.trim();
+  const canAccess = isLoggedIn && !!token && token !== "null" && token !== "undefined";
+
+  useEffect(() => {
+    if (canAccess || hasShownLoginAlert.current) return;
+
+    hasShownLoginAlert.current = true;
+    alert("로그인 후 이용 가능합니다.");
+    navigate(-1);
+  }, [canAccess, navigate]);
 
   const todayValue = getTodayValue();
   const [projectName, setProjectName] = useState("");
@@ -48,7 +61,9 @@ function TeamCreatePage() {
   const [endDate, setEndDate] = useState(todayValue);
   const [description, setDescription] = useState("");
   const [recruitImageUrl, setRecruitImageUrl] = useState("");
-  const isSubmitEnabled = projectName.trim() !== "" && description.trim() !== "";
+  const [isCreated, setIsCreated] = useState(false);
+  const isRecruitCountValid = Number.isInteger(Number(recruitCount)) && Number(recruitCount) >= 1 && Number(recruitCount) <= 99;
+  const isSubmitEnabled = !isCreated && projectName.trim() !== "" && description.trim() !== "" && isRecruitCountValid;
 
   const handleCancel = () => {
     setProjectName("");
@@ -107,7 +122,7 @@ function TeamCreatePage() {
         title: projectName,
         description: description,
         category: selectedDomain,
-        totalSlots: parseInt(recruitCount, 10),
+        totalSlots: Number(recruitCount),
         startDate: startDate,
         endDate: endDate,
         recruitImageUrl: recruitImageUrl || null,
@@ -115,6 +130,7 @@ function TeamCreatePage() {
 
       const response = await apiClient.post("/recruitments", payload);
       if (response.data && response.data.isSuccess) {
+        setIsCreated(true);
         alert("팀 모집 게시글 발행을 성공했습니다.");
         navigate(-1);
       }
@@ -124,12 +140,14 @@ function TeamCreatePage() {
     }
   };
 
+  if (!canAccess) return null;
+
   return (
-    <div className="page-wrapper">
+    <div className="teammaking-page">
       <h1 className="teammaking-page-title">프로젝트 생성</h1>
       <div className="card">
         <div className="teammaking-image-field">
-          <button
+          <GuardedButton
             type="button"
             className={`teammaking-logo-box${recruitImageUrl ? " has-image" : ""}`}
             onClick={() => imageInputRef.current?.click()}
@@ -141,15 +159,15 @@ function TeamCreatePage() {
               alt={recruitImageUrl ? "선택한 프로젝트 이미지 미리보기" : ""}
             />
             <span className="teammaking-logo-edit" aria-hidden="true">+</span>
-          </button>
+          </GuardedButton>
           {recruitImageUrl && (
-            <button
+            <GuardedButton
               type="button"
               className="teammaking-image-reset"
               onClick={handleResetImage}
             >
               기본 이미지로 변경
-            </button>
+            </GuardedButton>
           )}
           <input
             ref={imageInputRef}
@@ -178,21 +196,26 @@ function TeamCreatePage() {
           </div>
         </div>
         <div className="form-field recruit-count-field">
-          <label className="teammaking-form-label" htmlFor="recruit-count">
-            모집 인원
-          </label>
-          <select
+          <div className="recruit-count-label-row">
+            <label className="teammaking-form-label" htmlFor="recruit-count">
+              모집 인원
+            </label>
+            <span id="recruit-count-help" className="recruit-count-help">
+              모집 인원을 1~99명 사이의 정수로 입력해 주세요.
+            </span>
+          </div>
+          <input
             id="recruit-count"
-            className="recruit-count-select"
+            className="recruit-count-input"
+            type="number"
+            min="1"
+            max="99"
+            step="1"
             value={recruitCount}
             onChange={(event) => setRecruitCount(event.target.value)}
-          >
-            {Array.from({ length: 10 }, (_, index) => String(index + 1)).map((count) => (
-              <option key={count} value={count}>
-                {count}명
-              </option>
-            ))}
-          </select>
+            aria-describedby="recruit-count-help"
+            aria-invalid={!isRecruitCountValid}
+          />
         </div>
         <ProjectPeriodField
           startDate={startDate}

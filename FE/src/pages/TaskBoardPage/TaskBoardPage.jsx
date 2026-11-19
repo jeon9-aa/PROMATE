@@ -1,6 +1,9 @@
+import '../../components/TeamPageMenu/ProjectTitleButton.css';
+import TeamPageMenu from '../../components/TeamPageMenu/TeamPageMenu.jsx';
+import GuardedButton from '../../components/GuardedButton/GuardedButton.jsx';
 import React, { useEffect, useMemo, useState } from 'react';
-import { useSearchParams, useLocation } from 'react-router-dom';
-import { getProjectTasks, updateTaskStatus, deleteProjectTask, getProjectMembers, createProjectTask, getTaskDetail } from '../../api/TeamPage.js';
+import { useSearchParams, useLocation, useNavigate } from 'react-router-dom';
+import { getProjectTasks, updateProjectTask, updateTaskStatus, deleteProjectTask, getProjectMembers, createProjectTask, getTaskDetail } from '../../api/TeamPage.js';
 import NewTaskModal from '../../components/NewTaskModal/NewTaskModal.jsx';
 import TaskDetailModal from '../TeamPage/components/TaskDetailModal.jsx';
 import writeIcon from '../../assets/icons/writeIcon.svg';
@@ -15,6 +18,7 @@ const taskTabs = [
 function TaskBoardPage() {
   const [searchParams] = useSearchParams();
   const location = useLocation();
+  const navigate = useNavigate();
   const projectId = Number(searchParams.get('projectId'));
   
   const projectTitle = location.state?.projectTitle || '프로젝트';
@@ -153,32 +157,38 @@ function TaskBoardPage() {
   return (
     <section className="task-board" aria-labelledby="task-board-title">
       <div className="task-board__content">
+        <header className="task-board__header">
         <h1 id="task-board-title" className="task-board__title">
-          {projectTitle} - 태스크 보드
-        </h1>
+            <GuardedButton type="button" className="project-title-button" data-tooltip="팀페이지로 이동"
+              onClick={() => navigate(`/project/${projectId}`, { state: { projectTitle, dueDate: location.state?.dueDate } })}>
+              {projectTitle} - 태스크 보드
+            </GuardedButton>
+          </h1>
+          <TeamPageMenu projectId={projectId} projectTitle={projectTitle} dueDate={location.state?.dueDate} currentPage="tasks" />
+        </header>
 
         <div className="task-board__toolbar">
           <nav className="task-board__tabs" aria-label="태스크 상태 필터">
             {taskTabs.map((tab) => (
-              <button
+              <GuardedButton
                 key={tab.key}
                 type="button"
                 className={`task-board__tab ${activeTab === tab.key ? 'task-board__tab--active' : ''}`}
                 onClick={() => setActiveTab(tab.key)}
               >
                 {tab.label}
-              </button>
+              </GuardedButton>
             ))}
           </nav>
 
-          <button
+          <GuardedButton
             type="button"
             className="task-board__write-button"
             onClick={() => setIsNewTaskModalOpen(true)}
           >
             <img src={writeIcon} alt="" aria-hidden="true" />
             태스크 쓰기
-          </button>
+          </GuardedButton>
         </div>
 
         <div className="task-board__list" aria-label="태스크 목록">
@@ -203,7 +213,7 @@ function TaskBoardPage() {
 
             {task.status === 'IN_PROGRESS' || task.status === 'TODO' ? (
                 <div className="task-board__actions" aria-label={`${task.title} 상태 변경`}>
-                  <button
+                  <GuardedButton
                     type="button"
                     className="task-board__action-button task-board__action-button--cancel"
                     onClick={(e) => {
@@ -211,9 +221,9 @@ function TaskBoardPage() {
                       handleDeleteTask(task.taskId);
                     }}
                   >
-                    삭제하기
-                  </button>
-                  <button
+                    삭제
+                  </GuardedButton>
+                  <GuardedButton
                     type="button"
                     className="task-board__action-button task-board__action-button--complete"
                     onClick={(e) => {
@@ -222,7 +232,7 @@ function TaskBoardPage() {
                     }}
                   >
                     완료하기
-                  </button>
+                  </GuardedButton>
                 </div>
               ) : (
                 <span className={`task-board__status task-board__status--${task.status}`}>

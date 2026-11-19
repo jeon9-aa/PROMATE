@@ -1,3 +1,7 @@
+import '../../components/TeamPageMenu/ProjectTitleButton.css';
+import TeamPageMenu from '../../components/TeamPageMenu/TeamPageMenu.jsx';
+import GuardedForm from '../../components/GuardedForm/GuardedForm.jsx';
+import GuardedButton from '../../components/GuardedButton/GuardedButton.jsx';
 import React, { useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState } from 'react';
 import { ArrowLeft, Ellipsis } from 'lucide-react';
 import { useLocation, useNavigate, useParams, useSearchParams } from 'react-router-dom';
@@ -240,9 +244,9 @@ function BoardDetailPage() {
       <div className="board-detail__content">
         <header className="board-detail__page-header">
           <h1 id="board-detail-heading" className="board-detail__page-title">
-            <button
+            <GuardedButton
               type="button"
-              className="board-detail__title-button"
+              className="board-detail__title-button project-title-button" data-tooltip="팀페이지로 이동"
               onClick={() => navigate(`/project/${projectId}`, {
                 state: {
                   projectTitle,
@@ -251,28 +255,10 @@ function BoardDetailPage() {
               })}
             >
               {projectTitle ? `${projectTitle} | 게시판` : '게시판'}
-            </button>
+            </GuardedButton>
           </h1>
 
-          {!isLoading && !error && post && (
-            <div className="board-detail__menu" ref={menuRef}>
-              <button
-                type="button"
-                className="board-detail__menu-button"
-                aria-label="게시글 메뉴"
-                aria-expanded={isMenuOpen}
-                onClick={() => setIsMenuOpen((open) => !open)}
-              >
-                <Ellipsis size={24} />
-              </button>
-              {isMenuOpen && (
-                <div className="board-detail__menu-popup">
-                  <button type="button" onClick={openEditPage}>수정</button>
-                  <button type="button" className="board-detail__delete" onClick={handleDelete}>삭제</button>
-                </div>
-              )}
-            </div>
-          )}
+          <TeamPageMenu projectId={projectId} projectTitle={projectTitle} dueDate={location.state?.dueDate} currentPage="board" />
         </header>
 
         {isLoading && <div className="board-detail__status">게시글을 불러오는 중...</div>}
@@ -281,7 +267,26 @@ function BoardDetailPage() {
         {!isLoading && !error && post && (
           <div className="board-detail__cards">
             <article className="board-detail__post-card">
-              <h2 className="board-detail__post-title">{post.title}</h2>
+              <div className="board-detail__post-header">
+                <h2 className="board-detail__post-title">{post.title}</h2>
+                <div className="board-detail__menu" ref={menuRef}>
+                  <GuardedButton
+                    type="button"
+                    className="board-detail__menu-button"
+                    aria-label="게시글 메뉴"
+                    aria-expanded={isMenuOpen}
+                    onClick={() => setIsMenuOpen((open) => !open)}
+                  >
+                    <Ellipsis size={24} />
+                  </GuardedButton>
+                  {isMenuOpen && (
+                    <div className="board-detail__menu-popup">
+                      <GuardedButton type="button" onClick={openEditPage}>수정</GuardedButton>
+                      <GuardedButton type="button" className="board-detail__delete" onClick={handleDelete}>삭제</GuardedButton>
+                    </div>
+                  )}
+                </div>
+              </div>
               <div className="board-detail__post-meta">
                 <span>{post.writerName ?? post.authorName ?? '작성자'}</span>
                 <time dateTime={post.createdAt}>{formatDate(post.createdAt)}</time>
@@ -314,7 +319,7 @@ function BoardDetailPage() {
                           <time dateTime={createdAt}>{formatDate(createdAt)}</time>
                           {item.commentId != null && editingCommentId !== item.commentId && (
                             <div className="board-detail__comment-actions">
-                            <button
+                            <GuardedButton
                               type="button"
                               className="board-detail__comment-edit-button"
                               disabled={editingCommentId != null || isCommentSubmitting || deletingCommentId != null}
@@ -322,18 +327,18 @@ function BoardDetailPage() {
                                 setEditingCommentId(item.commentId);
                                 setEditComment(item.comment ?? item.content ?? item.commentContent ?? item.text ?? '');
                               }}
-                            >수정</button>
-                            <button
+                            >수정</GuardedButton>
+                            <GuardedButton
                               type="button"
                               className="board-detail__comment-edit-button board-detail__comment-delete-button"
                               disabled={editingCommentId != null || isCommentSubmitting || deletingCommentId != null}
                               onClick={() => handleCommentDelete(item.commentId)}
-                            >{deletingCommentId === item.commentId ? '삭제 중' : '삭제'}</button>
+                            >{deletingCommentId === item.commentId ? '삭제 중' : '삭제'}</GuardedButton>
                             </div>
                           )}
                         </div>
                         {editingCommentId != null && editingCommentId === item.commentId ? (
-                          <form className="board-detail__comment-edit-form" onSubmit={handleCommentEditSubmit}>
+                          <GuardedForm className="board-detail__comment-edit-form" onSubmit={handleCommentEditSubmit}>
                             <label className="board-detail__sr-only" htmlFor={`edit-comment-${item.commentId}`}>댓글 수정</label>
                             <CommentTextarea
                               id={`edit-comment-${item.commentId}`}
@@ -342,14 +347,14 @@ function BoardDetailPage() {
                               disabled={isCommentEditSubmitting}
                               autoFocus
                             />
-                            <button type="submit" disabled={isCommentEditSubmitting || !editComment.trim()}>
+                            <GuardedButton type="submit" disabled={isCommentEditSubmitting || !editComment.trim()}>
                               {isCommentEditSubmitting ? '저장 중' : '저장'}
-                            </button>
-                            <button type="button" disabled={isCommentEditSubmitting} onClick={() => {
+                            </GuardedButton>
+                            <GuardedButton type="button" disabled={isCommentEditSubmitting} onClick={() => {
                               setEditingCommentId(null);
                               setEditComment('');
-                            }}>취소</button>
-                          </form>
+                            }}>취소</GuardedButton>
+                          </GuardedForm>
                         ) : (
                           <p>{item.comment ?? item.content ?? item.commentContent ?? item.text}</p>
                         )}
@@ -362,7 +367,7 @@ function BoardDetailPage() {
                 )}
               </div>
 
-              <form className="board-detail__comment-form" onSubmit={handleCommentSubmit}>
+              <GuardedForm className="board-detail__comment-form" onSubmit={handleCommentSubmit}>
                 <label className="board-detail__sr-only" htmlFor="board-comment">댓글 입력</label>
                 <CommentTextarea
                   id="board-comment"
@@ -376,22 +381,22 @@ function BoardDetailPage() {
                   placeholder="댓글을 입력해주세요."
                   disabled={isCommentSubmitting || isCommentEditSubmitting || deletingCommentId != null}
                 />
-                <button type="submit" disabled={isCommentSubmitting || isCommentEditSubmitting || deletingCommentId != null || !comment.trim()}>
+                <GuardedButton type="submit" disabled={isCommentSubmitting || isCommentEditSubmitting || deletingCommentId != null || !comment.trim()}>
                   {isCommentSubmitting ? '등록 중' : '등록'}
-                </button>
-              </form>
+                </GuardedButton>
+              </GuardedForm>
             </section>
           </div>
         )}
 
-        <button
+        <GuardedButton
           type="button"
           className="board-detail__back-button"
           onClick={() => navigate(boardUrl, { state: { projectTitle, dueDate: location.state?.dueDate } })}
         >
           <ArrowLeft size={16} />
           <span>목록</span>
-        </button>
+        </GuardedButton>
       </div>
 
     </section>

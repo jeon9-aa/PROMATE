@@ -1,3 +1,4 @@
+import GuardedButton from '../../components/GuardedButton/GuardedButton.jsx';
 import React, { useState, useEffect, useRef } from 'react';
 import { ClipboardList, SquarePen, Users } from 'lucide-react';
 import { useNavigate, useParams, useLocation } from 'react-router-dom';
@@ -7,7 +8,7 @@ import SummaryCard from '../../components/SummaryCard/SummaryCard';
 import moreIcon from '../../assets/moreIcon.svg';
 import NewTaskModal from '../../components/NewTaskModal/NewTaskModal.jsx';
 import TaskDetailModal from './components/TaskDetailModal.jsx';
-import TeamPageMenu from './components/TeamPageMenu.jsx';
+import TeamPageMenu from '../../components/TeamPageMenu/TeamPageMenu.jsx';
 import { 
   getProjectMembers, 
   getProjectTasks, 
@@ -62,6 +63,12 @@ function TeamPage() {
 
   const idToFetch = Number(projectId);
   const projectDueDate = location.state?.dueDate || '마감일 미정';
+
+  useEffect(() => {
+    if (location.hash !== '#calendar') return;
+    calendarRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    calendarRef.current?.focus({ preventScroll: true });
+  }, [location.hash, location.key]);
 
   const completedTasksCount = tasks.filter(task => task.status === 'DONE').length;
   const pendingTasksCount = tasks.filter(task => task.status !== 'DONE').length;
@@ -257,6 +264,7 @@ function TeamPage() {
       <div className={`team-page-grid ${isTaskExpanded ? 'team-task-expanded' : ''}`}>
         <section
           className="team-card team-progress-card team-card-clickable"
+          data-tooltip="태스크 페이지로 이동"
           role="button"
           tabIndex={0}
           onClick={() => openTaskBoard('all')}
@@ -284,7 +292,7 @@ function TeamPage() {
           unit="개"
           isAllEmpty={true}
           actionButton={
-            <button
+            <GuardedButton
               type="button"
               className="team-board-write-button"
               onClick={(e) => {
@@ -294,7 +302,7 @@ function TeamPage() {
             >
               <SquarePen size={12} />
               <span>태스크 쓰기</span>
-            </button>
+            </GuardedButton>
           }
         />
 
@@ -351,6 +359,7 @@ function TeamPage() {
 
         <div
           className="team-card team-metric-card team-metric-card-urgent team-card-clickable"
+          data-tooltip="태스크 페이지(진행 중)로 이동"
           role="button"
           tabIndex={0}
           onClick={() => openTaskBoard('IN_PROGRESS')}
@@ -365,6 +374,7 @@ function TeamPage() {
         </div>
         <div
           className="team-card team-metric-card team-metric-card-completed team-card-clickable"
+          data-tooltip="태스크(완료) 페이지로 이동"
           role="button"
           tabIndex={0}
           onClick={() => openTaskBoard('DONE')}
@@ -378,14 +388,14 @@ function TeamPage() {
           <SummaryCard title="완료한 태스크" count={completedTasksCount} isAllEmpty={true} />
         </div>
 
-        <div className="team-calendar" ref={calendarRef} tabIndex={-1}>
+        <div id="calendar" className="team-calendar" ref={calendarRef} tabIndex={-1}>
           <Calendar projectId={idToFetch} projectTitle={projectTitle} />
         </div>
 
         <section className={`team-card team-board-card ${isBoardExpanded ? 'team-card-expanded' : ''}`}>
           <div className="team-board-header team-board-header-clickable" onClick={openBoard}>
             <PanelTitle icon={<ClipboardList size={18} />} title="게시판" onClick={openBoard} />
-            <button
+            <GuardedButton
               type="button"
               className="team-board-write-button"
               onClick={(event) => {
@@ -395,7 +405,7 @@ function TeamPage() {
             >
               <SquarePen size={12} />
               <span>글쓰기</span>
-            </button>
+            </GuardedButton>
           </div>
           <div className="team-board-list">
             {isBoardLoading && <div className="team-member-status">불러오는 중...</div>}
@@ -485,7 +495,7 @@ function TeamPage() {
 
 function MoreButton({ isExpanded, onClick }) {
   return (
-    <button
+    <GuardedButton
       className="team-more-button"
       type="button"
       aria-expanded={isExpanded}
@@ -496,7 +506,7 @@ function MoreButton({ isExpanded, onClick }) {
     >
       <span>{isExpanded ? '접기' : '더보기'}</span>
       <img src={moreIcon} alt="" aria-hidden="true" />
-    </button>
+    </GuardedButton>
   );
 }
 

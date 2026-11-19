@@ -1,4 +1,7 @@
-﻿import { useState } from 'react';
+import '../../components/TeamPageMenu/ProjectTitleButton.css';
+import TeamPageMenu from '../../components/TeamPageMenu/TeamPageMenu.jsx';
+import GuardedButton from '../../components/GuardedButton/GuardedButton.jsx';
+import { useState } from 'react';
 import { useLocation, useNavigate, useParams } from 'react-router-dom';
 import { ArrowLeft, Users } from 'lucide-react';
 import { getCurrentUserId, getProjectGroups } from '../../utils/smallMeetings';
@@ -15,7 +18,8 @@ export default function SmallMeetingDetailPage() {
   const userId = getCurrentUserId();
   const participantStorageKey = `promate-small-meeting-joined:${projectId || 'default'}:${meetingId}:${userId}`;
   const [joinedThisVisit, setJoinedThisVisit] = useState({});
-  const group = getProjectGroups(projectId).find((item) => String(item.id) === String(meetingId));
+  const group = getProjectGroups(projectId, state?.group).find((item) => String(item.id) === String(meetingId));
+  const subgroup = String(state?.subgroup?.id) === meetingId ? state.subgroup : null;
   let joined = Boolean(joinedThisVisit[participantStorageKey]);
   try { joined ||= localStorage.getItem(participantStorageKey) === 'true'; } catch { /* Storage unavailable. */ }
   const members = group?.members ?? [];
@@ -34,25 +38,37 @@ export default function SmallMeetingDetailPage() {
     try { localStorage.setItem(participantStorageKey, 'true'); } catch { /* Keep this visit's joined state. */ }
   };
 
-  if (!group) return <div className="small-meeting-detail-page">소모임을 찾을 수 없습니다. 목록에서 다시 선택해 주세요.</div>;
+  if (!group && !subgroup) return <div className="small-meeting-detail-page">소모임을 찾을 수 없습니다. 목록에서 다시 선택해 주세요.</div>;
 
   return (
     <div className="small-meeting-detail-page">
       <div className="small-meeting-detail-content">
         <header className="small-meeting-detail-header">
-          <h1>{projectTitle} <span aria-hidden="true">|</span> 소모임</h1>
+          <h1>
+            <GuardedButton type="button" className="project-title-button" data-tooltip="팀페이지로 이동"
+              onClick={() => navigate(`/project/${projectId}`, { state: { projectTitle, dueDate: state?.dueDate } })}>
+              {projectTitle} <span aria-hidden="true">|</span> 소모임
+            </GuardedButton>
+          </h1>
+          <TeamPageMenu projectId={projectId} projectTitle={projectTitle} dueDate={state?.dueDate} currentPage="meetings" />
         </header>
-        <article className="small-meeting-card">
+        {subgroup ? (
+          <article className="small-meeting-card">
+            <h2>소모임 #{subgroup.id}</h2>
+            {subgroup.grade != null && <p>학년 {subgroup.grade}</p>}
+            {subgroup.comment && <p className="small-meeting-description">{subgroup.comment}</p>}
+          </article>
+        ) : <article className="small-meeting-card">
           <div className="small-meeting-card-heading">
             <div className="small-meeting-title-row">
               <h2>{group.title}</h2>
               <span className={`small-meeting-badge${isClosed ? ' is-closed' : ''}`}>{isClosed ? '마감' : '모집 중'}</span>
             </div>
-            <button className={`small-meeting-join${hasJoined ? ' is-joined' : ''}`} type="button" onClick={handleJoin} disabled={isClosed || hasJoined}>
+            <GuardedButton className={`small-meeting-join${hasJoined ? ' is-joined' : ''}`} type="button" onClick={handleJoin} disabled={isClosed || hasJoined}>
               <span>{hasJoined ? '참여 완료' : isFull ? '마감' : '참여'}</span>
-            </button>
+            </GuardedButton>
           </div>
-          <p className="small-meeting-description">{group.description || 'React와 상태관리 라이브러리를 함께 공부해요. 매주 화요일 저녁에 온라인으로 모여 진행 상황을 공유합니다.'}</p>
+          {group.description && <p className="small-meeting-description">{group.description}</p>}
           <div className="small-meeting-meta">
             <span><Users size={16} aria-hidden="true" /> 모집 인원 {participants.length}/{maxMembers}</span>
             <span className="small-meeting-meta-divider" aria-hidden="true" />
@@ -68,8 +84,8 @@ export default function SmallMeetingDetailPage() {
               </li>
             ))}</ul>
           </div>
-        </article>
-        <button className="small-meeting-back" type="button" onClick={() => navigate(`/project/${projectId}/smallMeetingList`, { state: { projectTitle } })}><ArrowLeft size={16} aria-hidden="true" /> 목록</button>
+        </article>}
+        <GuardedButton className="small-meeting-back" type="button" onClick={() => navigate(`/project/${projectId}/smallMeetingList`, { state: { projectTitle } })}><ArrowLeft size={16} aria-hidden="true" /> 목록</GuardedButton>
       </div>
     </div>
   );

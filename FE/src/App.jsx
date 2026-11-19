@@ -6,6 +6,7 @@ import Header from "./components/Header/Header";
 import ComingSoonPage from "./pages/ComingSoonPage.jsx";
 import LoginPage from "./pages/LoginPage/LoginPage.jsx";
 import LinkInviteLoginPage from "./pages/LinkInviteLoginPage/components/LinkInviteLoginPage.jsx";
+import PasswordInviteLoginPage from "./pages/PasswordInviteLoginPage/PasswordInviteLoginPage.jsx";
 import AuthCallbackPage from "./pages/AuthCallbackPage/AuthCallbackPage.jsx";
 import TeamCreatePage from "./pages/TeamCreatePage/TeamCreatePage.jsx";
 import DashboardPage from "./pages/DashboardPage/DashboardPage.jsx";
@@ -24,10 +25,11 @@ import ProjectReadMePage from "./pages/ProjectReadMePage/ProjectReadMePage.jsx";
 import SmallMeetingListPage from "./pages/SmallMeetingListPage/SmallMeetingListPage.jsx";
 import SmallMeetingAddPage from "./pages/SmallMeetingAddPage/SmallMeetingAddPage.jsx";
 import SmallMeetingDetailPage from "./pages/SmallMeeingDetailPage/SmallMeetingDetailPage.jsx";
+import ChatAndRoomListPage from "./pages/ChatAndRoomListPage/ChatAndRoomListPage.jsx";
 
 function AppLayout({ isMenuOpen, toggleMenu, closeMenu }) {
   return (
-    <div style={{ display: "flex", flexDirection: "column", minHeight: "100vh" }}>
+    <div className="app-layout">
       <Header onMenuClick={toggleMenu} />
       <div style={{ display: "flex", flex: 1, backgroundColor: "#F8F9FA" }}>
         <Sidebar isOpen={isMenuOpen} onClose={closeMenu} />
@@ -57,6 +59,8 @@ function App() {
       <Routes>
         <Route path="/login" element={<LoginPage />} />
         <Route path="/invite/login" element={<LinkInviteLoginPage />} />
+        <Route path="/invite/password" element={<PasswordInviteLoginPage />} />
+        <Route path="/invite/:inviteToken" element={<PasswordInviteLoginPage />} />
         <Route path="/auth/kakao/callback" element={<AuthCallbackPage />} />
 
         <Route
@@ -70,6 +74,7 @@ function App() {
         >
           <Route path="/" element={<DashboardPage />} />
           <Route path="/dashboard" element={<DashboardPage />} />
+          <Route path="/chat/:roomId?" element={<ChatAndRoomListPage />} />
           <Route path="/teamCreate" element={<TeamCreatePage />} />
           <Route path="/readme/:postId" element={<ProjectReadMePage />} />
           <Route path="/applicant" element={<ApplicantPage/>} />

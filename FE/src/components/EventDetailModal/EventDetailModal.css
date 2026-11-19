@@ -49,7 +49,6 @@
   font-size: 14px;
   cursor: pointer;
   border: 1px solid transparent;
-  transition: all 0.2s ease;
 }
 
 .edm-cancel-btn {
@@ -279,7 +278,6 @@
 .edm-project-link {
   cursor: pointer;
   text-decoration: underline;
-  transition: color 0.2s ease-in-out;
 }
 
 .edm-project-link:hover {

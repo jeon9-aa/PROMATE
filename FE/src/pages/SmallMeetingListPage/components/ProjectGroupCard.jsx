@@ -1,9 +1,10 @@
+import GuardedButton from '../../../components/GuardedButton/GuardedButton.jsx';
 const formatDate = (date) => (date ? date.replaceAll('-', '.') : '');
 
 export default function ProjectGroupCard({ group, onClick }) {
   return (
     <li className="project-detail-group">
-      <button className="project-detail-group-button" type="button" onClick={onClick}>
+      <GuardedButton className="project-detail-group-button" type="button" onClick={onClick}>
         <span className="project-detail-group-info">
           <span className="project-detail-group-title">{group.title}</span>
           <span className="project-detail-group-meta">
@@ -19,7 +20,7 @@ export default function ProjectGroupCard({ group, onClick }) {
         <span className={`project-detail-status${group.closed ? ' is-closed' : ''}`}>
           {group.closed ? '마감' : '모집중'}
         </span>
-      </button>
+      </GuardedButton>
     </li>
   );
 } 

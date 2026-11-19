@@ -1,3 +1,4 @@
+import GuardedButton from '../../components/GuardedButton/GuardedButton.jsx';
 import React, { useEffect, useMemo, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import './DashboardPage.css';
@@ -87,6 +88,7 @@ function DashboardPage() {
             return {
               id: item.projectId,
               title: item.title,
+              recruitImageUrl: item.recruitImageUrl,
               dueDate: formatDate(item.endDate),
               currentStep: 0,
               totalStep: 0,
@@ -121,6 +123,7 @@ function DashboardPage() {
             return {
               id: status.projectId,
               title: status.title,
+              recruitImageUrl: newDashboardData.projects.find((project) => project.id === status.projectId)?.recruitImageUrl,
               dueDate: formatDate(status.endDate),
               currentStep: status.completedTaskCount ?? 0,
               totalStep: status.totalTaskCount ?? 0,
@@ -228,6 +231,7 @@ function DashboardPage() {
                     currentStep={project.currentStep}
                     totalStep={project.totalStep}
                     avatarSize="52px"
+                    avatarSrc={project.recruitImageUrl}
                     onClick={() => navigate(`/project/${project.id}`, { state: { projectTitle: project.title, dueDate: project.dueDate } })}
                     hidePcLabel
                   />
@@ -236,23 +240,23 @@ function DashboardPage() {
             </div>
 
             {visibleStatusCount < dashboardData.projectStatuses.length ? (
-              <button 
+              <GuardedButton
                 className="more-btn" 
                 onClick={handleShowMoreStatus} 
                 style={{ alignSelf: 'center', marginTop: '16px' }}
               >
                 더보기
                 <img src={moreIcon} alt="moreIcon" />
-              </button>
+              </GuardedButton>
             ) : dashboardData.projectStatuses.length > 3 ? (
-              <button 
+              <GuardedButton
                 className="more-btn" 
                 onClick={() => setVisibleStatusCount(3)} 
                 style={{ alignSelf: 'center', marginTop: '16px' }}
               >
                 접기
                 <img src={moreIcon} alt="moreIcon" style={{ transform: 'rotate(180deg)' }} />
-              </button>
+              </GuardedButton>
             ) : null}
           </div>
         </div>

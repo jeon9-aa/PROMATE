@@ -1,5 +1,7 @@
+import GuardedButton from '../../components/GuardedButton/GuardedButton.jsx';
 import React, { useState, useEffect } from 'react';
 import { useLocation } from 'react-router-dom';
+import ProjectAvatar from '../../components/ProjectAvatar/ProjectAvatar';
 import Avatar from '../../components/Avatar/Avatar';
 import logoIcon from '../../assets/logoIcon.svg';
 import {
@@ -22,6 +24,7 @@ const ApplicantDetail = () => {
   const recruitmentId = state?.recruitmentId;
   const projectTitle = state?.projectTitle ?? '프로젝트';
 
+  const [recruitImageUrl, setRecruitImageUrl] = useState(state?.recruitImageUrl);
   const [activeTab, setActiveTab] = useState('PENDING');
   const [applicantMap, setApplicantMap] = useState({ PENDING: [], ACCEPTED: [], REJECTED: [] });
   const [selectedApplicant, setSelectedApplicant] = useState(null);
@@ -39,6 +42,11 @@ const ApplicantDetail = () => {
       const extract = (res) =>
         res.status === 'fulfilled' ? (res.value.data?.data?.applicants ?? []) : [];
 
+      const imageResponse = [pendingRes, acceptedRes, rejectedRes].find((res) =>
+        res.status === 'fulfilled' && res.value.data?.data?.recruitImageUrl !== undefined
+      );
+      if (imageResponse) setRecruitImageUrl(imageResponse.value.data.data.recruitImageUrl);
+
       setApplicantMap({
         PENDING: extract(pendingRes),
         ACCEPTED: extract(acceptedRes),
@@ -48,13 +56,13 @@ const ApplicantDetail = () => {
   }, [recruitmentId]);
 
   const handleViewDetail = (person) => {
-    getApplicationDetail(recruitmentId, person.applicationId)
+    return getApplicationDetail(recruitmentId, person.applicationId)
       .then((res) => setSelectedApplicant(res.data?.data ?? res.data))
       .catch((err) => console.error('지원서 조회 실패', err));
   };
 
   const handleStatusChange = (applicationId, status) => {
-    updateApplicationStatus(recruitmentId, applicationId, status)
+    return updateApplicationStatus(recruitmentId, applicationId, status)
       .then((res) => {
         const resData = res.data?.data;
 
@@ -90,18 +98,21 @@ const ApplicantDetail = () => {
 
   return (
     <div className="ad-page">
-      <h1 className="ad-title">지원자 검토 - {projectTitle}</h1>
+      <div className="ad-heading">
+        <ProjectAvatar src={recruitImageUrl} size="46px" />
+        <h1 className="ad-title">지원자 검토 - {projectTitle}</h1>
+      </div>
 
       <div className="ad-card">
         <div className="ad-tab-bar">
           {tabs.map((tab) => (
-            <button
+            <GuardedButton
               key={tab.key}
               className={`ad-tab${activeTab === tab.key ? ' ad-tab--active' : ''}`}
               onClick={() => setActiveTab(tab.key)}
             >
               {tab.label}
-            </button>
+            </GuardedButton>
           ))}
         </div>
 
@@ -137,12 +148,12 @@ const ApplicantDetail = () => {
               <span className="ad-cell ad-cell--date">
                 {person.appliedAt?.slice(0, 10).replace(/-/g, ' - ')}
               </span>
-              <button
+              <GuardedButton
                 className="ad-view-btn"
                 onClick={() => handleViewDetail(person)}
               >
                 지원서 보기
-              </button>
+              </GuardedButton>
             </div>
           ))}
         </div>
@@ -223,37 +234,37 @@ const ApplicantDetail = () => {
               <div className="app-panel-actions">
                 {selectedApplicant.status === 'PENDING' && (
                   <>
-                    <button
+                    <GuardedButton
                       className="app-btn-reject"
                       onClick={() => handleStatusChange(selectedApplicant.applicationId, 'REJECTED')}
                     >
                       거절
-                    </button>
-                    <button
+                    </GuardedButton>
+                    <GuardedButton
                       className="app-btn-accept"
                       onClick={() => handleStatusChange(selectedApplicant.applicationId, 'ACCEPTED')}
                     >
                       수락
-                    </button>
+                    </GuardedButton>
                   </>
                 )}
                 {selectedApplicant.status === 'ACCEPTED' && (
-                  <button
+                  <GuardedButton
                     className="app-btn-reject"
                     style={{ width: '100%' }}
                     onClick={() => handleStatusChange(selectedApplicant.applicationId, 'REJECTED')}
                   >
                     팀에서 제외
-                  </button>
+                  </GuardedButton>
                 )}
                 {selectedApplicant.status === 'REJECTED' && (
-                  <button
+                  <GuardedButton
                     className="app-btn-accept"
                     style={{ width: '100%' }}
                     onClick={() => handleStatusChange(selectedApplicant.applicationId, 'ACCEPTED')}
                   >
                     수락
-                  </button>
+                  </GuardedButton>
                 )}
               </div>
             </div>

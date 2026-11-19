@@ -28,6 +28,11 @@ const mockPostComments = [
 
 export const handlers = [
   ...demoHandlers,
+  http.post('*/projects/:projectId/subgroup', async ({ request }) => {
+    const { name } = await request.json();
+    return ok({ subGroupId: Date.now(), name, currentCount: 1 });
+  }),
+
   http.get('*/projects/:projectId/members', async () => {
     await delay(150);
     return ok(mockMembers);

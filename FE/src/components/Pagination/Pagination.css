@@ -19,7 +19,6 @@
   border-radius: 4px;
   cursor: pointer;
   font-size: 14px;
-  transition: all 0.2s;
 }
 
 .pagination-btn:hover:not(:disabled) {

@@ -120,7 +120,6 @@
   font-weight: 700;
   color: #FFFFFF;
   white-space: nowrap;
-  transition: background 0.15s;
   flex-shrink: 0;
 }
 
@@ -137,6 +136,12 @@
   min-height: 100%;
   background: linear-gradient(180deg, #F0F0F0 0%, #FFFFFF 100%);
   box-sizing: border-box;
+}
+
+.ad-heading {
+  display: flex;
+  align-items: center;
+  gap: 12px;
 }
 
 .ad-title {
@@ -188,7 +193,6 @@
   font-weight: 500;
   line-height: 17px;
   color: #ABABAB;
-  transition: background 0.15s, color 0.15s;
 }
 
 .ad-tab--active {
@@ -334,7 +338,6 @@
   color: #FFFFFF;
   white-space: nowrap;
   box-sizing: border-box;
-  transition: background 0.15s;
 }
 
 .ad-view-btn:hover {
@@ -715,7 +718,6 @@
   font-weight: 700;
   line-height: 19px;
   color: #FFFFFF;
-  transition: opacity 0.15s;
 }
 
 .app-btn-accept {

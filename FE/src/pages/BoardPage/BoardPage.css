@@ -107,7 +107,6 @@
   box-sizing: border-box;
   background: #ffffff;
   cursor: pointer;
-  transition: background-color 0.18s ease;
 }
 
 .project-board__card:hover {

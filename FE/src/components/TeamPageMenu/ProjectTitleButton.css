@@ -1,0 +1,64 @@
+button.project-title-button {
+  position: relative;
+  padding: 3px 10px;
+  margin: -3px -10px;
+  border: 0;
+  border-radius: 12px;
+  background: transparent;
+  color: inherit;
+  font: inherit;
+  text-align: left;
+  cursor: pointer;
+}
+
+.project-title-button:focus-visible {
+  outline: 2px solid #ff6600;
+  outline-offset: 3px;
+}
+
+.project-title-button::after {
+  content: attr(data-tooltip);
+  position: absolute;
+  top: calc(100% + 6px);
+  left: 50%;
+  z-index: 10;
+  padding: 5px 8px;
+  border-radius: 4px;
+  background-color: #333333;
+  color: #FFFFFF;
+  font-family: 'Pretendard', sans-serif;
+  font-size: 11px;
+  font-weight: 400;
+  line-height: 1;
+  white-space: nowrap;
+  opacity: 0;
+  visibility: hidden;
+  transform: translateX(-50%) translateY(-2px);
+  pointer-events: none;
+}
+
+.project-title-button::before {
+  content: '';
+  position: absolute;
+  top: calc(100% + 1px);
+  left: 50%;
+  z-index: 10;
+  width: 0;
+  height: 0;
+  border-left: 5px solid transparent;
+  border-right: 5px solid transparent;
+  border-bottom: 5px solid #333333;
+  opacity: 0;
+  visibility: hidden;
+  transform: translateX(-50%) translateY(-2px);
+  pointer-events: none;
+}
+
+.project-title-button:hover:not(:disabled)::before,
+.project-title-button:focus-visible::before,
+.project-title-button:hover:not(:disabled)::after,
+.project-title-button:focus-visible::after {
+  opacity: 1;
+  visibility: visible;
+  transform: translateX(-50%) translateY(0);
+}

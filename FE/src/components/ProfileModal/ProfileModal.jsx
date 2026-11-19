@@ -1,3 +1,4 @@
+import GuardedButton from '../GuardedButton/GuardedButton.jsx';
 import React, { useState, useEffect, useRef, useCallback } from "react";
 import { useNavigate } from "react-router-dom";
 import "./ProfileModal.css";
@@ -125,9 +126,9 @@ function ProfileModal({ isOpen, onClose, user, position }) {
         onMouseDown={handleMouseDown}
         style={popoverStyle}
       >
-        <button className="profile-close-x-btn" onClick={onClose} aria-label="닫기">
+        <GuardedButton className="profile-close-x-btn" onClick={onClose} aria-label="닫기">
             <img src={closeIcon} alt="닫기 아이콘" />
-        </button>
+        </GuardedButton>
 
         <div className="profile-popover-header">
           <div className="profile-user-info">

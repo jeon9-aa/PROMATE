@@ -1,4 +1,6 @@
+import GuardedButton from '../GuardedButton/GuardedButton.jsx';
 import React, { useState } from 'react';
+import ProjectAvatar from '../ProjectAvatar/ProjectAvatar';
 import moreIcon from '../../assets/moreIcon.svg';
 import './SummaryCard.css';
 import { getDiffDays } from '../../pages/DashboardPage/components/DateUtils';
@@ -82,6 +84,7 @@ function SummaryCard({ title, count, unit = '개', subtitle, actionButton, items
                     />
                   )}
 
+                  {showDot && <ProjectAvatar src={item.recruitImageUrl} size="32px" />}
                   <div className="item-text">
                     <span className="item-name">{item.title}</span>
                     <span className="item-date">마감일: {item.dueDate}</span>
@@ -100,19 +103,19 @@ function SummaryCard({ title, count, unit = '개', subtitle, actionButton, items
           </ul>
 
           {visibleCount < items.length ? (
-            <button className="more-btn" onClick={handleShowMore}>
+            <GuardedButton className="more-btn" onClick={handleShowMore}>
               더보기
               <img src={moreIcon} alt="moreIcon" />
-            </button>
+            </GuardedButton>
           ) : items.length > 3 ? (
-            <button className="more-btn" onClick={() => setVisibleCount(3)}>
+            <GuardedButton className="more-btn" onClick={() => setVisibleCount(3)}>
               접기
               <img
                 src={moreIcon}
                 alt="moreIcon"
                 style={{ transform: 'rotate(180deg)' }}
               />
-            </button>
+            </GuardedButton>
           ) : null}
         </>
       )}
