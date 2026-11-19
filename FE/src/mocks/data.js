@@ -4,10 +4,12 @@ export const mockProject = {
 };
 
 export const mockMembers = [
-  { userId: 1, name: '쿠정아', role: '프론트엔드' },
-  { userId: 2, name: '초이하진', role: '백엔드' },
-  { userId: 3, name: '빽진선', role: '디자이너' },
-  { userId: 4, name: '이찬삼', role: 'PM' },
+  { userId: 1, name: '쿠정아', role: '프론트엔드', isLeader: true },
+  { userId: 2, name: '서령배', role: '프론트엔드', isLeader: false },
+  { userId: 3, name: '초이하진', role: '백엔드', isLeader: false },
+  { userId: 4, name: '빽진선', role: '백엔드', isLeader: false },
+  { userId: 5, name: '이찬삼', role: 'PM', isLeader: false },
+  { userId: 6, name: '갓은서', role: '디자이너', isLeader: false },
 ];
 
 export const mockTasks = [
