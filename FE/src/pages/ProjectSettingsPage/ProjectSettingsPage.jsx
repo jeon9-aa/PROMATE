@@ -141,7 +141,7 @@ export default function ProjectSettingsPage() {
             <div className="project-settings-image">
               <ProjectAvatar
                 src={values.imageUrl}
-                size="80px"
+                size="70px"
                 onImageChange={isEditing ? (imageUrl) => updateDraft('imageUrl', imageUrl) : undefined}
               />
               {isEditing && <span className="project-settings-image-add" aria-hidden="true">+</span>}
@@ -189,20 +189,22 @@ export default function ProjectSettingsPage() {
         </div>
 
         <hr />
-        <div className="project-settings-management">
-          <button type="button" className="project-settings-end" onClick={() => openConfirmation('end')}>프로젝트 종료</button>
-          <button type="button" className="project-settings-delete" onClick={() => openConfirmation('delete')}>프로젝트 삭제</button>
-        </div>
-        <div className="project-settings-actions">
-          {isEditing ? (
-            <>
-              {hasChanges && <p className="project-settings-unsaved" role="status">저장하지 않은 변경 사항이 있습니다.</p>}
-              <MainButton className="project-settings-edit project-settings-cancel" onClick={() => setDraft(null)}>취소</MainButton>
-              <MainButton className="project-settings-edit" type="submit">저장하기</MainButton>
-            </>
-          ) : (
-            <MainButton className="project-settings-edit" onClick={() => setDraft({ ...project })}>수정하기</MainButton>
-          )}
+        <div className="project-settings-footer">
+          <div className="project-settings-management">
+            <button type="button" className="project-settings-end" onClick={() => openConfirmation('end')}>프로젝트 종료</button>
+            <button type="button" className="project-settings-delete" onClick={() => openConfirmation('delete')}>프로젝트 삭제</button>
+          </div>
+          <div className="project-settings-actions">
+            {isEditing ? (
+              <>
+                {hasChanges && <p className="project-settings-unsaved" role="status">저장하지 않은 변경 사항이 있습니다.</p>}
+                <MainButton className="project-settings-edit project-settings-cancel" onClick={() => setDraft(null)}>취소</MainButton>
+                <MainButton className="project-settings-edit" type="submit">저장하기</MainButton>
+              </>
+            ) : (
+              <MainButton className="project-settings-edit" onClick={() => setDraft({ ...project })}>수정하기</MainButton>
+            )}
+          </div>
         </div>
       </form>
       ) : activeTab === 'recruitment' ? (

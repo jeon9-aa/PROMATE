@@ -1,6 +1,7 @@
 .project-settings-page {
+  box-sizing: border-box;
   min-height: calc(100vh - 56px);
-  padding: 19px 30px 20px;
+  padding: 14px 30px 0px;
   background: linear-gradient(180deg, #F0F0F0 0%, #FFFFFF 100%);
   color: #000;
   font-family: 'Pretendard', sans-serif;
@@ -81,7 +82,11 @@
   box-shadow: 0 0 10px rgba(0, 0, 0, 0.05);
   display: flex;
   flex-direction: column;
-  gap: 35px;
+  gap: 25px;
+}
+
+#project-settings-info {
+  padding: 30px 40px 11px;
 }
 
 .project-settings-card h2 {
@@ -95,14 +100,14 @@
 .project-settings-fields {
   display: flex;
   flex-direction: column;
-  gap: 30px;
+  gap: 28px;
   padding: 0 10px;
 }
 
 .project-settings-identity {
   display: flex;
   align-items: center;
-  gap: 40px;
+  gap: 30px;
   width: 100%;
   max-width: 600px;
 }
@@ -120,7 +125,7 @@
 .project-settings-field {
   display: flex;
   flex-direction: column;
-  gap: 10px;
+  gap: 7px;
   min-width: 0;
 }
 
@@ -169,6 +174,14 @@
   gap: 8px;
 }
 
+.project-settings-domains .common-tag {
+  height: 28px;
+  min-height: 0;
+  padding: 4px 12px;
+  font-size: 15px;
+  line-height: 1;
+}
+
 .project-settings-domains .common-tag:not(.active) {
   background: #d9d9d9;
   border-color: #ababab;
@@ -188,6 +201,7 @@
 
 .project-settings-period time {
   display: block;
+  width: 150px;
   padding: 9px 15px;
   border: 1px solid #ababab;
   border-radius: 5px;
@@ -200,6 +214,23 @@
   margin: 0;
   border: 0;
   border-top: 1px solid #d9d9d9;
+}
+
+.project-settings-footer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 16px 24px;
+}
+
+.project-settings-actions {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  flex-wrap: wrap;
+  gap: 12px 20px;
+  margin-left: auto;
 }
 
 .project-settings-management {
@@ -356,36 +387,27 @@
   font-weight: 700;
 }
 
-.project-settings-card:not(.is-editing) .project-settings-actions .project-settings-edit {
-  position: relative;
-  top: -65px;
-}
-
-.project-settings-card:not(.is-editing) .project-settings-actions {
-  margin-bottom: -65px;
-}
-
 /* 이미지 */
 .project-settings-image {
   position: relative;
   flex-shrink: 0;
-  width: 80px;
-  height: 80px;
+  width: 70px;
+  height: 70px;
 }
 
 .project-settings-image-add {
   position: absolute;
-  right: 4px;
-  bottom: 4px;
+  right: 3px;
+  bottom: 3px;
   display: flex;
   align-items: center;
   justify-content: center;
-  width: 24px;
-  height: 24px;
+  width: 22px;
+  height: 22px;
   border-radius: 50%;
   background: #fe9a57;
   color: #fff;
-  font-size: 20px;
+  font-size: 18px;
   font-weight: 700;
   line-height: 1;
   text-align: center;
