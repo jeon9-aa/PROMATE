@@ -60,10 +60,10 @@ function PasswordInviteForm({ inviteToken }) {
       const { projectId } = await joinProjectByInvite(inviteToken, characters.join(""));
       navigate(`/project/${projectId}`, { replace: true });
     } catch (error) {
-      const { code, message } = error.response?.data ?? {};
+      const { message } = error.response?.data ?? {};
       setFeedback({
-        isError: code === "INVITE_E004",
-        message: message || "초대 참여 요청을 처리할 수 없습니다. 잠시 후 다시 시도해 주세요.",
+        isError: true,
+        message: message || error.message || "초대 참여 요청을 처리할 수 없습니다. 잠시 후 다시 시도해 주세요.",
       });
     } finally {
       setIsSubmitting(false);
