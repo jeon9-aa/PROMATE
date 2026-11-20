@@ -9,6 +9,7 @@ import org.example.promate.domain.chatRoom.entity.ChatRoom;
 import org.example.promate.domain.user.entity.User;
 
 import java.time.LocalDateTime;
+import java.time.ZoneId;
 
 @Entity
 @Getter
@@ -42,6 +43,6 @@ public class ChatMessage { // 채팅방 엔티티 이름은 ChatRoom
         this.chatRoom = chatRoom;
         this.sender = sender;
         this.content = content;
-        this.createdAt = LocalDateTime.now();
+        this.createdAt = LocalDateTime.now(ZoneId.of("Asia/Seoul"));
     }
 }
