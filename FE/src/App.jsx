@@ -14,6 +14,7 @@ import ApplicantDetail from "./pages/ApplicantPage/ApplicantDetail.jsx";
 import ProfilePage from "./pages/ProfilePage/ProfilePage.jsx";
 import FindTeamPage from "./pages/FindTeamPage/FindTeamPage.jsx";
 import ProjectPage from "./pages/ProjectPage/ProjectPage.jsx";
+import ProjectSettingsPage from "./pages/ProjectSettingsPage/ProjectSettingsPage.jsx";
 import TeamPage from "./pages/TeamPage/TeamPage.jsx";
 import TaskBoardPage from "./pages/TaskBoardPage/TaskBoardPage.jsx";
 import BoardCreatePage from "./pages/BoardCreatePage/BoardCreatePage.jsx";
@@ -81,6 +82,7 @@ function App() {
           <Route path="/findTeam" element={<FindTeamPage />} />
           <Route path="/project" element={<ProjectPage />} />
           <Route path="/project/:projectId" element={<TeamPage />} />
+          <Route path="/project/:projectId/settings" element={<ProjectSettingsPage />} />
           <Route path="/task-board" element={<TaskBoardPage />} />
           <Route path="/board" element={<BoardPage />} />
           <Route path="/board/new" element={<BoardCreatePage key="create" />} />

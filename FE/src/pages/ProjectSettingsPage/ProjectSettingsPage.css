@@ -1,0 +1,737 @@
+.project-settings-page {
+  box-sizing: border-box;
+  min-height: calc(100vh - 56px);
+  padding: 14px 30px 0px;
+  background: linear-gradient(180deg, #F0F0F0 0%, #FFFFFF 100%);
+  color: #000;
+  font-family: 'Pretendard', sans-serif;
+}
+
+/* 헤더 */
+.project-settings-header {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 20px;
+  margin-bottom: 20px;
+}
+
+.project-settings-header h1 {
+  margin: 0;
+  font-family: 'YSpotlightOTF', 'Pretendard', sans-serif;
+  font-size: 22px;
+  font-weight: 500;
+  line-height: normal;
+  overflow-wrap: anywhere;
+}
+
+/* 설정 탭 */
+.project-settings-tabs {
+  display: flex;
+  align-items: center;
+  width: 100%;
+  height: 37px;
+  min-width: 0;
+  margin-bottom: 20px;
+  overflow-x: hidden;
+}
+
+.project-settings-tabs button {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  flex-shrink: 0;
+  gap: 10px;
+  height: 37px;
+  padding: 10px 32px;
+  box-sizing: border-box;
+  border: 0;
+  border-bottom: 1px solid #b3b3b3;
+  background: transparent;
+  color: #000;
+  font-family: 'Pretendard', sans-serif;
+  font-weight: 400;
+  font-size: 14px;
+  line-height: 17px;
+  white-space: nowrap;
+  cursor: pointer;
+}
+
+.project-settings-tabs button[aria-selected='true'] {
+  border-bottom: 1.5px solid #ff6600;
+  color: #ff6600;
+  font-weight: 700;
+}
+
+.project-settings-tabs button:disabled {
+  cursor: not-allowed;
+}
+
+.project-settings-tabs button:not(:disabled):hover {
+  background-color: rgba(255, 102, 0, 0.05);
+}
+
+/* 정보 카드 */
+.project-settings-card {
+  box-sizing: border-box;
+  width: 100%;
+  max-width: 1000px;
+  padding: 30px 40px;
+  border-radius: 10px;
+  background: #fff;
+  box-shadow: 0 0 10px rgba(0, 0, 0, 0.05);
+  display: flex;
+  flex-direction: column;
+  gap: 25px;
+}
+
+#project-settings-info {
+  padding: 30px 40px 11px;
+}
+
+.project-settings-card h2 {
+  margin: 0;
+  font-size: 18px;
+  font-weight: 600;
+  line-height: 22px;
+}
+
+/* 정보 필드 */
+.project-settings-fields {
+  display: flex;
+  flex-direction: column;
+  gap: 28px;
+  padding: 0 10px;
+}
+
+.project-settings-identity {
+  display: flex;
+  align-items: center;
+  gap: 30px;
+  width: 100%;
+  max-width: 600px;
+}
+
+.project-settings-identity .avatar-container {
+  border: 1px solid #ababab;
+  border-radius: 50%;
+}
+
+.project-settings-identity .avatar-logo.default {
+  width: 30px;
+  height: 30px;
+}
+
+.project-settings-field {
+  display: flex;
+  flex-direction: column;
+  gap: 7px;
+  min-width: 0;
+}
+
+.project-settings-field label,
+.project-settings-field h3 {
+  margin: 0;
+  font-size: 15px;
+  font-weight: 600;
+  line-height: 18px;
+}
+
+.project-settings-name {
+  flex: 1;
+}
+
+.project-settings-field input,
+.project-settings-field textarea {
+  width: 100%;
+  border: 1px solid #ababab;
+  border-radius: 5px;
+  background: #fff;
+  color: #000;
+  font: 400 16px/19px 'Pretendard', sans-serif;
+}
+
+.project-settings-field input {
+  height: 40px;
+  padding: 0 12px;
+}
+
+.project-settings-description {
+  width: 100%;
+  max-width: 600px;
+}
+
+.project-settings-field textarea {
+  height: 80px;
+  padding: 10px 12px;
+  resize: none;
+}
+
+/* 태그 */
+.project-settings-domains {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.project-settings-domains .common-tag {
+  height: 28px;
+  min-height: 0;
+  padding: 4px 12px;
+  font-size: 15px;
+  line-height: 1;
+}
+
+.project-settings-domains .common-tag:not(.active) {
+  background: #d9d9d9;
+  border-color: #ababab;
+  color: #fff;
+}
+
+/* 프로젝트 기간 */
+.project-settings-period {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  width: fit-content;
+  max-width: 100%;
+  font-size: 14px;
+  line-height: 17px;
+}
+
+.project-settings-period time {
+  display: block;
+  width: 150px;
+  padding: 9px 15px;
+  border: 1px solid #ababab;
+  border-radius: 5px;
+  text-align: center;
+  white-space: nowrap;
+}
+
+/* Management actions */
+.project-settings-card hr {
+  margin: 0;
+  border: 0;
+  border-top: 1px solid #d9d9d9;
+}
+
+.project-settings-footer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 16px 24px;
+}
+
+.project-settings-actions {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  flex-wrap: wrap;
+  gap: 12px 20px;
+  margin-left: auto;
+}
+
+.project-settings-management {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 40px;
+}
+
+.project-settings-management button {
+  padding: 0;
+  border: 0;
+  background: transparent;
+  color: #000;
+  font: 600 16px/19px 'Pretendard', sans-serif;
+}
+
+.project-settings-management .project-settings-delete {
+  color: #de0000;
+}
+
+.project-settings-management .project-settings-delete,
+.project-settings-management .project-settings-end {
+  padding: 8px 12px;
+  margin: -8px -12px;
+  border-radius: 5px;
+  cursor: pointer;
+}
+
+.project-settings-management .project-settings-delete:hover,
+.project-settings-management .project-settings-end:hover {
+  background: #f8f9fa;
+}
+
+/* 프로젝트 삭제 오버레이 */
+.project-settings-delete-overlay {
+  position: fixed;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  max-width: none;
+  max-height: none;
+  margin: 0;
+  padding: min(130px, 12vh) 20px 24px;
+  border: 0;
+  background: rgba(0, 0, 0, 0.4);
+  overflow-y: auto;
+}
+
+.project-settings-delete-overlay::backdrop {
+  background: transparent;
+}
+
+.project-settings-delete-dialog {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  width: 360px;
+  max-width: 100%;
+  margin: 0 auto;
+  padding: 24px 24px 20px;
+  border-radius: 10px;
+  background: #fff;
+  box-shadow: 0 0 10px rgba(0, 0, 0, 0.05);
+}
+
+.project-settings-delete-dialog h2 {
+  margin: 0;
+  color: #000;
+  font-size: 18px;
+  font-weight: 700;
+  line-height: 22px;
+}
+
+.project-settings-delete-dialog p {
+  margin: 0;
+  color: #909090;
+  font-size: 13px;
+  line-height: 19px;
+  word-break: keep-all;
+}
+
+.project-settings-delete-description {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.project-settings-delete-description strong {
+  color: #de0000;
+  font-weight: 600;
+}
+
+.project-settings-delete-dialog .project-settings-delete-review {
+  color: #000;
+  font-weight: 600;
+}
+
+.project-settings-delete-dialog .project-settings-delete-notice {
+  min-height: 0;
+  color: #de0000;
+}
+
+.project-settings-delete-dialog-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 12px;
+}
+
+.project-settings-delete-dialog-actions .main-btn {
+  height: 36px;
+  padding: 8px 16px;
+  border-radius: 5px;
+  font-size: 16px;
+  font-weight: 700;
+  line-height: 20px;
+}
+
+.project-settings-delete-dialog-actions .project-settings-delete-cancel {
+  background: #d9d9d9;
+}
+
+.project-settings-delete-dialog-actions .project-settings-delete-cancel:hover {
+  background: #ababab;
+}
+
+.project-settings-delete-dialog-actions .project-settings-delete-confirm {
+  background: #de0000;
+}
+
+.project-settings-delete-dialog-actions .project-settings-delete-confirm:hover {
+  background: #bd0000;
+}
+
+.project-settings-delete-dialog-actions .project-settings-end-confirm {
+  background: #fe9a57;
+}
+
+.project-settings-delete-dialog-actions .project-settings-end-confirm:hover {
+  background: #e8894c;
+}
+
+.project-settings-actions .project-settings-edit {
+  height: 41px;
+  padding: 10px 24px;
+  border-radius: 5px;
+  font-weight: 700;
+}
+
+/* 이미지 */
+.project-settings-image {
+  position: relative;
+  flex-shrink: 0;
+  width: 70px;
+  height: 70px;
+}
+
+.project-settings-image-add {
+  position: absolute;
+  right: 3px;
+  bottom: 3px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 22px;
+  height: 22px;
+  border-radius: 50%;
+  background: #fe9a57;
+  color: #fff;
+  font-size: 18px;
+  font-weight: 700;
+  line-height: 1;
+  text-align: center;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.2);
+  pointer-events: none;
+}
+
+.project-settings-image .editable {
+  cursor: pointer;
+}
+
+.project-settings-card.is-editing input,
+.project-settings-card.is-editing textarea {
+  background: #f1f1f1;
+}
+
+.project-settings-domain-option {
+  padding: 0;
+  border: 0;
+  border-radius: 90px;
+  background: transparent;
+  cursor: pointer;
+}
+
+.project-settings-domain-option .common-tag {
+  pointer-events: none;
+}
+
+.project-settings-period input[type='date'] {
+  width: 154px;
+  max-width: 100%;
+  height: 37px;
+  padding: 8px;
+  font-size: 14px;
+  line-height: 17px;
+}
+
+.project-settings-unsaved {
+  margin: 0;
+  color: #de0000;
+  font-size: 14px;
+  line-height: 17px;
+}
+
+.project-settings-actions .project-settings-cancel {
+  background: #d9d9d9;
+}
+
+.project-settings-actions .project-settings-cancel:hover {
+  background: #ababab;
+}
+
+/* 모집 관리 */
+.project-settings-card.project-settings-recruitment {
+  gap: 20px;
+}
+
+.project-settings-recruitment-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 20px;
+  padding: 0 10px;
+}
+
+.project-settings-recruitment-copy {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 8px 20px;
+  min-width: 0;
+}
+
+.project-settings-recruitment-copy > span {
+  font-size: 16px;
+  font-weight: 600;
+  line-height: 19px;
+}
+
+.project-settings-recruitment-copy p {
+  margin: 0;
+  color: #ababab;
+  font-size: 14px;
+  line-height: 17px;
+}
+
+.project-settings-switch {
+  display: flex;
+  align-items: center;
+  flex-shrink: 0;
+  width: 52px;
+  height: 32px;
+  padding: 4px;
+  border: 0;
+  border-radius: 100px;
+  background: #ababab;
+  cursor: pointer;
+}
+
+.project-settings-switch[aria-checked='true'] {
+  background: #fe9a57;
+}
+
+.project-settings-switch-handle {
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  background: #fff;
+}
+
+.project-settings-switch[aria-checked='true'] .project-settings-switch-handle {
+  transform: translateX(20px);
+}
+
+.project-settings-page [aria-disabled='true'] {
+  cursor: default;
+}
+
+.project-settings-page :focus-visible {
+  outline: none;
+}
+
+.project-settings-sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
+}
+
+@media (max-width: 768px) {
+  .project-settings-tabs button {
+    flex: 1;
+    min-width: 0;
+    padding: 8px 2px;
+    font-size: 11px;
+  }
+}
+
+@media (max-width: 600px) {
+  .project-settings-recruitment-row {
+    padding: 0;
+  }
+
+  .project-settings-card {
+    padding: 24px 20px;
+    gap: 24px;
+  }
+
+  .project-settings-fields {
+    padding: 0;
+    gap: 24px;
+  }
+
+  .project-settings-identity {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 20px;
+  }
+
+  .project-settings-name {
+    width: 100%;
+  }
+
+  .project-settings-period {
+    flex-wrap: wrap;
+  }
+
+  .project-settings-management {
+    gap: 24px;
+  }
+}
+
+/* Member management */
+.project-settings-member-list {
+  margin: 0;
+  padding: 0 10px;
+  list-style: none;
+}
+
+.project-settings-member-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 20px;
+  min-height: 68px;
+  padding: 14px 0;
+}
+
+.project-settings-member-person {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  min-width: 0;
+}
+
+.project-settings-member-person .profile-avatar {
+  flex-shrink: 0;
+  border: 1px solid #ababab;
+}
+
+.project-settings-member-name {
+  font-size: 16px;
+  font-weight: 500;
+  overflow-wrap: anywhere;
+}
+
+.project-settings-member-leader {
+  padding: 4px 10px;
+  border-radius: 20px;
+  background: #ffebde;
+  color: #ff6600;
+  font-size: 14px;
+  font-weight: 600;
+  white-space: nowrap;
+}
+
+.project-settings-member-actions {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 20px;
+  width: 300px;
+  flex-shrink: 0;
+}
+
+.project-settings-member-role {
+  position: relative;
+  width: 125px;
+  flex-shrink: 0;
+}
+
+.project-settings-role-input {
+  width: 100%;
+  height: 36px;
+  padding: 7px 34px 7px 12px;
+  box-sizing: border-box;
+  border: 1px solid #d9d9d9;
+  border-radius: 5px;
+  background: #fff;
+  color: #000;
+  font: 500 14px/20px 'Pretendard', sans-serif;
+  text-overflow: ellipsis;
+}
+
+.project-settings-role-input:hover {
+  border-color: #ababab;
+}
+
+.project-settings-role-input:focus,
+.project-settings-role-input:focus-visible {
+  outline: none;
+}
+
+.project-settings-role-icon {
+  position: absolute;
+  top: 11px;
+  right: 12px;
+  color: #ababab;
+  pointer-events: none;
+}
+
+.project-settings-role-save {
+  position: absolute;
+  top: 6px;
+  right: 6px;
+  height: 24px;
+  padding: 0 5px;
+  border: 0;
+  border-radius: 4px;
+  background: #fff1ef;
+  color: #ff6600;
+  font: 500 12px/24px 'Pretendard', sans-serif;
+  cursor: pointer;
+}
+
+.project-settings-role-save:hover:not(:disabled) {
+  background: #ffe2d8;
+}
+
+.project-settings-role-save:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.project-settings-member-remove {
+  padding: 8px 0;
+  border: 0;
+  background: transparent;
+  color: #ababab;
+  font: 400 14px/17px 'Pretendard', sans-serif;
+  white-space: nowrap;
+  cursor: pointer;
+}
+
+.project-settings-member-remove:hover:not(:disabled) {
+  color: #de0000;
+}
+
+.project-settings-member-remove:disabled {
+  cursor: not-allowed;
+  opacity: 0.5;
+}
+
+.project-settings-members-error button {
+  padding: 6px 12px;
+  border: 0;
+  border-radius: 5px;
+  background: #f1f1f1;
+  font: inherit;
+  cursor: pointer;
+}
+
+@media (max-width: 600px) {
+  .project-settings-member-list {
+    padding: 0;
+  }
+
+  .project-settings-member-row {
+    flex-wrap: wrap;
+    gap: 12px;
+  }
+
+  .project-settings-member-actions {
+    width: 100%;
+  }
+
+  #project-settings-info {
+    padding: 24px 20px;
+  }
+
+}
