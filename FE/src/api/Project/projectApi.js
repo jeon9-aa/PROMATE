@@ -5,7 +5,6 @@ export const getProjectSubgroups = async (projectId, signal) => {
   const payload = data?.data ?? data;
 
   if (Array.isArray(payload)) return payload;
-  if (payload?.id != null) return [payload];
   throw new Error('Unexpected subgroup response');
 };
 
