@@ -18,8 +18,11 @@ export default function SmallMeetingDetailPage() {
   const [result, setResult] = useState(null);
   const currentResult = result?.projectId === projectId && result?.meetingId === meetingId ? result : null;
   const subgroup = currentResult?.subgroup;
-  const canJoin = subgroup?.status === 'RECRUITING' && !subgroup.joined
-    && subgroup.currentCount < subgroup.capacity;
+  const hasJoined = subgroup?.joined === true;
+  const isFull = subgroup?.currentCount != null && subgroup.capacity != null
+    && Number(subgroup.currentCount) >= Number(subgroup.capacity);
+  const isClosed = subgroup?.status === 'COMPLETED' || isFull;
+  const canJoin = Boolean(subgroup) && !hasJoined && !isClosed;
 
   useEffect(() => {
     const controller = new AbortController();
@@ -74,13 +77,13 @@ export default function SmallMeetingDetailPage() {
             <div className="small-meeting-card-heading">
               <div className="small-meeting-title-row">
                 <h2>{subgroup.name}</h2>
-                {subgroup.status === 'RECRUITING' && <span className="small-meeting-badge">모집 중</span>}
-                {subgroup.status === 'COMPLETED' && <span className="small-meeting-badge is-closed">마감</span>}
+                {!isClosed && subgroup.status === 'RECRUITING' && <span className="small-meeting-badge">모집 중</span>}
+                {isClosed && <span className="small-meeting-badge is-closed">마감</span>}
               </div>
-              {subgroup.joined ? (
+              {hasJoined ? (
                 <span role="status">참여 완료</span>
-              ) : canJoin && (
-                <GuardedButton className="small-meeting-join" type="button" onClick={handleJoin}>
+              ) : (
+                <GuardedButton className="small-meeting-join" type="button" onClick={handleJoin} disabled={!canJoin}>
                   참여하기
                 </GuardedButton>
               )}
