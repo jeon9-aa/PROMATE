@@ -49,21 +49,22 @@ export default function SmallMeetingListPage() {
             </GuardedButton>
           </div>
           {!currentList && <p role="status">소모임 목록을 불러오는 중입니다.</p>}
-          {(currentList?.error || currentList?.groups?.length === 0) && (
+          {currentList?.error && <p role="alert">소모임 목록을 불러오지 못했습니다.</p>}
+          {currentList?.groups?.length === 0 && (
             <p className="small-meeting-list-empty" role="status">등록된 소모임이 없습니다.</p>
           )}
           {currentList?.groups?.length > 0 && (
             <ul className="project-detail-list">
               {currentList.groups.map((subgroup) => (
-                <li className="project-detail-group" key={subgroup.id}>
+                <li className="project-detail-group" key={subgroup.subgroupId}>
                   <button
                     className="project-detail-group-button"
                     type="button"
-                    onClick={() => navigate(`/project/${projectId}/smallMeeting/${subgroup.id}`, { state: { subgroup, projectTitle } })}
+                    onClick={() => navigate(`/project/${projectId}/smallMeeting/${subgroup.subgroupId}`, { state: { projectTitle, dueDate: state?.dueDate } })}
                   >
                     <span className="project-detail-group-info">
-                      <span className="project-detail-group-title">{subgroup.comment || `소모임 #${subgroup.id}`}</span>
-                      {subgroup.grade != null && <span className="project-detail-group-meta">학년 {subgroup.grade}</span>}
+                      <span className="project-detail-group-title">{subgroup.name}</span>
+                      <span className="project-detail-group-meta">모집 인원 {subgroup.currentCount}/{subgroup.capacity}</span>
                     </span>
                   </button>
                 </li>
