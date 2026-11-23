@@ -1,6 +1,8 @@
 ﻿import { useRef } from "react";
 import Avatar from "../../../components/Avatar/Avatar.jsx";
 
+const MAX_IMAGE_SIZE = 10 * 1024 * 1024;
+
 const imageIcon = (
   <svg
     width="28"
@@ -29,6 +31,12 @@ function ImageUploadField({ imageSrc, onImageChange }) {
   const handleFileChange = (event) => {
     const file = event.target.files?.[0];
     if (!file) return;
+
+    if (file.size > MAX_IMAGE_SIZE) {
+      alert("사진 용량이 10MB를 초과했습니다. 10MB 이하의 이미지를 선택해주세요.");
+      event.target.value = "";
+      return;
+    }
 
     const fileReader = new FileReader();
     fileReader.onload = ({ target }) => {
