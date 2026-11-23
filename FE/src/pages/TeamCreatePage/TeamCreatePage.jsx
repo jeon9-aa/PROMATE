@@ -56,7 +56,7 @@ function TeamCreatePage() {
   const todayValue = getTodayValue();
   const [projectName, setProjectName] = useState("");
   const [selectedDomain, setSelectedDomain] = useState("PROJECT");
-  const [recruitCount, setRecruitCount] = useState("1");
+  const [recruitCount, setRecruitCount] = useState("");
   const [startDate, setStartDate] = useState(todayValue);
   const [endDate, setEndDate] = useState(todayValue);
   const [description, setDescription] = useState("");
@@ -69,7 +69,7 @@ function TeamCreatePage() {
   const handleCancel = () => {
     setProjectName("");
     setSelectedDomain("PROJECT");
-    setRecruitCount("1");
+    setRecruitCount("");
     setStartDate(todayValue);
     setEndDate(todayValue);
     setDescription("");
@@ -240,14 +240,12 @@ function TeamCreatePage() {
             <label className="teammaking-form-label" htmlFor="recruit-count">
               모집 인원
             </label>
-            <span id="recruit-count-help" className="recruit-count-help">
-              모집 인원을 1~99명 사이의 정수로 입력해 주세요.
-            </span>
           </div>
           <input
             id="recruit-count"
             className="recruit-count-input"
             type="number"
+            placeholder="1~99명"
             min="1"
             max="99"
             step="1"
