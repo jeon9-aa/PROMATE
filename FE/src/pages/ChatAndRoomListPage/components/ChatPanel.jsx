@@ -42,7 +42,7 @@ export default function ChatPanel({ room, draft, onDraftChange, onSend, onBack, 
         <div className="chat-panel__identity">
           <h2>
             {room.recruitId != null ? (
-              <Link className="chat-panel__project-link" to={`/readme/${encodeURIComponent(room.recruitId)}`}>
+              <Link className="chat-panel__project-link" to={`/readme/${encodeURIComponent(room.recruitId)}`} title="프로젝트 소개 페이지로 이동">
                 {room.projectName}
               </Link>
             ) : room.projectName}

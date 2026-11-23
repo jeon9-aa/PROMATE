@@ -219,13 +219,6 @@
   text-decoration: none;
 }
 
-.chat-panel__project-link:hover,
-.chat-panel__project-link:focus-visible {
-  color: #FE9A57;
-  text-decoration: underline;
-  text-underline-offset: 3px;
-}
-
 .chat-panel__identity span {
   color: #909090;
   font-size: 12px;
