@@ -1,13 +1,12 @@
 import GuardedButton from '../GuardedButton/GuardedButton.jsx';
 import React, { useState, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
+import { LogOut, MessageCircle } from 'lucide-react';
 import { getUserInfo } from '../../api/User/userProfileApi.js';
 import { useAuthStore } from '../../stores/useAuthStore.js';
 import logoImg from '../../assets/logoOrange.svg';
 import profileIcon from '../../assets/icons/profileIcon.svg';
 import profileIconHover from '../../assets/icons/profileOrangeIcon.svg';
-import logoutIcon from '../../assets/icons/logout_black.svg';
-import logoutIconHover from '../../assets/icons/logout_orange.svg';
 import ProfileAvatar from '../ProfileAvatar/ProfileAvatar';
 import './Header.css';
 
@@ -71,6 +70,14 @@ function Header({ onMenuClick }) {
       <div className="header-right">
         {isLoggedIn ? (
           <>
+            <Link
+              to="/chat"
+              className="header-chat-btn"
+              aria-label="내 채팅 목록"
+              data-tooltip="채팅 목록"
+            >
+              <MessageCircle size={20} aria-hidden="true" />
+            </Link>
             <GuardedButton
               type="button"
               className="header-logout-btn"
@@ -78,13 +85,13 @@ function Header({ onMenuClick }) {
               aria-label="로그아웃"
               data-tooltip="로그아웃"
             >
-              <img src={logoutIcon} alt="" className="header-logout-icon default-icon" />
-              <img src={logoutIconHover} alt="" className="header-logout-icon hover-icon" />
+              <LogOut size={20} aria-hidden="true" className="header-logout-icon" />
             </GuardedButton>
-            <Link to="/profile" className="header-greeting">
-              <strong>{userData.userName}</strong> 님 안녕하세요 :)
-            </Link>
-            <Link to="/profile">
+            <span className="header-account-divider" aria-hidden="true" />
+            <Link to="/profile" className="header-profile" aria-label="내 프로필">
+              <span className="header-greeting">
+                <strong>{userData.userName}</strong> 님 안녕하세요 :)
+              </span>
               <ProfileAvatar src={userData.profileImageUrl} size="36px" />
             </Link>
           </>
