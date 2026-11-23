@@ -4,7 +4,7 @@ import GuardedButton from '../../components/GuardedButton/GuardedButton.jsx';
 import { useEffect, useState } from 'react';
 import { useLocation, useNavigate, useParams } from 'react-router-dom';
 import { ArrowLeft, Users } from 'lucide-react';
-import { getProjectSubgroup } from '../../api/Project/projectApi';
+import { getProjectSubgroup, joinProjectSubgroup } from '../../api/Project/projectApi';
 import useProjectTitle from '../../utils/useProjectTitle';
 import './SmallMeetingDetailPage.css';
 
@@ -18,6 +18,11 @@ export default function SmallMeetingDetailPage() {
   const [result, setResult] = useState(null);
   const currentResult = result?.projectId === projectId && result?.meetingId === meetingId ? result : null;
   const subgroup = currentResult?.subgroup;
+  const hasJoined = subgroup?.joined === true;
+  const isFull = subgroup?.currentCount != null && subgroup.capacity != null
+    && Number(subgroup.currentCount) >= Number(subgroup.capacity);
+  const isClosed = subgroup?.status === 'COMPLETED' || isFull;
+  const canJoin = Boolean(subgroup) && !hasJoined && !isClosed;
 
   useEffect(() => {
     const controller = new AbortController();
@@ -33,6 +38,22 @@ export default function SmallMeetingDetailPage() {
 
     return () => controller.abort();
   }, [projectId, meetingId]);
+
+  const handleJoin = async () => {
+    if (!canJoin) return;
+
+    try {
+      const { status, currentCount, capacity } = await joinProjectSubgroup(projectId, meetingId);
+      setResult((previous) => previous === currentResult ? {
+        ...previous,
+        joinError: '',
+        subgroup: { ...previous.subgroup, status, currentCount, capacity, joined: true },
+      } : previous);
+    } catch (error) {
+      const joinError = error.response?.data?.message || '소모임에 참여하지 못했습니다. 다시 시도해 주세요.';
+      setResult((previous) => previous === currentResult ? { ...previous, joinError } : previous);
+    }
+  };
 
   return (
     <div className="small-meeting-detail-page">
@@ -56,11 +77,18 @@ export default function SmallMeetingDetailPage() {
             <div className="small-meeting-card-heading">
               <div className="small-meeting-title-row">
                 <h2>{subgroup.name}</h2>
-                {subgroup.status === 'RECRUITING' && <span className="small-meeting-badge">모집 중</span>}
-                {subgroup.status === 'COMPLETED' && <span className="small-meeting-badge is-closed">마감</span>}
+                {!isClosed && subgroup.status === 'RECRUITING' && <span className="small-meeting-badge">모집 중</span>}
+                {isClosed && <span className="small-meeting-badge is-closed">마감</span>}
               </div>
-              {subgroup.joined && <span>참여 완료</span>}
+              {hasJoined ? (
+                <span role="status">참여 완료</span>
+              ) : (
+                <GuardedButton className="small-meeting-join" type="button" onClick={handleJoin} disabled={!canJoin}>
+                  참여하기
+                </GuardedButton>
+              )}
             </div>
+            {currentResult.joinError && <p role="alert">{currentResult.joinError}</p>}
             {subgroup.description && <p className="small-meeting-description">{subgroup.description}</p>}
             <div className="small-meeting-meta">
               <span><Users size={16} aria-hidden="true" /> 모집 인원 {subgroup.currentCount}/{subgroup.capacity}</span>
