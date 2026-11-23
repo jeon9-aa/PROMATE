@@ -2,7 +2,7 @@ import { useEffect, useRef } from 'react';
 import { createPortal } from 'react-dom';
 import './PasswordInviteModal.css';
 
-export default function PasswordJoinNoticeModal({ onClose, onContinue }) {
+export default function PasswordJoinNoticeModal({ onClose }) {
   const dialogRef = useRef(null);
 
   useEffect(() => {
@@ -33,15 +33,12 @@ export default function PasswordJoinNoticeModal({ onClose, onContinue }) {
       }}
     >
       <div className="project-password-form">
-        <h2 id="project-password-join-title">비밀번호로 참여하기</h2>
-        <p id="project-password-join-description">
-          팀장이 설정한 초대 비밀번호를 입력하면 지원자 검토 없이 바로 프로젝트에 참여할 수 있습니다.
-          <br />
-          비밀번호를 전달받았다면 입력을 진행해 주세요.
-        </p>
+        <h2 id="project-password-join-title">초대 링크로 참여하기</h2>
+        <div id="project-password-join-description" className="project-password-join-description">
+          <p>팀장에게 초대 링크와 비밀번호를 받은 후, 그 링크에 접속해 비밀번호를 입력하면 <span className="project-password-join-highlight">지원자 검토 없이</span> 바로 프로젝트에 참여할 수 있습니다.</p>
+        </div>
         <div className="project-password-actions">
-          <button type="button" className="project-password-cancel" onClick={onClose}>취소</button>
-          <button type="button" className="project-password-submit" onClick={onContinue}>비밀번호 입력하기</button>
+          <button type="button" className="project-password-submit" onClick={onClose}>닫기</button>
         </div>
       </div>
     </dialog>,

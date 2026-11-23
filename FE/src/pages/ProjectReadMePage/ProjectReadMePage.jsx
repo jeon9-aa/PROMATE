@@ -62,11 +62,6 @@ function ProjectReadMePage() {
     }
   };
 
-  const handlePasswordJoinContinue = () => {
-    setIsPasswordJoinNoticeOpen(false);
-    navigate('/invite/password');
-  };
-
   const handlePasswordRegister = async (password) => {
     if (inviteRequestPending.current || !projectData?.isAuthor || !/^[0-9]{4}$/.test(password)) return;
     if (projectData.projectId == null) {
@@ -327,7 +322,6 @@ function ProjectReadMePage() {
       {isPasswordJoinNoticeOpen && !projectData.isAuthor && (
         <PasswordJoinNoticeModal
           onClose={() => setIsPasswordJoinNoticeOpen(false)}
-          onContinue={handlePasswordJoinContinue}
         />
       )}
 
