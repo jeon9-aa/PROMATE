@@ -8,6 +8,17 @@ export const getProjectSubgroups = async (projectId, signal) => {
   throw new Error('Unexpected subgroup response');
 };
 
+export const getProjectSubgroup = async (projectId, subgroupId, signal) => {
+  const { data } = await apiClient.get(
+    `/projects/${encodeURIComponent(projectId)}/subgroups/${encodeURIComponent(subgroupId)}`,
+    { signal },
+  );
+  const subgroup = data?.data;
+
+  if (subgroup?.subgroupId != null) return subgroup;
+  throw new Error('Unexpected subgroup detail response');
+};
+
 export const getAppliedProjects = () => {
   return apiClient.get('/projects/applications/me');
 };
