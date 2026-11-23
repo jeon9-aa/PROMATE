@@ -23,6 +23,7 @@
 .project-readme-banner-logo {
   width: 180px;
   height: 180px;
+  object-fit: contain;
 }
 
 .project-readme-info-section {

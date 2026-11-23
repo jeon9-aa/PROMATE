@@ -218,7 +218,11 @@ function ProjectReadMePage() {
     <main className="project-readme-page">
       <div className="project-readme-banner">
         <div className="project-readme-banner-logo-wrapper">
-          <img className='project-readme-banner-logo' src={logoGray} alt="프로젝트 로고" />
+          <img
+            className='project-readme-banner-logo'
+            src={projectData.recruitImageUrl || logoGray}
+            alt={projectData.recruitImageUrl ? '프로젝트 이미지' : '프로젝트 로고'}
+          />
         </div>
       </div>
       
