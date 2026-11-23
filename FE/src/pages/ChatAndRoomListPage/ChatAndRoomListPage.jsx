@@ -32,7 +32,10 @@ export default function ChatAndRoomListPage() {
   const [listRequest, setListRequest] = useState(null);
   const isListLoading = listRequest?.key !== listRetryCount;
   const listError = !isListLoading ? listRequest?.error : null;
-  const listedRooms = (listRequest?.ids || []).map((id) => rooms.find((item) => item.id === id)).filter(Boolean);
+  const listedRooms = (listRequest?.ids || [])
+    .map((id) => rooms.find((item) => item.id === id))
+    .filter(Boolean)
+    .sort((a, b) => (Date.parse(b.lastMessageAt) || 0) - (Date.parse(a.lastMessageAt) || 0));
   const navigate = useNavigate();
   const { roomId } = useParams();
   const [searchParams, setSearchParams] = useSearchParams();
