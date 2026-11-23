@@ -4,7 +4,7 @@ import GuardedButton from '../../components/GuardedButton/GuardedButton.jsx';
 import { useEffect, useState } from 'react';
 import { useLocation, useNavigate, useParams } from 'react-router-dom';
 import { ArrowLeft, Users } from 'lucide-react';
-import { getProjectSubgroups } from '../../api/Project/projectApi';
+import { getProjectSubgroup } from '../../api/Project/projectApi';
 import useProjectTitle from '../../utils/useProjectTitle';
 import './SmallMeetingDetailPage.css';
 
@@ -21,14 +21,14 @@ export default function SmallMeetingDetailPage() {
 
   useEffect(() => {
     const controller = new AbortController();
-    getProjectSubgroups(projectId, controller.signal)
-      .then((groups) => {
+    getProjectSubgroup(projectId, meetingId, controller.signal)
+      .then((subgroup) => {
         if (controller.signal.aborted) return;
-        const subgroup = groups.find((group) => String(group.subgroupId) === meetingId);
         setResult({ projectId, meetingId, subgroup });
       })
-      .catch(() => {
-        if (!controller.signal.aborted) setResult({ projectId, meetingId, error: true });
+      .catch((error) => {
+        if (controller.signal.aborted) return;
+        setResult({ projectId, meetingId, error: error.response?.status !== 404 });
       });
 
     return () => controller.abort();
