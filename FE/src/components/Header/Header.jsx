@@ -1,7 +1,8 @@
 import GuardedButton from '../GuardedButton/GuardedButton.jsx';
 import React, { useState, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import { LogOut, MessageCircle } from 'lucide-react';
+import { LogOut } from 'lucide-react';
+import ChatLink from './ChatLink';
 import { getUserInfo } from '../../api/User/userProfileApi.js';
 import { useAuthStore } from '../../stores/useAuthStore.js';
 import logoImg from '../../assets/logoOrange.svg';
@@ -70,14 +71,7 @@ function Header({ onMenuClick }) {
       <div className="header-right">
         {isLoggedIn ? (
           <>
-            <Link
-              to="/chat"
-              className="header-chat-btn"
-              aria-label="내 채팅 목록"
-              data-tooltip="채팅 목록"
-            >
-              <MessageCircle size={20} aria-hidden="true" />
-            </Link>
+            <ChatLink />
             <GuardedButton
               type="button"
               className="header-logout-btn"

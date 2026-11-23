@@ -2,6 +2,7 @@ import apiClient from '../apiClient';
 
 export async function markChatMessagesRead(chatRoomId, signal) {
   await apiClient.patch(`/chat-rooms/${encodeURIComponent(chatRoomId)}/messages/read`, undefined, { signal });
+  window.dispatchEvent(new Event('chatUnreadUpdated'));
 }
 
 export async function getChatMessages(chatRoomId, signal) {
@@ -19,6 +20,7 @@ export const leaveChatRoom = async (chatRoomId) => {
   if (!response.data?.isSuccess || String(data?.chatRoomId) !== String(chatRoomId)) {
     throw new Error('채팅방 나가기 결과를 확인할 수 없습니다.');
   }
+  window.dispatchEvent(new Event('chatUnreadUpdated'));
   return data;
 };
 

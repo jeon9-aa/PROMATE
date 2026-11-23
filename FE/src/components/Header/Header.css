@@ -171,6 +171,27 @@
   outline-offset: 2px;
 }
 
+.header-chat-badge {
+  position: absolute;
+  top: -2px;
+  right: -5px;
+  min-width: 18px;
+  height: 18px;
+  padding: 0 4px;
+  box-sizing: border-box;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: 2px solid #FFFFFF;
+  border-radius: 10px;
+  background-color: #E5484D;
+  color: #FFFFFF;
+  font-size: 10px;
+  font-weight: 700;
+  line-height: 1;
+  pointer-events: none;
+}
+
 .header-logout-icon {
   display: block;
   width: 20px;
