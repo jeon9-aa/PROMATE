@@ -139,6 +139,15 @@
   overflow-wrap: anywhere;
 }
 
+.project-detail-group-description {
+  display: block;
+  margin-bottom: 6px;
+  color: #555;
+  font-size: 14px;
+  overflow-wrap: anywhere;
+  white-space: pre-wrap;
+}
+
 .project-detail-group-meta {
   display: flex;
   flex-wrap: wrap;

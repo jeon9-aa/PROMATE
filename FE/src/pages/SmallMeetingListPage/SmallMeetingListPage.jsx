@@ -8,6 +8,8 @@ import { getProjectSubgroups } from '../../api/Project/projectApi';
 import './SmallMeetingListPage.css';
 import useProjectTitle from '../../utils/useProjectTitle';
 
+const formatDate = (date) => date?.replaceAll('-', '.') ?? '미정';
+
 export default function SmallMeetingListPage() {
   const { state } = useLocation();
   const navigate = useNavigate();
@@ -64,8 +66,20 @@ export default function SmallMeetingListPage() {
                   >
                     <span className="project-detail-group-info">
                       <span className="project-detail-group-title">{subgroup.name}</span>
-                      <span className="project-detail-group-meta">모집 인원 {subgroup.currentCount}/{subgroup.capacity}</span>
+                      {subgroup.description && (
+                        <span className="project-detail-group-description">{subgroup.description}</span>
+                      )}
+                      <span className="project-detail-group-meta">
+                        <span>모집 인원 {subgroup.currentCount}/{subgroup.capacity}</span>
+                        {(subgroup.startDate || subgroup.endDate) && (
+                          <span className="project-detail-period">
+                            {formatDate(subgroup.startDate)} ~ {formatDate(subgroup.endDate)}
+                          </span>
+                        )}
+                      </span>
                     </span>
+                    {subgroup.status === 'RECRUITING' && <span className="project-detail-status">모집 중</span>}
+                    {subgroup.status === 'COMPLETED' && <span className="project-detail-status is-closed">마감</span>}
                   </button>
                 </li>
               ))}
