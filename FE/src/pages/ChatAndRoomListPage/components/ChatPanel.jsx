@@ -1,4 +1,5 @@
 import { useEffect, useRef, useState } from 'react';
+import { Link } from 'react-router-dom';
 import { ChevronLeft, LogOut, Menu, MessageCircle, Send } from 'lucide-react';
 import ProfileAvatar from '../../../components/ProfileAvatar/ProfileAvatar';
 import ChatMessage from './ChatMessage';
@@ -38,7 +39,17 @@ export default function ChatPanel({ room, draft, onDraftChange, onSend, onBack, 
       <header className="chat-panel__header">
         <button type="button" className="chat-icon-button" aria-label="채팅방 목록으로" onClick={onBack}><ChevronLeft size={20} /></button>
         <ProfileAvatar src={room.avatarUrl} alt={`${room.name} 프로필`} size={40} />
-        <div className="chat-panel__identity"><h2>{room.projectName} · {room.name}</h2>{room.memberCount != null && <span>멤버 {room.memberCount}명</span>}</div>
+        <div className="chat-panel__identity">
+          <h2>
+            {room.recruitId != null ? (
+              <Link className="chat-panel__project-link" to={`/readme/${encodeURIComponent(room.recruitId)}`}>
+                {room.projectName}
+              </Link>
+            ) : room.projectName}
+            {' · '}{room.name}
+          </h2>
+          {room.memberCount != null && <span>멤버 {room.memberCount}명</span>}
+        </div>
         {onLeave && <div className="chat-panel__menu" ref={menuRef}>
           <button ref={menuButtonRef} type="button" className="chat-icon-button" aria-label="채팅방 메뉴" aria-expanded={menuOpen} aria-controls="chat-room-actions" onClick={() => setMenuOpen(!menuOpen)}><Menu size={20} /></button>
           {menuOpen && <div id="chat-room-actions" className="chat-panel__dropdown"><button type="button" disabled={isLeaving} onClick={() => { setMenuOpen(false); onLeave(); }}><LogOut size={16} />채팅방 나가기</button></div>}
