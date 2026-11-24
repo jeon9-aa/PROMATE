@@ -104,7 +104,12 @@ export default function ProjectSettingsPage() {
       setSavedProject({ ...project, recruitmentStatus });
       setDraft((current) => current ? { ...current, recruitmentStatus } : current);
     } catch (error) {
-      setRecruitmentError(error.response?.data?.message || error.message || '모집 상태 변경에 실패했습니다.');
+      const message = error.response?.data?.message || error.message || '모집 상태 변경에 실패했습니다.';
+      if (message === '해당 게시글의 수정/삭제 권한이 없습니다.') {
+        window.alert('신규 모집 설정은 팀장만 변경가능합니다');
+      } else {
+        setRecruitmentError(message);
+      }
     } finally {
       recruitmentPendingRef.current = false;
       setIsUpdatingRecruitment(false);

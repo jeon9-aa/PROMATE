@@ -44,7 +44,12 @@ function MemberRow({ member, onRoleChange, onRemove }) {
     try {
       await onRemove(member.memberId);
     } catch (error) {
-      setError(error.response?.data?.message || error.message || '멤버 방출에 실패했습니다. 다시 시도해주세요.');
+      const message = error.response?.data?.message || error.message || '멤버 방출에 실패했습니다. 다시 시도해주세요.';
+      if (message === '멤버 방출은 팀장만 가능합니다.') {
+        window.alert(message);
+      } else {
+        setError(message);
+      }
     } finally {
       pendingRef.current = false;
       setIsRemoving(false);
