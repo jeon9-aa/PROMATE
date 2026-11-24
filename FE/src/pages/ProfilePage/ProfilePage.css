@@ -235,6 +235,17 @@
   white-space: nowrap;
 }
 
+.proj-title-link {
+  text-decoration: none;
+}
+
+.proj-title-link:hover,
+.proj-title-link:focus-visible {
+  color: #ff6600;
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+
 .proj-role {
   font-family: "Pretendard", sans-serif;
   font-weight: 400;

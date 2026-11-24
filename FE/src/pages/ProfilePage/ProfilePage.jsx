@@ -1,7 +1,7 @@
 import GuardedButton from '../../components/GuardedButton/GuardedButton.jsx';
 import ProjectAvatar from '../../components/ProjectAvatar/ProjectAvatar';
 import React, { useState, useEffect, useRef } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import apiClient from '../../api/apiClient';
 import MainButton from '../../components/MainButton/MainButton';
 import Avatar from '../../components/Avatar/Avatar';
@@ -287,7 +287,17 @@ const ProfilePage = () => {
                   <div className="proj-row-inner">
                     <div className="proj-name-group">
                       {!proj.isManual && <ProjectAvatar src={proj.recruitImageUrl} size="32px" />}
-                      <span className="proj-title">{proj.title}</span>
+                      {!proj.isManual && (proj.projectId ?? proj.id) != null ? (
+                        <Link
+                          className="proj-title proj-title-link"
+                          to={`/project/${proj.projectId ?? proj.id}`}
+                          state={{ projectTitle: proj.title, dueDate: proj.dueDate ?? proj.endDate }}
+                        >
+                          {proj.title}
+                        </Link>
+                      ) : (
+                        <span className="proj-title">{proj.title}</span>
+                      )}
                       {proj.role && <span className="proj-role">{proj.role}</span>}
                     </div>
                     <div className="proj-right-group">
