@@ -326,14 +326,18 @@
   white-space: nowrap;
 }
 
+.proj-score-container,
+.proj-row-actions {
+  width: 56px;
+  height: 26px;
+  flex-shrink: 0;
+}
+
 .proj-score-container {
   display: flex;
   flex-direction: row;
   align-items: center;
   gap: 6px;
-  height: 26px;
-  width: 47px;
-  flex-shrink: 0;
 }
 
 .proj-score-num {

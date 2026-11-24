@@ -311,19 +311,7 @@ const ProfilePage = () => {
                       <span className={proj.isCompleted ? 'badge-completed' : 'badge-ongoing'}>
                         <span>{proj.isCompleted ? '완료' : '진행중'}</span>
                       </span>
-                      {(!proj.isManual || proj.score != null) && (
-                        <div className="proj-score-container">
-                        {proj.score != null ? (
-                          <>
-                            <span className="proj-score-num">{Number(proj.score).toFixed(1)}</span>
-                            <span className="proj-score-text">점</span>
-                          </>
-                        ) : (
-                          <span style={{ width: 47 }} />
-                        )}
-                        </div>
-                      )}
-                      {isEditing && proj.isManual && proj.isEditable && (
+                      {isEditing && proj.isManual && proj.isEditable ? (
                         <div className="proj-row-actions">
                           <GuardedButton
                             className="proj-delete-btn"
@@ -333,6 +321,15 @@ const ProfilePage = () => {
                             className="proj-delete-btn"
                             onClick={() => handleDeleteProject(proj)}
                           >✕</GuardedButton>
+                        </div>
+                      ) : (
+                        <div className="proj-score-container">
+                          {proj.score != null && (
+                            <>
+                              <span className="proj-score-num">{Number(proj.score).toFixed(1)}</span>
+                              <span className="proj-score-text">점</span>
+                            </>
+                          )}
                         </div>
                       )}
                     </div>
