@@ -404,6 +404,13 @@
   background: #f08040;
 }
 
+.proj-row-actions {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-shrink: 0;
+}
+
 .proj-delete-btn {
   display: flex;
   justify-content: center;
