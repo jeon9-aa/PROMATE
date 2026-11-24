@@ -118,6 +118,11 @@ export default function ProjectSettingsPage() {
   const handleSave = async (event) => {
     event.preventDefault();
     if (savingRef.current || statusRequestRef.current || isCompleted || !projectId || !draft?.title.trim()) return;
+    const totalSlots = Number(draft.totalSlots);
+    if (draft.totalSlots == null || String(draft.totalSlots).trim() === '' || !Number.isSafeInteger(totalSlots) || totalSlots < 0) {
+      setSaveError('모집 인원을 0 이상의 정수로 입력해주세요.');
+      return;
+    }
     const payload = {
       title: draft.title.trim(),
       category: draft.category,
@@ -125,6 +130,7 @@ export default function ProjectSettingsPage() {
       startDate: draft.startDate?.slice(0, 10),
       endDate: draft.endDate?.slice(0, 10),
       thumbnail: draft.thumbnail ?? null,
+      totalSlots,
     };
     if (!payload.startDate || !payload.endDate || payload.startDate > payload.endDate) {
       setSaveError('프로젝트 시작일과 종료일을 확인해주세요.');
@@ -243,6 +249,21 @@ export default function ProjectSettingsPage() {
                 )
               ))}
             </div>
+          </div>
+
+          <div className="project-settings-field">
+            <label htmlFor="project-settings-total-slots">모집 인원</label>
+            <input
+              id="project-settings-total-slots"
+              type="number"
+              min="0"
+              step="1"
+              required
+              value={values.totalSlots ?? ''}
+              placeholder="모집 인원 입력"
+              readOnly={!isEditing || isSaving}
+              onChange={(event) => updateDraft('totalSlots', event.target.value)}
+            />
           </div>
 
           <div className="project-settings-field project-settings-description">
