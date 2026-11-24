@@ -38,7 +38,7 @@ export const getProjectSubgroupMembers = async (projectId, subgroupId, signal) =
 
 export const joinProjectSubgroup = async (projectId, subgroupId) => {
   const { data } = await apiClient.post(
-    `/projects/${encodeURIComponent(projectId)}/subgroups/${encodeURIComponent(subgroupId)}/members`,
+    `/projects/${encodeURIComponent(projectId)}/subgroups/${encodeURIComponent(subgroupId)}/members/join`,
   );
 
   return data.data;
