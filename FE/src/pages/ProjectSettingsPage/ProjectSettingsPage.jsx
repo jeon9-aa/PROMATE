@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from 'react';
 import { useLocation, useNavigate, useParams } from 'react-router-dom';
-import { getProjectSettings, updateProject, updateProjectStatus } from '../../api/Project/projectApi';
+import { getProjectSettings, updateProject, updateProjectStatus, updateRecruitmentStatus } from '../../api/Project/projectApi';
 import GuardedButton from '../../components/GuardedButton/GuardedButton.jsx';
 import '../../components/TeamPageMenu/ProjectTitleButton.css';
 import MainButton from '../../components/MainButton/MainButton';
@@ -69,7 +69,9 @@ export default function ProjectSettingsPage() {
   const [saveError, setSaveError] = useState('');
   const [saveNotice, setSaveNotice] = useState('');
   const [activeTab, setActiveTab] = useState('info');
-  const [isRecruiting, setIsRecruiting] = useState(true);
+  const [isUpdatingRecruitment, setIsUpdatingRecruitment] = useState(false);
+  const recruitmentPendingRef = useRef(false);
+  const [recruitmentError, setRecruitmentError] = useState('');
   const sourceProject = isLoaded ? loadedProject.data : {};
   const project = savedProject || {
     ...sourceProject,
@@ -84,13 +86,36 @@ export default function ProjectSettingsPage() {
   const hasChanges = isEditing && JSON.stringify(draft) !== JSON.stringify(project);
   const title = project.title;
   const isCompleted = project.status === 'COMPLETED';
+  const isRecruiting = project.recruitmentStatus === 'RECRUITING';
+
+  const toggleRecruitment = async () => {
+    if (recruitmentPendingRef.current || !isLoaded || isCompleted || isSaving || isChangingStatus) return;
+    if (project.recruitmentId == null) {
+      setRecruitmentError('연결된 모집글을 확인할 수 없습니다.');
+      return;
+    }
+    const recruitmentStatus = isRecruiting ? 'COMPLETED' : 'RECRUITING';
+    recruitmentPendingRef.current = true;
+    setIsUpdatingRecruitment(true);
+    setRecruitmentError('');
+    try {
+      await updateRecruitmentStatus(project.recruitmentId, recruitmentStatus);
+      setSavedProject({ ...project, recruitmentStatus });
+      setDraft((current) => current ? { ...current, recruitmentStatus } : current);
+    } catch (error) {
+      setRecruitmentError(error.response?.data?.message || error.message || '모집 상태 변경에 실패했습니다.');
+    } finally {
+      recruitmentPendingRef.current = false;
+      setIsUpdatingRecruitment(false);
+    }
+  };
 
   const handleConfirmation = async () => {
     if (!isEnding) {
       setDeleteNotice('프로젝트 삭제 기능은 준비 중입니다.');
       return;
     }
-    if (statusRequestRef.current || savingRef.current || isCompleted) return;
+    if (statusRequestRef.current || savingRef.current || recruitmentPendingRef.current || isCompleted) return;
     if (!projectId) {
       setDeleteNotice('프로젝트 ID를 확인할 수 없습니다.');
       return;
@@ -125,7 +150,7 @@ export default function ProjectSettingsPage() {
 
   const handleSave = async (event) => {
     event.preventDefault();
-    if (!isLoaded || savingRef.current || statusRequestRef.current || isCompleted || !projectId || !draft?.title.trim()) return;
+    if (!isLoaded || savingRef.current || statusRequestRef.current || recruitmentPendingRef.current || isCompleted || !projectId || !draft?.title.trim()) return;
     const totalSlots = Number(draft.totalSlots);
     if (draft.totalSlots == null || String(draft.totalSlots).trim() === '' || !Number.isSafeInteger(totalSlots) || totalSlots < 0) {
       setSaveError('모집 인원을 0 이상의 정수로 입력해주세요.');
@@ -332,11 +357,16 @@ export default function ProjectSettingsPage() {
               aria-checked={isRecruiting}
               aria-labelledby="project-settings-recruitment-label"
               aria-describedby="project-settings-recruitment-description"
-              onClick={() => setIsRecruiting((current) => !current)}
+              disabled={!isLoaded || isUpdatingRecruitment || isSaving || isChangingStatus || isCompleted}
+              aria-busy={isUpdatingRecruitment}
+              onClick={toggleRecruitment}
             >
               <span className="project-settings-switch-handle" />
             </button>
           </div>
+          {!isLoaded && <p role="status">{loadError || '모집 상태를 불러오는 중입니다.'}</p>}
+          {isUpdatingRecruitment && <p role="status">모집 상태를 변경하는 중입니다.</p>}
+          {recruitmentError && <p role="alert">{recruitmentError}</p>}
         </section>
       ) : null}
       <div hidden={activeTab !== 'members'}>

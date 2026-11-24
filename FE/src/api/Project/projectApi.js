@@ -16,7 +16,13 @@ export const getProjectSettings = async (projectId) => {
   if (data?.isSuccess !== true || !data.data || String(data.data.projectId) !== String(projectId)) {
     throw new Error('프로젝트 소개를 불러오지 못했습니다.');
   }
-  return { ...data.data, status: project?.status, recruitmentId };
+  return { ...data.data, recruitmentStatus: data.data.status, status: project?.status, recruitmentId };
+};
+
+export const updateRecruitmentStatus = async (recruitmentId, status) => {
+  const { data } = await apiClient.patch(`/recruitments/${encodeURIComponent(recruitmentId)}/status`, { status });
+  if (data?.isSuccess === true) return data.data;
+  throw new Error(data?.message || '모집 상태 변경 결과를 확인하지 못했습니다.');
 };
 
 export const removeProjectMember = async (projectId, memberId) => {
