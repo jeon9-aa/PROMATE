@@ -33,13 +33,6 @@ public class MemberService {
         Member member = memberRepository.findByIdAndProjectIdWithProjectAndRecruit(memberId, projectId)
                 .orElseThrow(() -> new MemberException(MemberErrorCode.NOT_PROJECT_MEMBER));
 
-        Project project = member.getProject();
-
-        // 검증3: 로그인 사용자가 팀장인가 - 지금은 팀장만 팀원 역할 변경 가능
-        if(!userId.equals(project.getUser().getId())){
-            throw new MemberException(MemberErrorCode.ONLY_PROJECT_LEADER);
-        }
-
         member.changeRole(role);
 
         return RoleChangeResponseDto.builder()
