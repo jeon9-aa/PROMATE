@@ -15,14 +15,6 @@ import { createProjectInvite } from '../../api/Project/projectInviteApi';
 import PasswordJoinNoticeModal from './PasswordJoinNoticeModal';
 import './ProjectReadMePage.css';
 
-const categoryMap = {
-  PROJECT: "조별과제",
-  STUDY: "스터디",
-  CONTEST: "공모전",
-  DEV: "개발",
-  ETC: "기타"
-};
-
 const categories = [
   { id: "PROJECT", label: "조별과제" },
   { id: "STUDY", label: "스터디" },
@@ -35,10 +27,11 @@ function ProjectReadMePage() {
   const location = useLocation();
   const navigate = useNavigate();
   const { postId } = useParams();
-  const passedData = location.state || {};
 
   const [projectData, setProjectData] = useState(null);
   const [isLoading, setIsLoading] = useState(true);
+  const [deletablePostId, setDeletablePostId] = useState(null);
+  const canDelete = projectData?.isAuthor && deletablePostId === postId;
 
   const [isProfileModalOpen, setIsProfileModalOpen] = useState(false);
   const [isShareModalOpen, setIsShareModalOpen] = useState(false);
@@ -126,26 +119,32 @@ function ProjectReadMePage() {
   };
 
   useEffect(() => {
+    let cancelled = false;
     const fetchProjectDetail = async () => {
       try {
         setIsLoading(true);
+        setDeletablePostId(null);
         const response = await apiClient.get(`/recruitments/${postId}`);
+        if (cancelled) return;
         if (response.data && response.data.isSuccess) {
           const data = response.data.data;
           setProjectData(data);
           setIsApplied(data.hasApplied);
+            try {
         }
       } catch (error) {
+        if (cancelled) return;
         console.error('게시글 상세 정보 조회 실패:', error);
         alert(error.message || '해당 게시글을 찾을 수 없습니다.');
         navigate(-1, { replace: true });
       } finally {
-        setIsLoading(false);
+        if (!cancelled) setIsLoading(false);
       }
     };
 
     if (postId) fetchProjectDetail();
     else setIsLoading(false);
+    return () => { cancelled = true; };
   }, [postId, navigate]);
 
   const handleMemberClick = async (event) => {
@@ -195,6 +194,7 @@ function ProjectReadMePage() {
   };
 
   const handleDelete = async () => {
+    if (!canDelete) return;
     if (window.confirm("정말 이 게시글을 삭제하시겠습니까?")) {
       try {
         const response = await apiClient.delete(`/recruitments/${postId}`);
@@ -295,6 +295,7 @@ function ProjectReadMePage() {
         </div>
 
         {projectData.isAuthor ? (
+          canDelete && (
           <div className="project-readme-apply-container">
             <GuardedButton
               className="project-readme-delete-btn"
@@ -303,6 +304,7 @@ function ProjectReadMePage() {
               삭제
             </GuardedButton>
           </div>
+          )
         ) : (
           <div className="project-readme-apply-container project-readme-participant-actions">
             {projectData.status === "RECRUITING" ? (
