@@ -3,15 +3,32 @@ import { findProjectRecruitment } from './findProjectRecruitment';
 
 export const getProjectSettings = async (projectId) => {
   const { data: projects } = await apiClient.get('/projects/me');
-  const project = projects?.data?.find?.((item) => String(item.projectId) === String(projectId));
+  let project = projects?.data?.find?.((item) => String(item.projectId) === String(projectId));
+  if (project?.recruitmentId == null) {
+    const { data: activities } = await apiClient.get('/projects/activity/me');
+    const activity = activities?.data?.find?.((item) => String(item.projectId) === String(projectId));
+    if (activity) project = { ...activity, ...project, recruitmentId: activity.recruitmentId };
+  }
   const getDetail = async (id) => {
     const { data } = await apiClient.get(`/recruitments/${encodeURIComponent(id)}`);
     if (data?.isSuccess !== true || !data.data) throw new Error('프로젝트 소개를 불러오지 못했습니다.');
     return data.data;
   };
+  if (project?.recruitmentId != null) {
+    const recruitment = await getDetail(project.recruitmentId);
+    if (recruitment.projectId != null && String(recruitment.projectId) !== String(projectId)) {
+      throw new Error('프로젝트와 모집글의 연결 정보가 일치하지 않습니다.');
+    }
+    return {
+      ...recruitment,
+      projectId: project.projectId,
+      recruitmentId: project.recruitmentId,
+      recruitmentStatus: recruitment.status,
+      status: project.projectStatus ?? project.status,
+    };
+  }
   const recruitment = await findProjectRecruitment(projectId, {
     getPage: async (page) => {
-      if (project?.recruitmentId != null) return [{ recruitmentId: project.recruitmentId }];
       const { data } = await apiClient.get('/recruitments/me', { params: { page, size: 20 } });
       return data?.data;
     },

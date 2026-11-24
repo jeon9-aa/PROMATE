@@ -174,8 +174,11 @@ export default function ProjectSettingsPage() {
     setSaveError('');
     setSaveNotice('');
     try {
-      await updateProject(projectId, payload);
-      const updatedProject = { ...draft, ...payload, description: payload.content };
+      const result = await updateProject(projectId, payload);
+      const updatedProject = {
+        ...draft, ...payload, description: payload.content,
+        thumbnail: result?.thumbnailUrl !== undefined ? result.thumbnailUrl : payload.thumbnail,
+      };
       setSavedProject(updatedProject);
       setDraft(null);
       try { sessionStorage.setItem(`promate-project-title:${projectId}`, payload.title); } catch { /* Storage unavailable. */ }
