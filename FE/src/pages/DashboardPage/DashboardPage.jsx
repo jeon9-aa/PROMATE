@@ -7,20 +7,20 @@ import projectMenuIcon from '../../assets/projectMenuIcon.svg';
 import SummaryCard from '../../components/SummaryCard/SummaryCard';
 import ProjectBox from '../../components/ProjectBox/ProjectBox';
 import moreIcon from '../../assets/moreIcon.svg';
-import { getDashboardProjects, getDashboardUrgentTasks, getDashboardCompletedTasks, getDashboardProjectStatuses } from '../../api/Dashboard/dashboardApi';
+import { getDashboardProjects, getDashboardUrgentTasks, getDashboardInProgressTasks, getDashboardProjectStatuses } from '../../api/Dashboard/dashboardApi';
 
 function DashboardPage() {
   const [dashboardData, setDashboardData] = useState({
     projects: [],
     urgentTasks: [],
-    completedTasks: [],
+    inProgressTasks: [],
     projectStatuses: [],
   });
 
   const [fetchErrors, setFetchErrors] = useState({
     projects: false,
     urgentTasks: false,
-    completedTasks: false,
+    inProgressTasks: false,
     projectStatuses: false,
   });
 
@@ -43,10 +43,11 @@ function DashboardPage() {
       try {
         setIsLoading(true);
         
+        const projectsPromise = getDashboardProjects();
         const results = await Promise.allSettled([
-          getDashboardProjects(),
+          projectsPromise,
           getDashboardUrgentTasks(),
-          getDashboardCompletedTasks(),
+          projectsPromise.then((response) => getDashboardInProgressTasks(response.data.data || [])),
           getDashboardProjectStatuses(),
         ]);
 
@@ -67,19 +68,19 @@ function DashboardPage() {
         const newDashboardData = {
           projects: [],
           urgentTasks: [],
-          completedTasks: [],
+          inProgressTasks: [],
           projectStatuses: [],
         };
 
         const projectsRes = results[0].status === 'fulfilled' ? results[0].value : null;
         const urgentTasksRes = results[1].status === 'fulfilled' ? results[1].value : null;
-        const completedTasksRes = results[2].status === 'fulfilled' ? results[2].value : null;
+        const inProgressTasksRes = results[2].status === 'fulfilled' ? results[2].value : null;
         const projectStatusesRes = results[3].status === 'fulfilled' ? results[3].value : null;
 
         setFetchErrors({
           projects: results[0].status === 'rejected',
           urgentTasks: results[1].status === 'rejected',
-          completedTasks: results[2].status === 'rejected',
+          inProgressTasks: results[2].status === 'rejected',
           projectStatuses: results[3].status === 'rejected',
         });
 
@@ -107,8 +108,8 @@ function DashboardPage() {
           }));
         }
 
-        if (completedTasksRes) {
-          newDashboardData.completedTasks = (completedTasksRes.data.data || []).map((task) => ({
+        if (inProgressTasksRes) {
+          newDashboardData.inProgressTasks = inProgressTasksRes.map((task) => ({
             id: task.taskId,
             projectId: task.projectId,
             projectTitle: task.projectTitle,
@@ -159,9 +160,9 @@ function DashboardPage() {
       },
       {
         id: 3,
-        title: '완료한 태스크',
-        items: dashboardData.completedTasks,
-        isError: fetchErrors.completedTasks,
+        title: '남은 태스크',
+        items: dashboardData.inProgressTasks,
+        isError: fetchErrors.inProgressTasks,
       },
     ],
     [dashboardData, fetchErrors]
