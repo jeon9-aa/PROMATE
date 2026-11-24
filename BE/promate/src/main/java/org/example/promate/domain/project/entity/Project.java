@@ -117,7 +117,10 @@ public class Project extends BaseTimeEntity {
     public void update(RecruitUpdateRequest request) {
         this.title = request.title();
         this.description = request.description();
-        this.thumbnailUrl = request.thumbnailUrl();
+        if (request.thumbnailUrl() != null
+                && !request.thumbnailUrl().isBlank()) {
+            this.thumbnailUrl = request.thumbnailUrl();
+        }
         this.category = request.category();
         this.startDate = request.startDate();
         this.endDate = request.endDate();
@@ -132,7 +135,10 @@ public class Project extends BaseTimeEntity {
     public void update(UpdateProjectRequestDto request) {
         this.title = request.getTitle();
         this.description = request.getDescription();
-        this.thumbnailUrl = request.getThumbnailUrl();
+        if (request.getThumbnailUrl() != null
+                && !request.getThumbnailUrl().isBlank()) {
+            this.thumbnailUrl = request.getThumbnailUrl();
+        }
         this.category = request.getCategory();
         this.startDate = request.getStartDate();
         this.endDate = request.getEndDate();
