@@ -49,7 +49,7 @@ public class Recruit extends BaseEntity {
     @Column(name="total_slots", nullable = false)
     private int totalSlots;
 
-    @Column(name = "thumbnail_url", nullable = true, columnDefinition = "TEXT")
+    @Column(name = "thumbnail_url", nullable = true, columnDefinition = "MEDIUMTEXT")
     private String thumbnailUrl;
 
     //mapping

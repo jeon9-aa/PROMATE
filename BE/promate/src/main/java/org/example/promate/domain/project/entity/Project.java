@@ -51,7 +51,7 @@ public class Project extends BaseTimeEntity {
     @Enumerated(EnumType.STRING)
     private ProjectStatus status;       //PREPARING, ACTIVE, COMPLETED, CANCELED
 
-    @Column(name = "thumbnail_url", columnDefinition = "TEXT")
+    @Column(name = "thumbnail_url", columnDefinition = "MEDIUMTEXT")
     private String thumbnailUrl;
 
     @Column(name = "joined_count", nullable = false)
