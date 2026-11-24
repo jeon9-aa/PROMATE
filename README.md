@@ -10,7 +10,7 @@
 </p>
 
 <p align="center">
-  <a href="https://promate-kappa.vercel.app/login"><strong>🔗 PRO:MATE 서비스 이용하기</strong></a>
+  <a href="https://promate-nd-six.vercel.app/login"><strong>🔗 PRO:MATE 서비스 이용하기</strong></a>
 </p>
 
 <table align="center">
