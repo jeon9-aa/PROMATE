@@ -686,7 +686,10 @@
 
   .profile-main-card {
     padding: 24px 20px;
+    height: auto;
     min-height: unset;
+    overflow: visible;
+    flex-shrink: 0;
     gap: 16px;
   }
 
