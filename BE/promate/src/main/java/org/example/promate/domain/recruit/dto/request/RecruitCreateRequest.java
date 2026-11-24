@@ -1,5 +1,6 @@
 package org.example.promate.domain.recruit.dto.request;
 
+import com.fasterxml.jackson.annotation.JsonAlias;
 import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotNull;
 import org.example.promate.domain.recruit.enums.Category;
@@ -18,6 +19,8 @@ public record RecruitCreateRequest(
         LocalDate startDate,
         @NotNull(message = "프로젝트 마감일을 선택하세요")
         LocalDate endDate,
+
+        @JsonAlias("recruitImageUrl")
         String thumbnailUrl
 ){
 }
