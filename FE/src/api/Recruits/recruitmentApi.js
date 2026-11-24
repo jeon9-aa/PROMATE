@@ -1,7 +1,6 @@
 import apiClient from "../apiClient";
 import { getChatRooms } from "../Chat/chatApi";
 import { openRecruitmentChat } from "./openRecruitmentChat";
-import { getAppliedProjects } from "../Project/projectApi";
 
 export const getOrCreateChatRoom = (recruitmentId) => openRecruitmentChat(recruitmentId, {
   getRooms: getChatRooms,
@@ -33,20 +32,6 @@ export const postApplication = async (recruitmentId, applicationData) => {
   return response.data;
 };
 // The server checks application ownership using the access token.
-export const resolveMyApplicationId = async (recruitmentId, applicationId) => {
-  if (applicationId != null) return applicationId;
-
-  const { data } = await getAppliedProjects();
-  if (!data?.isSuccess || !Array.isArray(data.data)) {
-    throw new Error(data?.message || "내 지원 목록을 불러오지 못했습니다.");
-  }
-  const application = data.data.find((item) => String(item.recruitmentId) === String(recruitmentId));
-  if (application?.applicationId == null) {
-    throw new Error("이 모집글에 제출한 지원서를 내 지원 목록에서 찾을 수 없습니다.");
-  }
-  return application.applicationId;
-};
-
 export const getMyApplication = async (recruitmentId, applicationId) => {
   const response = await apiClient.get(`/recruitments/${recruitmentId}/applications/${applicationId}`);
   return response.data;

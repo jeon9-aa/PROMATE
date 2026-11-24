@@ -2,7 +2,7 @@ import GuardedForm from '../GuardedForm/GuardedForm.jsx';
 import GuardedButton from '../GuardedButton/GuardedButton.jsx';
 import { useEffect, useState, useRef } from "react";
 import "./ApplyModal.css";
-import { getApplicationForm, postApplication, getMyApplication, updateMyApplication, cancelMyApplication, resolveMyApplicationId } from "../../api/Recruits/recruitmentApi";
+import { getApplicationForm, postApplication, getMyApplication, updateMyApplication, cancelMyApplication } from "../../api/Recruits/recruitmentApi";
 
 function ApplyModal({
   isOpen,
@@ -23,7 +23,6 @@ function ApplyModal({
   const [loadError, setLoadError] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isEditing, setIsEditing] = useState(false);
-  const [resolvedApplicationId, setResolvedApplicationId] = useState(null);
   const submitLockRef = useRef(false);
   const savedApplicationRef = useRef({ job: "", motivation: "" });
 
@@ -37,23 +36,18 @@ function ApplyModal({
       setLoadError("");
       setFetchedTitle("");
       setIsEditing(false);
-      setResolvedApplicationId(null);
 
       if (recruitmentId) {
         const fetchApplyData = async () => {
           try {
-            const targetApplicationId = isApplied
-              ? await resolveMyApplicationId(recruitmentId, applicationId)
-              : null;
-            if (!active) return;
-            const response = await (isApplied ? getMyApplication(recruitmentId, targetApplicationId) : getApplicationForm(recruitmentId));
+            if (isApplied && applicationId == null) throw new Error("지원서 ID를 확인할 수 없습니다. 페이지를 새로고침해주세요.");
+            const response = await (isApplied ? getMyApplication(recruitmentId, applicationId) : getApplicationForm(recruitmentId));
             if (!active) return;
             const isSuccess = response?.data?.isSuccess ?? response?.isSuccess;
             if (isSuccess) {
               const data = response?.data?.data ?? response?.data;
               setFetchedTitle(data?.recruitmentTitle);
               if (isApplied) {
-                setResolvedApplicationId(targetApplicationId);
                 const saved = {
                   job: data?.objective ?? "",
                   motivation: data?.prContent ?? data?.introduction ?? "",
@@ -97,7 +91,7 @@ function ApplyModal({
       };
 
       const response = await (isApplied
-        ? updateMyApplication(recruitmentId, resolvedApplicationId, applicationData)
+        ? updateMyApplication(recruitmentId, applicationId, applicationData)
         : postApplication(recruitmentId, applicationData));
       
       const isSuccess = response?.data?.isSuccess ?? response?.isSuccess;
@@ -128,7 +122,7 @@ function ApplyModal({
     submitLockRef.current = true;
     setIsSubmitting(true);
     try {
-      const response = await cancelMyApplication(recruitmentId, resolvedApplicationId);
+      const response = await cancelMyApplication(recruitmentId, applicationId);
       if (!response?.isSuccess) throw new Error(response?.message || "지원 취소에 실패했습니다.");
       alert("지원이 취소되었습니다.");
       onCancel?.();
