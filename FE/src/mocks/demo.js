@@ -54,6 +54,7 @@ const applications = ['PENDING', 'PENDING', 'ACCEPTED', 'REJECTED'].map((status,
 }));
 const histories = [{ historyId: 1, projectName: '캠퍼스 해커톤', startDate: demoDate(-90), endDate: demoDate(-60), status: 'COMPLETED', editable: true }];
 const ok = (data) => HttpResponse.json({ isSuccess: true, message: '요청에 성공했습니다.', data });
+applications.push({ applicationId: 101, recruitmentId: 2, status: 'PENDING', objective: '프론트엔드 개발', prContent: 'React 개발 경험으로 프로젝트에 기여하고 싶습니다.' });
 const missing = () => HttpResponse.json({ isSuccess: false, message: '데이터를 찾을 수 없습니다.', data: null }, { status: 404 });
 const projectStats = () => projects.map((project) => ({
   ...project,
@@ -123,12 +124,13 @@ export const demoHandlers = [
     const item = findRecruitment(params);
     return item ? ok({ recruitmentTitle: item.title }) : missing();
   }),
-  http.post('*/recruitments/:recruitmentId/apply', ({ params }) => {
+  http.post('*/recruitments/:recruitmentId/apply', async ({ params, request }) => {
     const item = findRecruitment(params);
     if (!item) return missing();
     item.hasApplied = true;
     item.myApplyStatus = 'PENDING';
     item.myApplicationId = 100 + item.recruitmentId;
+    applications.push({ ...(await request.json()), applicationId: item.myApplicationId, recruitmentId: item.recruitmentId, status: 'PENDING' });
     return ok({ applicationId: item.myApplicationId });
   }),
   ...['pending', 'accepted', 'rejected'].map((status) => http.get(`*/recruitments/:recruitmentId/applications/${status}`, ({ params }) => ok({
@@ -144,5 +146,21 @@ export const demoHandlers = [
     if (!item) return missing();
     item.status = (await request.json()).status;
     return ok({ currentParticipants: 1 + applications.filter((entry) => entry.recruitmentId === item.recruitmentId && entry.status === 'ACCEPTED').length, maxParticipants: 5 });
+  }),
+  http.put('*/recruitments/:recruitmentId/applications/:applicationId', async ({ params, request }) => {
+    const recruitment = findRecruitment(params);
+    const item = applications.find((entry) => entry.recruitmentId === Number(params.recruitmentId) && entry.applicationId === Number(params.applicationId));
+    if (!item || recruitment?.myApplicationId !== item.applicationId) return missing();
+    const { objective, prContent } = await request.json();
+    Object.assign(item, { objective, prContent });
+    return ok({ applicationId: item.applicationId, updatedAt: new Date().toISOString() });
+  }),
+  http.delete('*/recruitments/:recruitmentId/applications/:applicationId', ({ params }) => {
+    const recruitment = findRecruitment(params);
+    const index = applications.findIndex((entry) => entry.recruitmentId === Number(params.recruitmentId) && entry.applicationId === Number(params.applicationId));
+    if (index < 0 || recruitment?.myApplicationId !== Number(params.applicationId)) return missing();
+    applications.splice(index, 1);
+    Object.assign(recruitment, { hasApplied: false, myApplyStatus: null, myApplicationId: null });
+    return ok(null);
   }),
 ];

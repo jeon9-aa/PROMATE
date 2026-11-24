@@ -15,14 +15,6 @@ import { createProjectInvite } from '../../api/Project/projectInviteApi';
 import PasswordJoinNoticeModal from './PasswordJoinNoticeModal';
 import './ProjectReadMePage.css';
 
-const categoryMap = {
-  PROJECT: "조별과제",
-  STUDY: "스터디",
-  CONTEST: "공모전",
-  DEV: "개발",
-  ETC: "기타"
-};
-
 const categories = [
   { id: "PROJECT", label: "조별과제" },
   { id: "STUDY", label: "스터디" },
@@ -35,7 +27,6 @@ function ProjectReadMePage() {
   const location = useLocation();
   const navigate = useNavigate();
   const { postId } = useParams();
-  const passedData = location.state || {};
 
   const [projectData, setProjectData] = useState(null);
   const [isLoading, setIsLoading] = useState(true);
@@ -89,6 +80,7 @@ function ProjectReadMePage() {
   const [applyJob, setApplyJob] = useState('');
   const [applyMotivation, setApplyMotivation] = useState('');
   const [isApplied, setIsApplied] = useState(false);
+  const [applicationId, setApplicationId] = useState(null);
   const [isCreatingChatRoom, setIsCreatingChatRoom] = useState(false);
   const chatRoomRequestPending = useRef(false);
 
@@ -134,6 +126,7 @@ function ProjectReadMePage() {
           const data = response.data.data;
           setProjectData(data);
           setIsApplied(data.hasApplied);
+          setApplicationId(data.myApplicationId ?? null);
         }
       } catch (error) {
         console.error('게시글 상세 정보 조회 실패:', error);
@@ -184,11 +177,10 @@ function ProjectReadMePage() {
     setApplyMotivation('');
   };
 
-  const handleSubmitApply = () => {
-    console.log('지원 완료:', projectData.title, applyJob, applyMotivation);
+  const handleSubmitApply = (data) => {
+    if (data?.applicationId != null) setApplicationId(data.applicationId);
     setIsApplied(true);
     handleCloseApplyModal();
-    navigate(-1);
   };
 
   const handleDelete = async () => {
@@ -302,13 +294,12 @@ function ProjectReadMePage() {
           </div>
         ) : (
           <div className="project-readme-apply-container project-readme-participant-actions">
-            {projectData.status === "RECRUITING" ? (
+            {isApplied || projectData.status === "RECRUITING" ? (
               <GuardedButton
-                className={`project-readme-apply-btn ${isApplied ? 'reviewing' : 'apply'}`}
-                onClick={() => !isApplied && handleApplyClick()}
-                disabled={isApplied}
+                className="project-readme-apply-btn apply"
+                onClick={handleApplyClick}
               >
-                {isApplied ? '지원완료' : '지원하기'}
+                {isApplied ? '내 지원서 보기' : '지원하기'}
               </GuardedButton>
             ) : (
               <GuardedButton className="project-readme-apply-btn reviewing" disabled style={{ cursor: 'default' }}>
@@ -367,6 +358,13 @@ function ProjectReadMePage() {
         onClose={handleCloseApplyModal}
         onSubmit={handleSubmitApply}
         recruitmentId={postId}
+        isApplied={isApplied}
+        applicationId={applicationId}
+        onCancel={() => {
+          setIsApplied(false);
+          setApplicationId(null);
+          handleCloseApplyModal();
+        }}
         projectName={projectData.title}
         job={applyJob}
         motivation={applyMotivation}
