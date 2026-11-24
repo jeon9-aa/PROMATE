@@ -13,5 +13,6 @@ import java.time.LocalDateTime;
 @JsonPropertyOrder({"projectId", "updatedAt"})
 public class UpdatedProjectResponseDto {
     private Long projectId;
+    private String thumbnailUrl;
     private LocalDateTime updatedAt;
 }

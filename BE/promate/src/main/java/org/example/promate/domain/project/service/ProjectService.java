@@ -145,6 +145,7 @@ public class ProjectService {
                             );
                     return MyActivityResponseDTO.builder()
                             .projectId(member.getProject().getId())
+                            .recruitmentId(member.getProject().getRecruit().getId())
                             .title(member.getProject().getTitle())
                             .recruitImageUrl(member.getProject().getThumbnailUrl()) // 추가
                             .description(member.getProject().getDescription())
