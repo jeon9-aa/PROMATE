@@ -173,14 +173,19 @@ public class RecruitService {
             throw new GeneralException(RecruitErrorCode.NOT_RECRUITMENT_AUTHOR);
         }
 
+        Project project = recruit.getProject();
+
+        if (project != null
+                && project.getStatus() != ProjectStatus.PREPARING) {
+            throw new GeneralException(RecruitErrorCode.RECRUITMENT_DELETE_FORBIDDEN);
+        }
+
         if (recruit.getStatus() == RecruitStatus.RECRUITING) {
-            // CASE 1: 모집 중일 때는 Hard Delete
-            // -> cascade = CascadeType.ALL 설정에 의해 Project, Apply도 DB에서 통째로 지움
+            // 모집 중인 임시 프로젝트 및 모집글 Hard Delete
             recruitRepository.delete(recruit);
         } else {
-            // CASE 2: 이미 마감되었거나 진행 중일 때는 프로젝트 보호를 위해 겉만 숨김 (Soft Delete)
-            // -> 이래야 다른 팀원들이 프로젝트 내역에서 쫓겨나지 않음
-            recruit.delete(); // super.performDelete() 호출하여 is_deleted = true 변경
+            // 삭제가 허용된 모집글 중 모집 중이 아닌 경우 Soft Delete
+            recruit.delete();
         }
     }
 
@@ -202,30 +207,46 @@ public class RecruitService {
 
 
 
-    @Transactional
-    public RecruitStatusResponse changeRecruitStatus(Long recruitmentId, Long userId, RecruitStatusRequest request) {
-        // 모집글 조회 및 권한 확인
-        Recruit recruit = recruitRepository.findById(recruitmentId)
-                .orElseThrow(() -> new GeneralException(RecruitErrorCode.RECRUITMENT_NOT_FOUND));
+        @Transactional
+        public RecruitStatusResponse changeRecruitStatus(Long recruitmentId, Long userId, RecruitStatusRequest request) {
+            // 모집글 조회 및 권한 확인
+            Recruit recruit = recruitRepository.findById(recruitmentId)
+                    .orElseThrow(() -> new GeneralException(RecruitErrorCode.RECRUITMENT_NOT_FOUND));
 
-        if (!recruit.getUser().getId().equals(userId)) {
-            throw new GeneralException(RecruitErrorCode.NOT_RECRUITMENT_AUTHOR);
+            if (!recruit.getUser().getId().equals(userId)) {
+                throw new GeneralException(RecruitErrorCode.NOT_RECRUITMENT_AUTHOR);
+            }
+
+            Project project = recruit.getProject();
+
+            if (project == null) {
+                throw new GeneralException(
+                        RecruitErrorCode.PROJECT_NOT_FOUND);
+            }
+
+            // 동일한 상태 변경 요청 시 기존 상태 반환
+            if (recruit.getStatus() == request.status()) {
+                return new RecruitStatusResponse(recruit.getProject().getId(), recruit.getStatus());
+            }
+
+            // 모집 재개
+            if (recruit.getStatus() == RecruitStatus.COMPLETED
+                    && request.status() == RecruitStatus.RECRUITING) {
+
+                recruit.updateStatus(RecruitStatus.RECRUITING);
+
+                return new RecruitStatusResponse(project.getId(), recruit.getStatus());
+            }
+
+            // 모집 마감
+            if (recruit.getStatus() == RecruitStatus.RECRUITING
+                    && request.status() == RecruitStatus.COMPLETED) {
+                return processCompletion(recruit);
+            }
+
+            throw new GeneralException(
+                    RecruitErrorCode.RECRUITMENT_ALREADY_CLOSED);
         }
-
-        // 핵심 제약 조건: 현재 상태가 RECRUITING이 아니면 상태 변경 불가
-        // (이 로직은 지원하기 / 합격,불합격 판정 API에도 추가)
-        if (recruit.getStatus() != RecruitStatus.RECRUITING) {
-            throw new GeneralException(RecruitErrorCode.RECRUITMENT_ALREADY_CLOSED);
-        }
-
-        if (request.status() == RecruitStatus.COMPLETED) {
-            return processCompletion(recruit);
-        }
-
-        // 그 외 상태 변경 로직(모집글 soft delete 사용 채택 하면)
-        //recruit.updateStatus(request.status());
-        return new RecruitStatusResponse(null, recruit.getStatus());
-    }
 
     public RecruitStatusResponse processCompletion(Recruit recruit) {
         // 임시 프로젝트 상태 변경 (PREPARING -> ACTIVE)
@@ -235,7 +256,9 @@ public class RecruitService {
         }
 
         recruit.updateStatus(RecruitStatus.COMPLETED);
-        project.updateStatus(ProjectStatus.ACTIVE);
+        if (project.getStatus() == ProjectStatus.PREPARING) {
+            project.updateStatus(ProjectStatus.ACTIVE);
+        }
 
 
         return new RecruitStatusResponse(project.getId(), RecruitStatus.COMPLETED);

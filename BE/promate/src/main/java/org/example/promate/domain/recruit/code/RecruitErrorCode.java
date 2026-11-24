@@ -31,6 +31,7 @@ public enum RecruitErrorCode implements BaseErrorCode {
 
     INVALID_RECRUIT_STATUS(HttpStatus.BAD_REQUEST, "RECRUIT_E014", "유효하지 않은 모집 상태 필터 값입니다."),
     INVALID_RECRUIT_PARTICIPANTS(HttpStatus.BAD_REQUEST, "RECRUIT_E015", "모집 인원이 현재 인원을 초과했습니다."),
+    RECRUITMENT_DELETE_FORBIDDEN(HttpStatus.FORBIDDEN, "RECRUIT_E016", "프로젝트가 진행 중인 모집글은 삭제가 불가능합니다."),
     ;
 
     private final HttpStatus status;

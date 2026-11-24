@@ -98,7 +98,7 @@ public class RecruitController {
             @AuthenticationPrincipal Long userId
     ) {
         RecruitStatusResponse response = recruitService.changeRecruitStatus(recruitmentId, userId, request);
-        return ApiResponse.onSuccess(RecruitSuccessCode.RECRUITMENT_COMPLETED, response);
+        return ApiResponse.onSuccess(RecruitSuccessCode.RECRUITMENT_STATUS_UPDATED, response);
     }
 
     @PostMapping("/{recruitmentId}/bookmark")
