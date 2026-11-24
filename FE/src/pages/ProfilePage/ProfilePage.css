@@ -216,6 +216,8 @@
   align-items: center;
   width: 100%;
   height: 26px;
+  min-width: 0;
+  gap: 24px;
 }
 
 .proj-name-group {
@@ -224,9 +226,14 @@
   align-items: center;
   gap: 24px;
   min-height: 19px;
+  flex: 1;
+  min-width: 0;
 }
 
 .proj-title {
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
   font-family: "Pretendard Variable", "Pretendard", sans-serif;
   font-weight: 400;
   font-size: 16px;
@@ -263,6 +270,7 @@
 }
 
 .proj-right-group {
+  flex-shrink: 0;
   display: flex;
   flex-direction: row;
   justify-content: flex-end;
@@ -753,6 +761,11 @@
     align-items: flex-start;
     height: auto;
     gap: 8px;
+  }
+
+  .proj-name-group {
+    width: 100%;
+    flex: auto;
   }
 
   .proj-right-group {

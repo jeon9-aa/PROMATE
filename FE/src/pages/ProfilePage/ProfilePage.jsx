@@ -290,13 +290,14 @@ const ProfilePage = () => {
                       {!proj.isManual && (proj.projectId ?? proj.id) != null ? (
                         <Link
                           className="proj-title proj-title-link"
+                          title={proj.title}
                           to={`/project/${proj.projectId ?? proj.id}`}
                           state={{ projectTitle: proj.title, dueDate: proj.dueDate ?? proj.endDate }}
                         >
                           {proj.title}
                         </Link>
                       ) : (
-                        <span className="proj-title">
+                        <span className="proj-title" title={proj.title}>
                           {proj.title}
                           {proj.isManual && <span className="proj-manual-label">(수동 입력)</span>}
                         </span>
