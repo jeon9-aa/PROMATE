@@ -7,6 +7,7 @@ import { Plus } from 'lucide-react';
 import { getProjectSubgroups } from '../../api/Project/projectApi';
 import './SmallMeetingListPage.css';
 import useProjectTitle from '../../utils/useProjectTitle';
+import { isSmallMeetingClosed, useSmallMeetingClock } from '../../utils/smallMeetings';
 
 const formatDate = (date) => date?.replaceAll('-', '.') ?? '미정';
 
@@ -17,6 +18,7 @@ export default function SmallMeetingListPage() {
   const projectTitle = useProjectTitle(projectId, state?.projectTitle);
   const [list, setList] = useState(null);
   const currentList = list?.projectId === projectId ? list : null;
+  const now = useSmallMeetingClock();
 
   useEffect(() => {
     const controller = new AbortController();
@@ -78,8 +80,11 @@ export default function SmallMeetingListPage() {
                         )}
                       </span>
                     </span>
-                    {subgroup.status === 'RECRUITING' && <span className="project-detail-status">모집 중</span>}
-                    {subgroup.status === 'COMPLETED' && <span className="project-detail-status is-closed">마감</span>}
+                    {isSmallMeetingClosed(subgroup, now) ? (
+                      <span className="project-detail-status is-closed">마감</span>
+                    ) : subgroup.status === 'RECRUITING' && (
+                      <span className="project-detail-status">모집 중</span>
+                    )}
                   </button>
                 </li>
               ))}

@@ -1,4 +1,39 @@
+import { useEffect, useState } from 'react';
+
 const storageKey = 'promate-small-meetings';
+
+export function useSmallMeetingClock() {
+  const [now, setNow] = useState(Date.now);
+
+  useEffect(() => {
+    const refresh = () => setNow(Date.now());
+    const timer = window.setInterval(refresh, 1000);
+    window.addEventListener('focus', refresh);
+
+    return () => {
+      window.clearInterval(timer);
+      window.removeEventListener('focus', refresh);
+    };
+  }, []);
+
+  return now;
+}
+
+export function isSmallMeetingClosed(subgroup, now) {
+  if (!subgroup) return false;
+  const { status, currentCount, capacity, endDate } = subgroup;
+  const isFull = currentCount != null && capacity != null && Number(currentCount) >= Number(capacity);
+  if (status === 'COMPLETED' || isFull) return true;
+  if (!endDate) return false;
+
+  if (/^\d{4}-\d{2}-\d{2}$/.test(endDate)) {
+    const endOfRecruitment = new Date(`${endDate}T00:00:00`);
+    endOfRecruitment.setDate(endOfRecruitment.getDate() + 1);
+    return now >= endOfRecruitment.getTime();
+  }
+
+  return now >= Date.parse(endDate);
+}
 
 export function readSavedGroups() {
   const groups = JSON.parse(localStorage.getItem(storageKey) || '[]');

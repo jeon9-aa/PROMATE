@@ -4,8 +4,11 @@ import GuardedButton from '../../components/GuardedButton/GuardedButton.jsx';
 import { useEffect, useState } from 'react';
 import { useLocation, useNavigate, useParams } from 'react-router-dom';
 import { ArrowLeft, Users } from 'lucide-react';
-import { getProjectSubgroup, joinProjectSubgroup } from '../../api/Project/projectApi';
+import { getProjectSubgroup, getProjectSubgroupMembers, joinProjectSubgroup } from '../../api/Project/projectApi';
+import profileIcon from '../../assets/icons/profileIcon.svg';
+import { getSecureImageUrl } from '../../utils/imageUrl';
 import useProjectTitle from '../../utils/useProjectTitle';
+import { isSmallMeetingClosed, useSmallMeetingClock } from '../../utils/smallMeetings';
 import './SmallMeetingDetailPage.css';
 
 const formatDate = (date) => (date ? date.replaceAll('-', '.') : '미정');
@@ -16,12 +19,15 @@ export default function SmallMeetingDetailPage() {
   const { projectId, meetingId } = useParams();
   const projectTitle = useProjectTitle(projectId, state?.projectTitle);
   const [result, setResult] = useState(null);
+  const [memberResult, setMemberResult] = useState(null);
   const currentResult = result?.projectId === projectId && result?.meetingId === meetingId ? result : null;
   const subgroup = currentResult?.subgroup;
   const hasJoined = subgroup?.joined === true;
-  const isFull = subgroup?.currentCount != null && subgroup.capacity != null
-    && Number(subgroup.currentCount) >= Number(subgroup.capacity);
-  const isClosed = subgroup?.status === 'COMPLETED' || isFull;
+  const currentMembers = memberResult?.projectId === projectId
+    && memberResult?.meetingId === meetingId && memberResult.hasJoined === hasJoined ? memberResult : null;
+  const hasSubgroup = Boolean(subgroup);
+  const now = useSmallMeetingClock();
+  const isClosed = isSmallMeetingClosed(subgroup, now);
   const canJoin = Boolean(subgroup) && !hasJoined && !isClosed;
 
   useEffect(() => {
@@ -39,8 +45,23 @@ export default function SmallMeetingDetailPage() {
     return () => controller.abort();
   }, [projectId, meetingId]);
 
+  useEffect(() => {
+    if (!hasSubgroup) return;
+
+    const controller = new AbortController();
+    getProjectSubgroupMembers(projectId, meetingId, controller.signal)
+      .then((members) => {
+        if (!controller.signal.aborted) setMemberResult({ projectId, meetingId, hasJoined, members });
+      })
+      .catch(() => {
+        if (!controller.signal.aborted) setMemberResult({ projectId, meetingId, hasJoined, error: true });
+      });
+
+    return () => controller.abort();
+  }, [projectId, meetingId, hasSubgroup, hasJoined]);
+
   const handleJoin = async () => {
-    if (!canJoin) return;
+    if (!canJoin || isSmallMeetingClosed(subgroup, Date.now())) return;
 
     try {
       const { status, currentCount, capacity } = await joinProjectSubgroup(projectId, meetingId);
@@ -95,6 +116,24 @@ export default function SmallMeetingDetailPage() {
               <span className="small-meeting-meta-divider" aria-hidden="true" />
               <span>{formatDate(subgroup.startDate)} ~ {formatDate(subgroup.endDate)}</span>
             </div>
+            <section className="small-meeting-members" aria-labelledby="small-meeting-members-heading">
+              <h3 id="small-meeting-members-heading">소모임 멤버</h3>
+              {!currentMembers && <p role="status">멤버를 불러오는 중입니다.</p>}
+              {currentMembers?.error && <p role="alert">멤버 목록을 불러오지 못했습니다.</p>}
+              {currentMembers?.members?.length === 0 && <p>참여한 멤버가 없습니다.</p>}
+              {currentMembers?.members?.length > 0 && (
+                <ul className="small-meeting-member-list">
+                  {currentMembers.members.map(({ userId, name, profileImageUrl, role }) => (
+                    <li className="small-meeting-member" key={userId}>
+                      <img src={getSecureImageUrl(profileImageUrl) || profileIcon} alt="" />
+                      <span>{name}</span>
+                      {role === 'LEADER' && <span className="small-meeting-member-role">리더</span>}
+                      {role === 'MEMBER' && <span className="small-meeting-member-role">멤버</span>}
+                    </li>
+                  ))}
+                </ul>
+              )}
+            </section>
           </article>
         )}
         <GuardedButton className="small-meeting-back" type="button" onClick={() => navigate(`/project/${projectId}/smallMeetingList`, { state: { projectTitle } })}><ArrowLeft size={16} aria-hidden="true" /> 목록</GuardedButton>
