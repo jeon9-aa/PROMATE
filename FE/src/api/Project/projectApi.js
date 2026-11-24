@@ -1,15 +1,5 @@
 import apiClient from '../apiClient';
 
-export const updateProject = async (projectId, payload) => {
-  const { data } = await apiClient.put(
-    `/projects/${encodeURIComponent(projectId)}`,
-    payload,
-  );
-
-  if (data?.isSuccess === true) return data.data;
-  throw new Error(data?.message || '프로젝트 정보 갱신 결과를 확인하지 못했습니다.');
-};
-
 export const getProjectSubgroups = async (projectId, signal) => {
   const { data } = await apiClient.get(`/projects/${encodeURIComponent(projectId)}/subgroups`, { signal });
   const payload = data?.data ?? data;

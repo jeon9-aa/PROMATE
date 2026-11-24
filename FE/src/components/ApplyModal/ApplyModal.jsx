@@ -2,7 +2,7 @@ import GuardedForm from '../GuardedForm/GuardedForm.jsx';
 import GuardedButton from '../GuardedButton/GuardedButton.jsx';
 import { useEffect, useState, useRef } from "react";
 import "./ApplyModal.css";
-import { getApplicationForm, postApplication, getMyApplication, updateMyApplication, cancelMyApplication } from "../../api/Recruits/recruitmentApi";
+import { getApplicationForm, postApplication } from "../../api/Recruits/recruitmentApi";
 
 function ApplyModal({
   isOpen,
@@ -14,56 +14,28 @@ function ApplyModal({
   motivation,
   setJob,
   setMotivation,
-  isApplied = false,
-  applicationId,
-  onCancel,
 }) {
   const [fetchedTitle, setFetchedTitle] = useState("");
-  const [isLoading, setIsLoading] = useState(true);
-  const [loadError, setLoadError] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const [isEditing, setIsEditing] = useState(false);
   const submitLockRef = useRef(false);
-  const savedApplicationRef = useRef({ job: "", motivation: "" });
 
   useEffect(() => {
     const previousOverflow = document.body.style.overflow;
-    let active = true;
 
     if (isOpen) {
       document.body.style.overflow = "hidden";
-      setIsLoading(true);
-      setLoadError("");
-      setFetchedTitle("");
-      setIsEditing(false);
 
       if (recruitmentId) {
         const fetchApplyData = async () => {
           try {
-            if (isApplied && applicationId == null) throw new Error("지원서 ID를 확인할 수 없습니다. 페이지를 새로고침해주세요.");
-            const response = await (isApplied ? getMyApplication(recruitmentId, applicationId) : getApplicationForm(recruitmentId));
-            if (!active) return;
+            const response = await getApplicationForm(recruitmentId);
             const isSuccess = response?.data?.isSuccess ?? response?.isSuccess;
             if (isSuccess) {
               const data = response?.data?.data ?? response?.data;
               setFetchedTitle(data?.recruitmentTitle);
-              if (isApplied) {
-                const saved = {
-                  job: data?.objective ?? "",
-                  motivation: data?.prContent ?? data?.introduction ?? "",
-                };
-                savedApplicationRef.current = saved;
-                setJob(saved.job);
-                setMotivation(saved.motivation);
-              }
-            } else {
-              throw new Error(response?.message || "지원서를 불러오지 못했습니다.");
             }
           } catch (error) {
             console.error("지원서 작성용 데이터 로드 실패:", error);
-            if (active) setLoadError(error.message || "지원서를 불러오지 못했습니다.");
-          } finally {
-            if (active) setIsLoading(false);
           }
         };
         fetchApplyData();
@@ -71,16 +43,15 @@ function ApplyModal({
     }
 
     return () => {
-      active = false;
       document.body.style.overflow = previousOverflow;
     };
-  }, [isOpen, recruitmentId, applicationId, isApplied, setJob, setMotivation]);
+  }, [isOpen, recruitmentId]);
 
   if (!isOpen) return null;
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    if (submitLockRef.current || isLoading || loadError || (isApplied && !isEditing)) return;
+    if (submitLockRef.current) return;
 
     submitLockRef.current = true;
     setIsSubmitting(true);
@@ -90,14 +61,12 @@ function ApplyModal({
         prContent: motivation
       };
 
-      const response = await (isApplied
-        ? updateMyApplication(recruitmentId, applicationId, applicationData)
-        : postApplication(recruitmentId, applicationData));
+      const response = await postApplication(recruitmentId, applicationData);
       
       const isSuccess = response?.data?.isSuccess ?? response?.isSuccess;
       if (isSuccess) {
-        alert(isApplied ? "지원서가 수정되었습니다." : "지원이 완료되었습니다.");
-        onSubmit?.(response?.data?.data ?? response?.data);
+        alert("지원이 완료되었습니다.");
+        onSubmit?.();
         onClose?.();
       } else {
         const errorMsg = response?.data?.message ?? response?.message ?? "지원 처리 중 문제가 발생했습니다.";
@@ -116,32 +85,6 @@ function ApplyModal({
     }
   };
 
-  const handleCancel = async () => {
-    if (submitLockRef.current || isLoading || loadError) return;
-    if (!window.confirm("지원을 취소하시겠습니까?")) return;
-    submitLockRef.current = true;
-    setIsSubmitting(true);
-    try {
-      const response = await cancelMyApplication(recruitmentId, applicationId);
-      if (!response?.isSuccess) throw new Error(response?.message || "지원 취소에 실패했습니다.");
-      alert("지원이 취소되었습니다.");
-      onCancel?.();
-      onClose?.();
-    } catch (error) {
-      alert(error.message || "지원 취소에 실패했습니다.");
-    } finally {
-      submitLockRef.current = false;
-      setIsSubmitting(false);
-    }
-  };
-
-  const handleCancelEdit = () => {
-    if (submitLockRef.current) return;
-    setJob(savedApplicationRef.current.job);
-    setMotivation(savedApplicationRef.current.motivation);
-    setIsEditing(false);
-  };
-
   const handleOverlayClick = (e) => {
     if (!submitLockRef.current && e.target === e.currentTarget) {
       onClose?.();
@@ -150,11 +93,8 @@ function ApplyModal({
 
   return (
     <div className="apply-modal-overlay" onClick={handleOverlayClick}>
-      <div className="apply-modal" role="dialog" aria-modal="true" aria-label={isApplied ? "내 지원서" : "지원서 작성"}>
-        <button type="button" className="apply-modal-close-btn" onClick={onClose} disabled={isSubmitting} aria-label="닫기">×</button>
+      <div className="apply-modal">
         <h2 className="apply-modal-title">{fetchedTitle || projectName}</h2>
-        {isLoading && <p role="status">지원서를 불러오는 중입니다...</p>}
-        {loadError && <p role="alert">{loadError}</p>}
 
         <GuardedForm className="apply-modal-form" onSubmit={handleSubmit}>
           <div className="apply-modal-group">
@@ -166,8 +106,6 @@ function ApplyModal({
               type="text"
               className="apply-modal-input"
               value={job}
-              readOnly={isApplied && !isEditing}
-              disabled={isLoading || !!loadError || isSubmitting}
               onChange={(e) => setJob(e.target.value)}
               maxLength={50}
               placeholder="기여하고 싶은 분야를 적어주세요."
@@ -185,8 +123,6 @@ function ApplyModal({
               id="apply-motivation"
               className="apply-modal-textarea"
               value={motivation}
-              readOnly={isApplied && !isEditing}
-              disabled={isLoading || !!loadError || isSubmitting}
               onChange={(e) => setMotivation(e.target.value)}
               required
               maxLength={500}
@@ -198,31 +134,18 @@ function ApplyModal({
             <GuardedButton
               type="button"
               className="apply-modal-cancel-btn"
-              onClick={isApplied ? (isEditing ? handleCancelEdit : handleCancel) : onClose}
-              disabled={isSubmitting || (isApplied && (isLoading || !!loadError))}
+              onClick={onClose}
+              disabled={isSubmitting}
             >
-              {isApplied && !isEditing ? "지원 취소" : "취소"}
+              취소
             </GuardedButton>
-            {isApplied && !isEditing ? (
-              <GuardedButton
-                key="edit"
-                type="button"
-                className="apply-modal-submit-btn"
-                onClick={() => setIsEditing(true)}
-                disabled={isSubmitting || isLoading || !!loadError}
-              >
-                지원서 수정
-              </GuardedButton>
-            ) : (
-              <GuardedButton
-                key="submit"
-                type="submit"
-                className="apply-modal-submit-btn"
-                disabled={isSubmitting || isLoading || !!loadError}
-              >
-                {isSubmitting ? "처리 중..." : isApplied ? "완료" : "지원하기"}
-              </GuardedButton>
-            )}
+            <GuardedButton
+              type="submit" 
+              className="apply-modal-submit-btn"
+              disabled={isSubmitting}
+            >
+              {isSubmitting ? "지원중..." : "지원하기"}
+            </GuardedButton>
           </div>
         </GuardedForm>
       </div>

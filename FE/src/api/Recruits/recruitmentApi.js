@@ -31,18 +31,3 @@ export const postApplication = async (recruitmentId, applicationData) => {
 
   return response.data;
 };
-// The server checks application ownership using the access token.
-export const getMyApplication = async (recruitmentId, applicationId) => {
-  const response = await apiClient.get(`/recruitments/${recruitmentId}/applications/${applicationId}`);
-  return response.data;
-};
-
-export const updateMyApplication = async (recruitmentId, applicationId, applicationData) => {
-  const response = await apiClient.put(`/recruitments/${recruitmentId}/applications/${applicationId}`, applicationData);
-  return response.data;
-};
-
-export const cancelMyApplication = async (recruitmentId, applicationId) => {
-  const response = await apiClient.delete(`/recruitments/${recruitmentId}/applications/${applicationId}`);
-  return response.data;
-};
