@@ -23,9 +23,9 @@ export const updateProjectStatus = async (projectId, status) => {
   throw new Error(data?.message || '프로젝트 상태 변경 결과를 확인하지 못했습니다.');
 };
 
-export const updateProject = async (projectId, { title, category, cotent, startDate, endDate, thumbnail }) => {
+export const updateProject = async (projectId, { title, category, content, startDate, endDate, thumbnail }) => {
   const { data } = await apiClient.put(`/projects/${encodeURIComponent(projectId)}`, {
-    title, category, cotent, startDate, endDate, thumbnail,
+    title, category, content, startDate, endDate, thumbnail,
   });
   if (data?.isSuccess === true) return data.data;
   throw new Error(data?.message || '프로젝트 정보 갱신 결과를 확인하지 못했습니다.');
