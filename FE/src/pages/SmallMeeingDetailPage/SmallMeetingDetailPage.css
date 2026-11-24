@@ -144,20 +144,17 @@
 }
 
 .small-meeting-delete {
-  min-height: 41px;
-  padding: 8px 24px;
+  padding: 8px 12px;
   border: 0;
   border-radius: 5px;
-  background: #de0000;
-  color: #fff;
-  font: inherit;
-  font-size: 17px;
-  font-weight: 600;
+  background: transparent;
+  color: #de0000;
+  font: 600 16px/19px 'Pretendard', sans-serif;
   white-space: nowrap;
   cursor: pointer;
 }
 
-.small-meeting-delete:hover:not(:disabled) { background: #d32f2f; }
+.small-meeting-delete:hover:not(:disabled) { background: #f8f9fa; }
 .small-meeting-delete:disabled { opacity: 0.55; cursor: not-allowed; }
 
 @media (max-width: 768px) {
