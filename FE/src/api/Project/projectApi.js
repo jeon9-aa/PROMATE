@@ -19,6 +19,13 @@ export const getProjectSubgroup = async (projectId, subgroupId, signal) => {
   throw new Error('Unexpected subgroup detail response');
 };
 
+export const deleteProjectSubgroup = async (projectId, subgroupId, signal) => {
+  await apiClient.delete(
+    `/projects/${encodeURIComponent(projectId)}/subgroups/${encodeURIComponent(subgroupId)}`,
+    { signal },
+  );
+};
+
 export const getProjectSubgroupMembers = async (projectId, subgroupId, signal) => {
   const { data } = await apiClient.get(
     `/projects/${encodeURIComponent(projectId)}/subgroups/${encodeURIComponent(subgroupId)}/members`,

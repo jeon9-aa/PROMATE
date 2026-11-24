@@ -1,10 +1,10 @@
 import '../../components/TeamPageMenu/ProjectTitleButton.css';
 import TeamPageMenu from '../../components/TeamPageMenu/TeamPageMenu.jsx';
 import GuardedButton from '../../components/GuardedButton/GuardedButton.jsx';
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { useLocation, useNavigate, useParams } from 'react-router-dom';
 import { ArrowLeft, Users } from 'lucide-react';
-import { getProjectSubgroup, getProjectSubgroupMembers, joinProjectSubgroup } from '../../api/Project/projectApi';
+import { deleteProjectSubgroup, getProjectSubgroup, getProjectSubgroupMembers, joinProjectSubgroup } from '../../api/Project/projectApi';
 import profileIcon from '../../assets/icons/profileIcon.svg';
 import { getSecureImageUrl } from '../../utils/imageUrl';
 import useProjectTitle from '../../utils/useProjectTitle';
@@ -20,6 +20,7 @@ export default function SmallMeetingDetailPage() {
   const projectTitle = useProjectTitle(projectId, state?.projectTitle);
   const [result, setResult] = useState(null);
   const [memberResult, setMemberResult] = useState(null);
+  const pageRequest = useRef(null);
   const currentResult = result?.projectId === projectId && result?.meetingId === meetingId ? result : null;
   const subgroup = currentResult?.subgroup;
   const hasJoined = subgroup?.joined === true;
@@ -32,6 +33,7 @@ export default function SmallMeetingDetailPage() {
 
   useEffect(() => {
     const controller = new AbortController();
+    pageRequest.current = controller;
     getProjectSubgroup(projectId, meetingId, controller.signal)
       .then((subgroup) => {
         if (controller.signal.aborted) return;
@@ -65,14 +67,33 @@ export default function SmallMeetingDetailPage() {
 
     try {
       const { status, currentCount, capacity } = await joinProjectSubgroup(projectId, meetingId);
-      setResult((previous) => previous === currentResult ? {
+      setResult((previous) => previous?.subgroup === subgroup ? {
         ...previous,
         joinError: '',
         subgroup: { ...previous.subgroup, status, currentCount, capacity, joined: true },
       } : previous);
     } catch (error) {
       const joinError = error.response?.data?.message || '소모임에 참여하지 못했습니다. 다시 시도해 주세요.';
-      setResult((previous) => previous === currentResult ? { ...previous, joinError } : previous);
+      setResult((previous) => previous?.subgroup === subgroup ? { ...previous, joinError } : previous);
+    }
+  };
+
+  const handleDelete = async () => {
+    if (!subgroup || !window.confirm('이 소모임을 삭제하시겠습니까?')) return;
+
+    const { signal } = pageRequest.current;
+    setResult((previous) => ({ ...previous, deleteError: '' }));
+    try {
+      await deleteProjectSubgroup(projectId, meetingId, signal);
+      if (signal.aborted) return;
+      navigate(`/project/${projectId}/smallMeetingList`, {
+        replace: true,
+        state: { projectTitle, dueDate: state?.dueDate },
+      });
+    } catch (error) {
+      if (signal.aborted) return;
+      const deleteError = error.response?.data?.message || '소모임을 삭제하지 못했습니다. 다시 시도해 주세요.';
+      setResult((previous) => ({ ...previous, deleteError }));
     }
   };
 
@@ -137,6 +158,12 @@ export default function SmallMeetingDetailPage() {
           </article>
         )}
         <GuardedButton className="small-meeting-back" type="button" onClick={() => navigate(`/project/${projectId}/smallMeetingList`, { state: { projectTitle } })}><ArrowLeft size={16} aria-hidden="true" /> 목록</GuardedButton>
+        {subgroup && (
+          <GuardedButton className="small-meeting-back small-meeting-delete" type="button" onClick={handleDelete}>
+            소모임 삭제
+          </GuardedButton>
+        )}
+        {currentResult?.deleteError && <p role="alert">{currentResult.deleteError}</p>}
       </div>
     </div>
   );
