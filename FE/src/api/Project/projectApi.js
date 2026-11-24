@@ -1,5 +1,24 @@
 import apiClient from '../apiClient';
 
+export const getProjectSettings = async (projectId) => {
+  const { data: projects } = await apiClient.get('/projects/me');
+  const project = projects?.data?.find?.((item) => String(item.projectId) === String(projectId));
+  let recruitmentId = project?.recruitmentId;
+  if (recruitmentId == null) {
+    const { data: recruitments } = await apiClient.get('/recruitments/me');
+    const recruitment = recruitments?.data?.find?.((item) => String(item.projectId) === String(projectId));
+    recruitmentId = recruitment?.recruitmentId ?? recruitment?.postId;
+  }
+  if (recruitmentId == null) {
+    throw new Error('연결된 모집글을 찾을 수 없습니다. 프로젝트 조회 응답의 recruitmentId 또는 모집글 목록의 projectId가 필요합니다.');
+  }
+  const { data } = await apiClient.get(`/recruitments/${encodeURIComponent(recruitmentId)}`);
+  if (data?.isSuccess !== true || !data.data || String(data.data.projectId) !== String(projectId)) {
+    throw new Error('프로젝트 소개를 불러오지 못했습니다.');
+  }
+  return { ...data.data, status: project?.status, recruitmentId };
+};
+
 export const removeProjectMember = async (projectId, memberId) => {
   const { data } = await apiClient.delete(
     `/projects/${encodeURIComponent(projectId)}/members/${encodeURIComponent(memberId)}`,

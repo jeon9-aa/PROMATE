@@ -1,6 +1,6 @@
-import { useRef, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { useLocation, useNavigate, useParams } from 'react-router-dom';
-import { updateProject, updateProjectStatus } from '../../api/Project/projectApi';
+import { getProjectSettings, updateProject, updateProjectStatus } from '../../api/Project/projectApi';
 import GuardedButton from '../../components/GuardedButton/GuardedButton.jsx';
 import '../../components/TeamPageMenu/ProjectTitleButton.css';
 import MainButton from '../../components/MainButton/MainButton';
@@ -18,15 +18,6 @@ const categories = [
   { id: 'DEV', label: '개발' },
   { id: 'ETC', label: '기타' },
 ];
-
-// 정보 조회 API 연결 전 디자인 확인용 데이터
-const previewProject = {
-  title: '캡스톤 디자인',
-  category: 'PROJECT',
-  description: '프로젝트 설명입니다.',
-  startDate: '2026-05-02',
-  endDate: '2026-05-02',
-};
 
 function formatDate(value) {
   if (!value) return '미정';
@@ -56,6 +47,22 @@ export default function ProjectSettingsPage() {
   const { state } = location;
   const projectTitle = useProjectTitle(projectId, state?.projectTitle);
   const [savedProject, setSavedProject] = useState(null);
+  const [loadedProject, setLoadedProject] = useState(null);
+  const [loadError, setLoadError] = useState('');
+  const [loadAttempt, setLoadAttempt] = useState(0);
+  useEffect(() => {
+    let cancelled = false;
+    getProjectSettings(projectId).then((data) => {
+      if (!cancelled) {
+        setLoadedProject({ id: projectId, data });
+        setLoadError('');
+      }
+    }).catch((error) => {
+      if (!cancelled) setLoadError(error.message || '프로젝트 정보를 불러오지 못했습니다.');
+    });
+    return () => { cancelled = true; };
+  }, [projectId, loadAttempt]);
+  const isLoaded = loadedProject?.id === projectId;
   const [draft, setDraft] = useState(null);
   const [isSaving, setIsSaving] = useState(false);
   const savingRef = useRef(false);
@@ -63,13 +70,14 @@ export default function ProjectSettingsPage() {
   const [saveNotice, setSaveNotice] = useState('');
   const [activeTab, setActiveTab] = useState('info');
   const [isRecruiting, setIsRecruiting] = useState(true);
-  const sourceProject = state?.project || previewProject;
+  const sourceProject = isLoaded ? loadedProject.data : {};
   const project = savedProject || {
     ...sourceProject,
     description: sourceProject.content ?? sourceProject.description ?? '',
-    thumbnail: sourceProject.thumbnail ?? sourceProject.imageUrl ?? null,
-    title: projectTitle || sourceProject.title,
-    endDate: state?.dueDate || sourceProject.endDate,
+    thumbnail: sourceProject.thumbnail ?? sourceProject.recruitImageUrl ?? sourceProject.imageUrl ?? null,
+    title: sourceProject.title || projectTitle || '',
+    startDate: sourceProject.startDate?.slice(0, 10).replaceAll('.', '-'),
+    endDate: sourceProject.endDate?.slice(0, 10).replaceAll('.', '-'),
   };
   const isEditing = draft !== null;
   const values = draft || project;
@@ -117,7 +125,7 @@ export default function ProjectSettingsPage() {
 
   const handleSave = async (event) => {
     event.preventDefault();
-    if (savingRef.current || statusRequestRef.current || isCompleted || !projectId || !draft?.title.trim()) return;
+    if (!isLoaded || savingRef.current || statusRequestRef.current || isCompleted || !projectId || !draft?.title.trim()) return;
     const totalSlots = Number(draft.totalSlots);
     if (draft.totalSlots == null || String(draft.totalSlots).trim() === '' || !Number.isSafeInteger(totalSlots) || totalSlots < 0) {
       setSaveError('모집 인원을 0 이상의 정수로 입력해주세요.');
@@ -218,6 +226,7 @@ export default function ProjectSettingsPage() {
       {activeTab === 'info' ? (
       <form className={`project-settings-card${isEditing ? ' is-editing' : ''}`} id="project-settings-info" role="tabpanel" aria-labelledby="project-settings-info-tab" onSubmit={handleSave}>
         <h2>프로젝트 정보 관리</h2>
+        {!isLoaded && (loadError ? <div role="alert"><p>{loadError}</p><button type="button" onClick={() => { setLoadError(''); setLoadAttempt((value) => value + 1); }}>다시 시도</button></div> : <p role="status">프로젝트 정보를 불러오는 중입니다.</p>)}
         <div className="project-settings-fields">
           <div className="project-settings-identity">
             <div className="project-settings-image">
@@ -301,7 +310,7 @@ export default function ProjectSettingsPage() {
                 <MainButton className="project-settings-edit" type="submit" disabled={isSaving}>{isSaving ? '저장 중...' : '저장하기'}</MainButton>
               </>
             ) : (
-              <MainButton className="project-settings-edit" disabled={isChangingStatus || isCompleted} onClick={() => { setDraft({ ...project }); setSaveError(''); setSaveNotice(''); }}>수정하기</MainButton>
+              <MainButton className="project-settings-edit" disabled={!isLoaded || isChangingStatus || isCompleted} onClick={() => { setDraft({ ...project }); setSaveError(''); setSaveNotice(''); }}>수정하기</MainButton>
             )}
           </div>
         </div>
