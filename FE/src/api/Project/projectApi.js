@@ -1,14 +1,13 @@
 import apiClient from '../apiClient';
-import { findProjectRecruitment } from './findProjectRecruitment';
 
 export const getProjectSettings = async (projectId) => {
   const { data: projects } = await apiClient.get('/projects/me');
-  let project = projects?.data?.find?.((item) => String(item.projectId) === String(projectId));
-  if (project?.recruitmentId == null) {
-    const { data: activities } = await apiClient.get('/projects/activity/me');
-    const activity = activities?.data?.find?.((item) => String(item.projectId) === String(projectId));
-    if (activity) project = { ...activity, ...project, recruitmentId: activity.recruitmentId };
+  if (projects?.isSuccess !== true || !Array.isArray(projects.data)) {
+    throw new Error('프로젝트 목록을 불러오지 못했습니다.');
   }
+  const project = projects.data.find((item) => String(item.projectId) === String(projectId));
+  if (!project) throw new Error('참여 중인 프로젝트를 찾을 수 없습니다.');
+  if (project.recruitmentId == null) throw new Error('프로젝트의 모집글 연결 정보가 없습니다.');
   const getDetail = async (id) => {
     const { data } = await apiClient.get(`/recruitments/${encodeURIComponent(id)}`);
     if (data?.isSuccess !== true || !data.data) throw new Error('프로젝트 소개를 불러오지 못했습니다.');
@@ -21,20 +20,16 @@ export const getProjectSettings = async (projectId) => {
     }
     return {
       ...recruitment,
+      title: project.title ?? recruitment.title,
+      startDate: project.startDate ?? recruitment.startDate,
+      endDate: project.endDate ?? recruitment.endDate,
+      thumbnail: project.recruitImageUrl !== undefined ? project.recruitImageUrl : recruitment.recruitImageUrl,
       projectId: project.projectId,
       recruitmentId: project.recruitmentId,
       recruitmentStatus: recruitment.status,
       status: project.projectStatus ?? project.status,
     };
   }
-  const recruitment = await findProjectRecruitment(projectId, {
-    getPage: async (page) => {
-      const { data } = await apiClient.get('/recruitments/me', { params: { page, size: 20 } });
-      return data?.data;
-    },
-    getDetail,
-  });
-  return { ...recruitment, recruitmentStatus: recruitment.status, status: project?.projectStatus ?? project?.status };
 };
 
 export const updateRecruitmentStatus = async (recruitmentId, status) => {
