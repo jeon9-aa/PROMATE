@@ -66,7 +66,7 @@ export default function ProjectSettingsPage() {
   const sourceProject = state?.project || previewProject;
   const project = savedProject || {
     ...sourceProject,
-    description: sourceProject.cotent ?? sourceProject.description ?? '',
+    description: sourceProject.content ?? sourceProject.description ?? '',
     thumbnail: sourceProject.thumbnail ?? sourceProject.imageUrl ?? null,
     title: projectTitle || sourceProject.title,
     endDate: state?.dueDate || sourceProject.endDate,
@@ -121,7 +121,7 @@ export default function ProjectSettingsPage() {
     const payload = {
       title: draft.title.trim(),
       category: draft.category,
-      cotent: draft.description || '',
+      content: draft.description || '',
       startDate: draft.startDate?.slice(0, 10),
       endDate: draft.endDate?.slice(0, 10),
       thumbnail: draft.thumbnail ?? null,
@@ -136,7 +136,7 @@ export default function ProjectSettingsPage() {
     setSaveNotice('');
     try {
       await updateProject(projectId, payload);
-      const updatedProject = { ...draft, ...payload, description: payload.cotent };
+      const updatedProject = { ...draft, ...payload, description: payload.content };
       setSavedProject(updatedProject);
       setDraft(null);
       try { sessionStorage.setItem(`promate-project-title:${projectId}`, payload.title); } catch { /* Storage unavailable. */ }
