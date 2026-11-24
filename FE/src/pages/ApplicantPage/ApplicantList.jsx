@@ -4,6 +4,7 @@ import ApplicantBox from '../../components/ApplicantBox/ApplicantBox';
 import Pagination from '../../components/Pagination/Pagination';
 import { getMyRecruitments } from '../../api/RecruitApi';
 import apiClient from '../../api/apiClient';
+import { resolveRecruitmentImages } from '../../api/Recruits/resolveRecruitmentImages.js';
 import './ApplicantPage.css';
 
 const CATEGORY_LABEL = {
@@ -21,6 +22,23 @@ const ApplicantList = () => {
   const [recruitments, setRecruitments] = useState([]);
   const [loading, setLoading] = useState(false);
   const [currentPage, setCurrentPage] = useState(1);
+  const [visibleRecruitments, setVisibleRecruitments] = useState([]);
+
+  useEffect(() => {
+    let cancelled = false;
+    const page = recruitments.slice(
+      (currentPage - 1) * ITEMS_PER_PAGE,
+      currentPage * ITEMS_PER_PAGE,
+    );
+    setVisibleRecruitments(page);
+    resolveRecruitmentImages(page, async (id) => {
+      const response = await apiClient.get(`/recruitments/${id}`);
+      return response.data?.data;
+    }).then((resolved) => {
+      if (!cancelled) setVisibleRecruitments(resolved);
+    });
+    return () => { cancelled = true; };
+  }, [recruitments, currentPage]);
 
   const fetchRecruitments = () => {
     setLoading(true);
@@ -62,10 +80,6 @@ const ApplicantList = () => {
   };
 
   const totalPages = Math.ceil(recruitments.length / ITEMS_PER_PAGE);
-  const currentRecruitments = recruitments.slice(
-    (currentPage - 1) * ITEMS_PER_PAGE,
-    currentPage * ITEMS_PER_PAGE
-  );
 
   return (
     <main className="al-page">
@@ -79,7 +93,7 @@ const ApplicantList = () => {
             등록된 모집글이 없습니다.
           </div>
         )}
-        {!loading && currentRecruitments.map((recruitment) => {
+        {!loading && visibleRecruitments.map((recruitment) => {
           const isClosed = recruitment.status === 'COMPLETED' || recruitment.status === 'CANCELLED';
           const targetId = recruitment.recruitmentId || recruitment.id || recruitment.postId;
           return (
