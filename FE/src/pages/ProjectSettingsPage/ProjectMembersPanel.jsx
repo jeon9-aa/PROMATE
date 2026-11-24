@@ -125,8 +125,13 @@ export default function ProjectMembersPanel({ projectId }) {
       throw new Error('프로젝트 또는 멤버 ID를 확인할 수 없습니다. 멤버 목록의 memberId를 확인해주세요.');
     }
     setMessage('');
-    await updateProjectMemberRole(projectId, memberId, role);
-    setMembers((current) => current.map((member) => member.memberId === memberId ? { ...member, role } : member));
+    const result = await updateProjectMemberRole(projectId, memberId, role);
+    setMembers((current) => current.map((member) => member.memberId === memberId ? {
+      ...member,
+      role,
+      profileImageUrl: result?.profileImageUrl !== undefined ? result.profileImageUrl : member.profileImageUrl,
+      updatedAt: result?.updatedAt ?? member.updatedAt,
+    } : member));
     setMessage('직무가 저장되었습니다.');
   };
 
