@@ -1,5 +1,6 @@
 import { useRef, useState } from 'react';
 import { useLocation, useNavigate, useParams } from 'react-router-dom';
+import { updateProject, updateProjectStatus } from '../../api/Project/projectApi';
 import GuardedButton from '../../components/GuardedButton/GuardedButton.jsx';
 import '../../components/TeamPageMenu/ProjectTitleButton.css';
 import MainButton from '../../components/MainButton/MainButton';
@@ -39,6 +40,8 @@ export default function ProjectSettingsPage() {
   const navigate = useNavigate();
   const deleteOverlayRef = useRef(null);
   const [deleteNotice, setDeleteNotice] = useState('');
+  const [isChangingStatus, setIsChangingStatus] = useState(false);
+  const statusRequestRef = useRef(false);
   const [confirmationType, setConfirmationType] = useState('delete');
   const isEnding = confirmationType === 'end';
   const confirmationLabel = isEnding ? '종료' : '삭제';
@@ -49,15 +52,22 @@ export default function ProjectSettingsPage() {
     deleteOverlayRef.current?.showModal();
   };
   const { projectId } = useParams();
-  const { state } = useLocation();
+  const location = useLocation();
+  const { state } = location;
   const projectTitle = useProjectTitle(projectId, state?.projectTitle);
   const [savedProject, setSavedProject] = useState(null);
   const [draft, setDraft] = useState(null);
+  const [isSaving, setIsSaving] = useState(false);
+  const savingRef = useRef(false);
+  const [saveError, setSaveError] = useState('');
+  const [saveNotice, setSaveNotice] = useState('');
   const [activeTab, setActiveTab] = useState('info');
   const [isRecruiting, setIsRecruiting] = useState(true);
   const sourceProject = state?.project || previewProject;
   const project = savedProject || {
     ...sourceProject,
+    description: sourceProject.cotent ?? sourceProject.description ?? '',
+    thumbnail: sourceProject.thumbnail ?? sourceProject.imageUrl ?? null,
     title: projectTitle || sourceProject.title,
     endDate: state?.dueDate || sourceProject.endDate,
   };
@@ -65,25 +75,91 @@ export default function ProjectSettingsPage() {
   const values = draft || project;
   const hasChanges = isEditing && JSON.stringify(draft) !== JSON.stringify(project);
   const title = project.title;
+  const isCompleted = project.status === 'COMPLETED';
+
+  const handleConfirmation = async () => {
+    if (!isEnding) {
+      setDeleteNotice('프로젝트 삭제 기능은 준비 중입니다.');
+      return;
+    }
+    if (statusRequestRef.current || savingRef.current || isCompleted) return;
+    if (!projectId) {
+      setDeleteNotice('프로젝트 ID를 확인할 수 없습니다.');
+      return;
+    }
+    statusRequestRef.current = true;
+    setIsChangingStatus(true);
+    setDeleteNotice('');
+    try {
+      await updateProjectStatus(projectId, 'COMPLETED');
+      const updatedProject = { ...project, status: 'COMPLETED' };
+      setSavedProject(updatedProject);
+      setDraft(null);
+      setSaveError('');
+      setSaveNotice('프로젝트가 종료되었습니다.');
+      navigate(`${location.pathname}${location.search}${location.hash}`, {
+        replace: true,
+        state: { ...state, project: updatedProject },
+      });
+      deleteOverlayRef.current?.close();
+    } catch (error) {
+      setDeleteNotice(error.response?.data?.message || error.message || '프로젝트 종료에 실패했습니다. 다시 시도해주세요.');
+    } finally {
+      statusRequestRef.current = false;
+      setIsChangingStatus(false);
+    }
+  };
 
   const updateDraft = (field, value) => {
+    if (savingRef.current) return;
     setDraft((current) => current ? { ...current, [field]: value } : current);
   };
 
-  const handleSave = (event) => {
+  const handleSave = async (event) => {
     event.preventDefault();
-    if (!draft?.title.trim()) return;
-    // UI 확인용 저장
-    setSavedProject({ ...draft, title: draft.title.trim() });
-    setDraft(null);
+    if (savingRef.current || statusRequestRef.current || isCompleted || !projectId || !draft?.title.trim()) return;
+    const payload = {
+      title: draft.title.trim(),
+      category: draft.category,
+      cotent: draft.description || '',
+      startDate: draft.startDate?.slice(0, 10),
+      endDate: draft.endDate?.slice(0, 10),
+      thumbnail: draft.thumbnail ?? null,
+    };
+    if (!payload.startDate || !payload.endDate || payload.startDate > payload.endDate) {
+      setSaveError('프로젝트 시작일과 종료일을 확인해주세요.');
+      return;
+    }
+    savingRef.current = true;
+    setIsSaving(true);
+    setSaveError('');
+    setSaveNotice('');
+    try {
+      await updateProject(projectId, payload);
+      const updatedProject = { ...draft, ...payload, description: payload.cotent };
+      setSavedProject(updatedProject);
+      setDraft(null);
+      try { sessionStorage.setItem(`promate-project-title:${projectId}`, payload.title); } catch { /* Storage unavailable. */ }
+      navigate(`${location.pathname}${location.search}${location.hash}`, {
+        replace: true,
+        state: { ...state, project: updatedProject, projectTitle: payload.title, dueDate: payload.endDate },
+      });
+      setSaveNotice('프로젝트 정보가 저장되었습니다.');
+    } catch (error) {
+      setSaveError(error.response?.data?.message || error.message || '프로젝트 정보 저장에 실패했습니다. 다시 시도해주세요.');
+    } finally {
+      savingRef.current = false;
+      setIsSaving(false);
+    }
   };
 
   return (
     <div className="project-settings-page">
       <dialog ref={deleteOverlayRef} className="project-settings-delete-overlay"
+        onCancel={(event) => { if (statusRequestRef.current) event.preventDefault(); }}
         aria-labelledby="project-settings-delete-title" aria-describedby="project-settings-delete-description"
         onClick={(event) => {
-          if (event.target === event.currentTarget) deleteOverlayRef.current?.close();
+          if (event.target === event.currentTarget && !statusRequestRef.current) deleteOverlayRef.current?.close();
         }}>
         <div className="project-settings-delete-dialog">
           <h2 id="project-settings-delete-title">프로젝트 {confirmationLabel}</h2>
@@ -103,8 +179,8 @@ export default function ProjectSettingsPage() {
           </div>
           {deleteNotice && <p className="project-settings-delete-notice" role="status">{deleteNotice}</p>}
           <div className="project-settings-delete-dialog-actions">
-            <MainButton className="project-settings-delete-cancel" onClick={() => deleteOverlayRef.current?.close()}>취소</MainButton>
-            <MainButton className={isEnding ? 'project-settings-end-confirm' : 'project-settings-delete-confirm'} onClick={() => setDeleteNotice(`프로젝트 ${confirmationLabel} 기능은 준비 중입니다.`)}>{confirmationLabel}</MainButton>
+            <MainButton className="project-settings-delete-cancel" disabled={isChangingStatus} onClick={() => deleteOverlayRef.current?.close()}>취소</MainButton>
+            <MainButton className={isEnding ? 'project-settings-end-confirm' : 'project-settings-delete-confirm'} disabled={isChangingStatus} onClick={handleConfirmation}>{isChangingStatus ? '종료 중...' : confirmationLabel}</MainButton>
           </div>
         </div>
       </dialog>
@@ -140,9 +216,9 @@ export default function ProjectSettingsPage() {
           <div className="project-settings-identity">
             <div className="project-settings-image">
               <ProjectAvatar
-                src={values.imageUrl}
+                src={values.thumbnail}
                 size="70px"
-                onImageChange={isEditing ? (imageUrl) => updateDraft('imageUrl', imageUrl) : undefined}
+                onImageChange={isEditing && !isSaving ? (thumbnail) => updateDraft('thumbnail', thumbnail) : undefined}
               />
               {isEditing && <span className="project-settings-image-add" aria-hidden="true">+</span>}
             </div>
@@ -188,21 +264,23 @@ export default function ProjectSettingsPage() {
           </div>
         </div>
 
+        {saveError && <p role="alert">{saveError}</p>}
+        {saveNotice && <p role="status">{saveNotice}</p>}
         <hr />
         <div className="project-settings-footer">
           <div className="project-settings-management">
-            <button type="button" className="project-settings-end" onClick={() => openConfirmation('end')}>프로젝트 종료</button>
+            <button type="button" className="project-settings-end" disabled={isSaving || isChangingStatus || isEditing || isCompleted} onClick={() => openConfirmation('end')}>{isCompleted ? '종료된 프로젝트' : '프로젝트 종료'}</button>
             <button type="button" className="project-settings-delete" onClick={() => openConfirmation('delete')}>프로젝트 삭제</button>
           </div>
           <div className="project-settings-actions">
             {isEditing ? (
               <>
                 {hasChanges && <p className="project-settings-unsaved" role="status">저장하지 않은 변경 사항이 있습니다.</p>}
-                <MainButton className="project-settings-edit project-settings-cancel" onClick={() => setDraft(null)}>취소</MainButton>
-                <MainButton className="project-settings-edit" type="submit">저장하기</MainButton>
+                <MainButton className="project-settings-edit project-settings-cancel" disabled={isSaving} onClick={() => { setDraft(null); setSaveError(''); }}>취소</MainButton>
+                <MainButton className="project-settings-edit" type="submit" disabled={isSaving}>{isSaving ? '저장 중...' : '저장하기'}</MainButton>
               </>
             ) : (
-              <MainButton className="project-settings-edit" onClick={() => setDraft({ ...project })}>수정하기</MainButton>
+              <MainButton className="project-settings-edit" disabled={isChangingStatus || isCompleted} onClick={() => { setDraft({ ...project }); setSaveError(''); setSaveNotice(''); }}>수정하기</MainButton>
             )}
           </div>
         </div>
