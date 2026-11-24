@@ -1,5 +1,6 @@
 import { useRef, useState } from 'react';
 import { useLocation, useNavigate, useParams } from 'react-router-dom';
+import { updateProject } from '../../api/Project/projectApi';
 import GuardedButton from '../../components/GuardedButton/GuardedButton.jsx';
 import '../../components/TeamPageMenu/ProjectTitleButton.css';
 import MainButton from '../../components/MainButton/MainButton';
@@ -49,15 +50,22 @@ export default function ProjectSettingsPage() {
     deleteOverlayRef.current?.showModal();
   };
   const { projectId } = useParams();
-  const { state } = useLocation();
+  const location = useLocation();
+  const { state } = location;
   const projectTitle = useProjectTitle(projectId, state?.projectTitle);
   const [savedProject, setSavedProject] = useState(null);
   const [draft, setDraft] = useState(null);
+  const [isSaving, setIsSaving] = useState(false);
+  const savingRef = useRef(false);
+  const [saveError, setSaveError] = useState('');
+  const [saveNotice, setSaveNotice] = useState('');
   const [activeTab, setActiveTab] = useState('info');
   const [isRecruiting, setIsRecruiting] = useState(true);
   const sourceProject = state?.project || previewProject;
   const project = savedProject || {
     ...sourceProject,
+    description: sourceProject.cotent ?? sourceProject.description ?? '',
+    thumbnail: sourceProject.thumbnail ?? sourceProject.imageUrl ?? null,
     title: projectTitle || sourceProject.title,
     endDate: state?.dueDate || sourceProject.endDate,
   };
@@ -67,15 +75,46 @@ export default function ProjectSettingsPage() {
   const title = project.title;
 
   const updateDraft = (field, value) => {
+    if (savingRef.current) return;
     setDraft((current) => current ? { ...current, [field]: value } : current);
   };
 
-  const handleSave = (event) => {
+  const handleSave = async (event) => {
     event.preventDefault();
-    if (!draft?.title.trim()) return;
-    // UI 확인용 저장
-    setSavedProject({ ...draft, title: draft.title.trim() });
-    setDraft(null);
+    if (savingRef.current || !projectId || !draft?.title.trim()) return;
+    const payload = {
+      title: draft.title.trim(),
+      category: draft.category,
+      cotent: draft.description || '',
+      startDate: draft.startDate?.slice(0, 10),
+      endDate: draft.endDate?.slice(0, 10),
+      thumbnail: draft.thumbnail ?? null,
+    };
+    if (!payload.startDate || !payload.endDate || payload.startDate > payload.endDate) {
+      setSaveError('프로젝트 시작일과 종료일을 확인해주세요.');
+      return;
+    }
+    savingRef.current = true;
+    setIsSaving(true);
+    setSaveError('');
+    setSaveNotice('');
+    try {
+      await updateProject(projectId, payload);
+      const updatedProject = { ...draft, ...payload, description: payload.cotent };
+      setSavedProject(updatedProject);
+      setDraft(null);
+      try { sessionStorage.setItem(`promate-project-title:${projectId}`, payload.title); } catch { /* Storage unavailable. */ }
+      navigate(`${location.pathname}${location.search}${location.hash}`, {
+        replace: true,
+        state: { ...state, project: updatedProject, projectTitle: payload.title, dueDate: payload.endDate },
+      });
+      setSaveNotice('프로젝트 정보가 저장되었습니다.');
+    } catch (error) {
+      setSaveError(error.response?.data?.message || error.message || '프로젝트 정보 저장에 실패했습니다. 다시 시도해주세요.');
+    } finally {
+      savingRef.current = false;
+      setIsSaving(false);
+    }
   };
 
   return (
@@ -140,9 +179,9 @@ export default function ProjectSettingsPage() {
           <div className="project-settings-identity">
             <div className="project-settings-image">
               <ProjectAvatar
-                src={values.imageUrl}
+                src={values.thumbnail}
                 size="70px"
-                onImageChange={isEditing ? (imageUrl) => updateDraft('imageUrl', imageUrl) : undefined}
+                onImageChange={isEditing && !isSaving ? (thumbnail) => updateDraft('thumbnail', thumbnail) : undefined}
               />
               {isEditing && <span className="project-settings-image-add" aria-hidden="true">+</span>}
             </div>
@@ -188,6 +227,8 @@ export default function ProjectSettingsPage() {
           </div>
         </div>
 
+        {saveError && <p role="alert">{saveError}</p>}
+        {saveNotice && <p role="status">{saveNotice}</p>}
         <hr />
         <div className="project-settings-footer">
           <div className="project-settings-management">
@@ -198,11 +239,11 @@ export default function ProjectSettingsPage() {
             {isEditing ? (
               <>
                 {hasChanges && <p className="project-settings-unsaved" role="status">저장하지 않은 변경 사항이 있습니다.</p>}
-                <MainButton className="project-settings-edit project-settings-cancel" onClick={() => setDraft(null)}>취소</MainButton>
-                <MainButton className="project-settings-edit" type="submit">저장하기</MainButton>
+                <MainButton className="project-settings-edit project-settings-cancel" disabled={isSaving} onClick={() => { setDraft(null); setSaveError(''); }}>취소</MainButton>
+                <MainButton className="project-settings-edit" type="submit" disabled={isSaving}>{isSaving ? '저장 중...' : '저장하기'}</MainButton>
               </>
             ) : (
-              <MainButton className="project-settings-edit" onClick={() => setDraft({ ...project })}>수정하기</MainButton>
+              <MainButton className="project-settings-edit" onClick={() => { setDraft({ ...project }); setSaveError(''); setSaveNotice(''); }}>수정하기</MainButton>
             )}
           </div>
         </div>
