@@ -130,7 +130,22 @@ function ProjectReadMePage() {
           const data = response.data.data;
           setProjectData(data);
           setIsApplied(data.hasApplied);
+          if (data.isAuthor) {
             try {
+              const { data: projects } = await apiClient.get('/projects/me');
+              if (!cancelled && projects?.isSuccess && Array.isArray(projects.data)) {
+                const isActiveProject = projects.data.some((project) => (
+                  String(project.recruitmentId) === String(postId)
+                  || (data.projectId != null && String(project.projectId) === String(data.projectId))
+                ));
+                if (!isActiveProject && !['ACTIVE', 'COMPLETED'].includes(data.projectStatus)) {
+                  setDeletablePostId(postId);
+                }
+              }
+            } catch (error) {
+              console.error('프로젝트 진행 상태 조회 실패:', error);
+            }
+          }
         }
       } catch (error) {
         if (cancelled) return;
