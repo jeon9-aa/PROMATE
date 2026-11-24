@@ -13,4 +13,6 @@ public class ProjectMemberResponseDTO {
 
     private Long userId;
     private String name;
+    private Long memberId;
+    private String role;
 }

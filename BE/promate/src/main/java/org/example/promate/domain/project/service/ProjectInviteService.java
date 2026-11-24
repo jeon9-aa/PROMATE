@@ -84,6 +84,7 @@ public class ProjectInviteService {
         String inviteUrl = frontendUrl + "/invite/" + token;
 
         return new ProjectInviteCreateResponseDTO(
+                project.getId(),
                 token,
                 inviteUrl,
                 expiresAt

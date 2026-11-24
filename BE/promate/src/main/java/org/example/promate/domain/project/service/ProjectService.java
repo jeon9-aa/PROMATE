@@ -180,6 +180,8 @@ public class ProjectService {
                 .map(member -> ProjectMemberResponseDTO.builder()
                         .userId(member.getUser().getId())
                         .name(member.getUser().getName())
+                        .memberId(member.getId())
+                        .role(member.getRole())
                         .build())
                 .toList();
     }
