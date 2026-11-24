@@ -14,6 +14,11 @@ function LoginPage() {
 
     try {
       const backendUrl = await getKakaoLoginUrl();
+      if (state?.returnTo) {
+        sessionStorage.setItem("pendingLoginReturnTo", state.returnTo);
+      } else {
+        sessionStorage.removeItem("pendingLoginReturnTo");
+      }
       if (state?.inviteToken) {
         sessionStorage.setItem("pendingProjectInviteToken", state.inviteToken);
       } else {

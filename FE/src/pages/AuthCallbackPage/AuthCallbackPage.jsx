@@ -33,14 +33,25 @@ export default function AuthCallbackPage() {
           login(data.accessToken, data.refreshToken);
         }
         const inviteToken = sessionStorage.getItem("pendingProjectInviteToken");
+        const returnTo = sessionStorage.getItem("pendingLoginReturnTo");
+        const browsingReturnTo = /^\/(?:readme\/[^/?#\\\s]+|findTeam\/?)(?:[?#][^\\\s]*)?$/.test(returnTo || "")
+          ? returnTo
+          : "/dashboard";
         sessionStorage.removeItem("pendingProjectInviteToken");
-        navigate(inviteToken ? `/invite/${encodeURIComponent(inviteToken)}` : "/dashboard", {
+        sessionStorage.removeItem("pendingLoginReturnTo");
+        navigate(inviteToken ? `/invite/${encodeURIComponent(inviteToken)}` : browsingReturnTo, {
           replace: true,
         });
       } catch (err) {
         console.error("카카오 로그인 처리 실패:", err);
         alert(err.message || "로그인 처리 중 오류가 발생했습니다.");
-        navigate("/login", { replace: true });
+        navigate("/login", {
+          replace: true,
+          state: {
+            returnTo: sessionStorage.getItem("pendingLoginReturnTo"),
+            inviteToken: sessionStorage.getItem("pendingProjectInviteToken"),
+          },
+        });
       }
     };
 

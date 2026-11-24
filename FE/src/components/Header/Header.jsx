@@ -1,6 +1,6 @@
 import GuardedButton from '../GuardedButton/GuardedButton.jsx';
 import React, { useState, useEffect } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
+import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { LogOut } from 'lucide-react';
 import ChatLink from './ChatLink';
 import { getUserInfo } from '../../api/User/userProfileApi.js';
@@ -13,6 +13,7 @@ import './Header.css';
 
 function Header({ onMenuClick }) {
   const navigate = useNavigate();
+  const location = useLocation();
   const logout = useAuthStore((state) => state.logout);
   const isLoggedIn = useAuthStore((state) => state.isLoggedIn);
   const [userData, setUserData] = useState({ userName: "...", profileImageUrl: null });
@@ -90,7 +91,7 @@ function Header({ onMenuClick }) {
             </Link>
           </>
         ) : (
-          <Link to="/login" className="header-login-btn">
+          <Link to="/login" state={{ returnTo: location.pathname + location.search + location.hash }} className="header-login-btn">
             <img src={profileIcon} alt="" className="header-login-icon default-icon" />
             <img src={profileIconHover} alt="" className="header-login-icon hover-icon" />
             로그인
