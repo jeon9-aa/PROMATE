@@ -122,15 +122,21 @@ export default function SmallMeetingDetailPage() {
                 {!isClosed && subgroup.status === 'RECRUITING' && <span className="small-meeting-badge">모집 중</span>}
                 {isClosed && <span className="small-meeting-badge is-closed">마감</span>}
               </div>
-              {hasJoined ? (
-                <span role="status">참여 완료</span>
-              ) : (
-                <GuardedButton className="small-meeting-join" type="button" onClick={handleJoin} disabled={!canJoin}>
-                  참여하기
+              <div className="small-meeting-card-actions">
+                <GuardedButton className="small-meeting-delete" type="button" onClick={handleDelete}>
+                  소모임 삭제
                 </GuardedButton>
-              )}
+                {hasJoined ? (
+                  <span role="status">참여 완료</span>
+                ) : (
+                  <GuardedButton className="small-meeting-join" type="button" onClick={handleJoin} disabled={!canJoin}>
+                    참여하기
+                  </GuardedButton>
+                )}
+              </div>
             </div>
             {currentResult.joinError && <p role="alert">{currentResult.joinError}</p>}
+            {currentResult.deleteError && <p role="alert">{currentResult.deleteError}</p>}
             {subgroup.description && <p className="small-meeting-description">{subgroup.description}</p>}
             <div className="small-meeting-meta">
               <span><Users size={16} aria-hidden="true" /> 모집 인원 {subgroup.currentCount}/{subgroup.capacity}</span>
@@ -158,12 +164,6 @@ export default function SmallMeetingDetailPage() {
           </article>
         )}
         <GuardedButton className="small-meeting-back" type="button" onClick={() => navigate(`/project/${projectId}/smallMeetingList`, { state: { projectTitle } })}><ArrowLeft size={16} aria-hidden="true" /> 목록</GuardedButton>
-        {subgroup && (
-          <GuardedButton className="small-meeting-back small-meeting-delete" type="button" onClick={handleDelete}>
-            소모임 삭제
-          </GuardedButton>
-        )}
-        {currentResult?.deleteError && <p role="alert">{currentResult.deleteError}</p>}
       </div>
     </div>
   );
