@@ -1,5 +1,14 @@
 import apiClient from '../apiClient';
 
+export const updateProjectMemberRole = async (projectId, memberId, role) => {
+  const { data } = await apiClient.patch(
+    `/projects/${encodeURIComponent(projectId)}/members/${encodeURIComponent(memberId)}/role`,
+    { role },
+  );
+  if (data?.isSuccess === true) return data.data;
+  throw new Error(data?.message || '프로젝트 멤버 역할 변경 결과를 확인하지 못했습니다.');
+};
+
 export const updateProjectStatus = async (projectId, status) => {
   const { data } = await apiClient.patch(`/projects/${encodeURIComponent(projectId)}/status`, { status });
   if (data?.isSuccess === true) return data.data;

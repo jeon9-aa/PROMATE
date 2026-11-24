@@ -1,18 +1,36 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { Pencil } from 'lucide-react';
 import { getProjectMembers } from '../../api/TeamPage';
+import { updateProjectMemberRole } from '../../api/Project/projectApi';
 import ProfileAvatar from '../../components/ProfileAvatar/ProfileAvatar';
 
 function MemberRow({ member, onRoleChange, onRemove }) {
   const [role, setRole] = useState(member.role || '');
+  const [isSaving, setIsSaving] = useState(false);
+  const [error, setError] = useState('');
+  const pendingRef = useRef(false);
   const hasChanges = role !== (member.role || '');
   const isLeader = member.isLeader === true || member.projectRole === 'LEADER';
 
-  const saveRole = () => {
+  const saveRole = async () => {
     const nextRole = role.trim();
-    if (!nextRole || !hasChanges) return;
-    onRoleChange(member.userId, nextRole);
-    setRole(nextRole);
+    if (pendingRef.current || !nextRole || !hasChanges) return;
+    if (nextRole === (member.role || '')) {
+      setRole(nextRole);
+      return;
+    }
+    pendingRef.current = true;
+    setIsSaving(true);
+    setError('');
+    try {
+      await onRoleChange(member.memberId, nextRole);
+      setRole(nextRole);
+    } catch (error) {
+      setError(error.response?.data?.message || error.message || '직무 변경에 실패했습니다. 다시 시도해주세요.');
+    } finally {
+      pendingRef.current = false;
+      setIsSaving(false);
+    }
   };
 
   return (
@@ -29,6 +47,7 @@ function MemberRow({ member, onRoleChange, onRemove }) {
             aria-label={`${member.name} 직무`}
             aria-describedby="project-settings-role-help"
             value={role}
+            disabled={isSaving}
             placeholder="직무 입력"
             title={role || '직무 입력'}
             onChange={(event) => setRole(event.target.value)}
@@ -43,22 +62,25 @@ function MemberRow({ member, onRoleChange, onRemove }) {
                 event.preventDefault();
                 event.currentTarget.value = member.role || '';
                 setRole(member.role || '');
+                setError('');
                 event.currentTarget.blur();
               }
             }}
           />
           {hasChanges ? (
             <button type="button" className="project-settings-role-save"
-              aria-label={`${member.name} 직무 저장`} disabled={!role.trim()}
-              onClick={saveRole}>저장</button>
+              aria-label={`${member.name} 직무 저장`} disabled={isSaving || !role.trim()}
+              onClick={saveRole}>{isSaving ? '저장 중...' : '저장'}</button>
           ) : <Pencil className="project-settings-role-icon" size={14} aria-hidden="true" />}
         </div>
         <button type="button" className="project-settings-member-remove"
+          disabled={isSaving}
           aria-label={`${member.name} 내보내기`}
           onClick={() => {
             if (window.confirm(`${member.name} 님을 프로젝트에서 내보내시겠습니까?`)) onRemove(member.userId);
           }}>내보내기</button>
       </div>
+      {error && <p role="alert">{error}</p>}
     </li>
   );
 }
@@ -82,10 +104,14 @@ export default function ProjectMembersPanel({ projectId }) {
     return () => { cancelled = true; };
   }, [projectId, retry]);
 
-  // 변경 API 연결 전에는 현재 페이지의 목록에만 반영합니다.
-  const changeRole = (userId, role) => {
-    setMembers((current) => current.map((member) => member.userId === userId ? { ...member, role } : member));
-    setMessage('직무 변경이 화면에 반영되었습니다.');
+  const changeRole = async (memberId, role) => {
+    if (projectId == null || memberId == null) {
+      throw new Error('프로젝트 또는 멤버 ID를 확인할 수 없습니다. 멤버 목록의 memberId를 확인해주세요.');
+    }
+    setMessage('');
+    await updateProjectMemberRole(projectId, memberId, role);
+    setMembers((current) => current.map((member) => member.memberId === memberId ? { ...member, role } : member));
+    setMessage('직무가 저장되었습니다.');
   };
 
   const removeMember = (userId) => {
@@ -106,7 +132,7 @@ export default function ProjectMembersPanel({ projectId }) {
       )}
       {status === 'ready' && (members.length ? (
         <ul className="project-settings-member-list">
-          {members.map((member) => <MemberRow key={member.userId} member={member} onRoleChange={changeRole} onRemove={removeMember} />)}
+          {members.map((member) => <MemberRow key={member.memberId} member={member} onRoleChange={changeRole} onRemove={removeMember} />)}
         </ul>
       ) : <p>프로젝트 멤버가 없습니다.</p>)}
       <span className="project-settings-sr-only" role="status">{message}</span>
