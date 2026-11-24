@@ -288,7 +288,7 @@ export default function ProjectSettingsPage() {
             </div>
           </div>
 
-          <div className="project-settings-field">
+          <div className="project-settings-field project-settings-total-slots">
             <label htmlFor="project-settings-total-slots">모집 인원</label>
             <input
               id="project-settings-total-slots"
