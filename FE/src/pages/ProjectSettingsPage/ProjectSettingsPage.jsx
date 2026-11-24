@@ -159,10 +159,10 @@ export default function ProjectSettingsPage() {
     const payload = {
       title: draft.title.trim(),
       category: draft.category,
-      content: draft.description || '',
+      description: draft.description || '',
       startDate: draft.startDate?.slice(0, 10),
       endDate: draft.endDate?.slice(0, 10),
-      thumbnail: draft.thumbnail ?? null,
+      thumbnailUrl: draft.thumbnail ?? null,
       totalSlots,
     };
     if (!payload.startDate || !payload.endDate || payload.startDate > payload.endDate) {
@@ -174,10 +174,10 @@ export default function ProjectSettingsPage() {
     setSaveError('');
     setSaveNotice('');
     try {
-      const result = await updateProject(projectId, payload);
+      await updateProject(projectId, payload);
       const updatedProject = {
-        ...draft, ...payload, description: payload.content,
-        thumbnail: result?.thumbnailUrl !== undefined ? result.thumbnailUrl : payload.thumbnail,
+        ...draft, ...payload,
+        thumbnail: payload.thumbnailUrl,
       };
       setSavedProject(updatedProject);
       setDraft(null);
