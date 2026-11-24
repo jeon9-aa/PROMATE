@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import ApplicantBox from '../../components/ApplicantBox/ApplicantBox';
 import Pagination from '../../components/Pagination/Pagination';
-import { getMyRecruitments } from '../../api/RecruitApi';
+import { getMyRecruitments, getPendingApplications } from '../../api/RecruitApi';
 import apiClient from '../../api/apiClient';
 import { resolveRecruitmentImages } from '../../api/Recruits/resolveRecruitmentImages.js';
 import './ApplicantPage.css';
@@ -23,6 +23,7 @@ const ApplicantList = () => {
   const [loading, setLoading] = useState(false);
   const [currentPage, setCurrentPage] = useState(1);
   const [visibleRecruitments, setVisibleRecruitments] = useState([]);
+  const [applicantCounts, setApplicantCounts] = useState({});
 
   useEffect(() => {
     let cancelled = false;
@@ -31,6 +32,20 @@ const ApplicantList = () => {
       currentPage * ITEMS_PER_PAGE,
     );
     setVisibleRecruitments(page);
+    setApplicantCounts({});
+    page.filter((recruitment) =>
+      recruitment.status !== 'COMPLETED' && recruitment.status !== 'CANCELLED'
+    ).forEach((recruitment) => {
+      const id = recruitment.recruitmentId || recruitment.id || recruitment.postId;
+      getPendingApplications(id)
+        .then((response) => {
+          const applicants = response.data?.data?.applicants;
+          if (!cancelled && Array.isArray(applicants)) {
+            setApplicantCounts((counts) => ({ ...counts, [id]: applicants.length }));
+          }
+        })
+        .catch((err) => console.error('현재 지원자 수 조회 실패', err));
+    });
     resolveRecruitmentImages(page, async (id) => {
       const response = await apiClient.get(`/recruitments/${id}`);
       return response.data?.data;
@@ -109,6 +124,7 @@ const ApplicantList = () => {
               secondaryButtonColor="#D9D9D9"
               onSecondaryButtonClick={() => handleCompleteRecruitment(targetId)}
               buttonText={isClosed ? '모집 마감' : '지원자 검토'}
+              applicantCount={isClosed ? undefined : applicantCounts[targetId]}
               buttonColor={isClosed ? '#D9D9D9' : '#FE9A57'}
               disabled={isClosed}
               onClick={() => navigate(`/readme/${targetId}`, { state: recruitment })}

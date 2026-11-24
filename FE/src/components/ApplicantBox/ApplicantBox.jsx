@@ -11,6 +11,7 @@ function ApplicantBox({
   capacity,
   avatarSrc,
   buttonText = '지원하기',
+  applicantCount,
   buttonColor = '#FE9A57',
   buttonTextColor = '#FFFFFF',
   onButtonClick,
@@ -85,6 +86,11 @@ function ApplicantBox({
             disabled={disabled}
           >
             {buttonText}
+            {applicantCount != null && (
+              <span className="applicant-count-badge" aria-label={`현재 지원자 ${applicantCount}명`}>
+                {applicantCount}
+              </span>
+            )}
           </GuardedButton>
         </div>
       </div>
