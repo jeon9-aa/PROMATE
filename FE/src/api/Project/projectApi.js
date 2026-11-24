@@ -19,6 +19,16 @@ export const getProjectSubgroup = async (projectId, subgroupId, signal) => {
   throw new Error('Unexpected subgroup detail response');
 };
 
+export const getProjectSubgroupMembers = async (projectId, subgroupId, signal) => {
+  const { data } = await apiClient.get(
+    `/projects/${encodeURIComponent(projectId)}/subgroups/${encodeURIComponent(subgroupId)}/members`,
+    { signal },
+  );
+
+  if (data?.isSuccess && Array.isArray(data.data)) return data.data;
+  throw new Error('Unexpected subgroup members response');
+};
+
 export const joinProjectSubgroup = async (projectId, subgroupId) => {
   const { data } = await apiClient.post(
     `/projects/${encodeURIComponent(projectId)}/subgroups/${encodeURIComponent(subgroupId)}/members`,
