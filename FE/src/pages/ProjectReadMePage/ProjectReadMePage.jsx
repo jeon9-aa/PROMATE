@@ -31,6 +31,7 @@ function ProjectReadMePage() {
   const [projectData, setProjectData] = useState(null);
   const [isLoading, setIsLoading] = useState(true);
   const [deletablePostId, setDeletablePostId] = useState(null);
+  const [activeProjectId, setActiveProjectId] = useState(null);
   const canDelete = projectData?.isAuthor && deletablePostId === postId;
 
   const [isProfileModalOpen, setIsProfileModalOpen] = useState(false);
@@ -124,6 +125,7 @@ function ProjectReadMePage() {
       try {
         setIsLoading(true);
         setDeletablePostId(null);
+        setActiveProjectId(null);
         const response = await apiClient.get(`/recruitments/${postId}`);
         if (cancelled) return;
         if (response.data && response.data.isSuccess) {
@@ -131,14 +133,20 @@ function ProjectReadMePage() {
           setProjectData(data);
           setIsApplied(data.hasApplied);
           if (data.isAuthor) {
+            if (data.projectStatus === 'ACTIVE' && data.projectId != null) {
+              setActiveProjectId(data.projectId);
+            }
             try {
               const { data: projects } = await apiClient.get('/projects/me');
               if (!cancelled && projects?.isSuccess && Array.isArray(projects.data)) {
-                const isActiveProject = projects.data.some((project) => (
+                const activeProject = projects.data.find((project) => (
                   String(project.recruitmentId) === String(postId)
                   || (data.projectId != null && String(project.projectId) === String(data.projectId))
                 ));
-                if (!isActiveProject && !['ACTIVE', 'COMPLETED'].includes(data.projectStatus)) {
+                if (activeProject && data.projectStatus !== 'COMPLETED') {
+                  setActiveProjectId(activeProject.projectId ?? data.projectId ?? null);
+                }
+                if (!activeProject && !['ACTIVE', 'COMPLETED'].includes(data.projectStatus)) {
                   setDeletablePostId(postId);
                 }
               }
@@ -310,7 +318,18 @@ function ProjectReadMePage() {
         </div>
 
         {projectData.isAuthor ? (
-          canDelete && (
+          activeProjectId != null ? (
+            <div className="project-readme-apply-container">
+              <GuardedButton
+                className="project-readme-apply-btn apply"
+                onClick={() => navigate(`/project/${activeProjectId}`, {
+                  state: { projectTitle: projectData.title, dueDate: projectData.endDate },
+                })}
+              >
+                프로젝트 페이지로 이동
+              </GuardedButton>
+            </div>
+          ) : canDelete && (
           <div className="project-readme-apply-container">
             <GuardedButton
               className="project-readme-delete-btn"
