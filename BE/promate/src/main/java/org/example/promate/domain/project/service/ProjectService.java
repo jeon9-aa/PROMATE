@@ -89,6 +89,7 @@ public class ProjectService {
 
                     return MyProjectResponseDTO.builder()
                             .projectId(project.getId())
+                            .recruitmentId(project.getRecruit().getId())
                             .title(project.getTitle())
                             .recruitImageUrl(project.getThumbnailUrl()) // 추가
                             .projectStatus(project.getStatus())
@@ -134,6 +135,7 @@ public class ProjectService {
                 .toList();
         Set<Long> bookmarkedRecruitIds = bookmarkRepository.findBookmarkedRecruitIds(userId, recruitIds);
 
+
         return memberRepository
                 .findByUserIdAndProjectStatus(userId, ProjectStatus.COMPLETED)
                 .stream()
@@ -145,7 +147,6 @@ public class ProjectService {
                             );
                     return MyActivityResponseDTO.builder()
                             .projectId(member.getProject().getId())
-                            .recruitmentId(member.getProject().getRecruit().getId())
                             .title(member.getProject().getTitle())
                             .recruitImageUrl(member.getProject().getThumbnailUrl()) // 추가
                             .description(member.getProject().getDescription())

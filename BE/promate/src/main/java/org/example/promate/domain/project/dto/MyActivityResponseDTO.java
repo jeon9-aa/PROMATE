@@ -9,7 +9,6 @@ import java.time.LocalDate;
 @Builder
 public class MyActivityResponseDTO {
     private Long projectId;
-    private Long recruitmentId;
     private String title;
     private String recruitImageUrl; // 프로젝트 대표 이미지
     private Double averageReviewScore;
