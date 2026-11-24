@@ -2,6 +2,7 @@ import { useEffect, useRef, useState } from 'react';
 import { useLocation, useNavigate, useParams } from 'react-router-dom';
 import { getProjectSettings, updateProject, updateProjectStatus, updateRecruitmentStatus } from '../../api/Project/projectApi';
 import GuardedButton from '../../components/GuardedButton/GuardedButton.jsx';
+import DateInput from '../../components/DatePicker/DateInput.jsx';
 import '../../components/TeamPageMenu/ProjectTitleButton.css';
 import MainButton from '../../components/MainButton/MainButton';
 import ProjectAvatar from '../../components/ProjectAvatar/ProjectAvatar';
@@ -253,7 +254,20 @@ export default function ProjectSettingsPage() {
 
       {activeTab === 'info' ? (
       <form className={`project-settings-card${isEditing ? ' is-editing' : ''}`} id="project-settings-info" role="tabpanel" aria-labelledby="project-settings-info-tab" onSubmit={handleSave}>
-        <h2>프로젝트 정보 관리</h2>
+        <div className="project-settings-info-toolbar">
+          <h2>프로젝트 정보 관리</h2>
+          <div className="project-settings-actions">
+            {isEditing ? (
+              <>
+                {hasChanges && <p className="project-settings-unsaved" role="status">저장하지 않은 변경 사항이 있습니다.</p>}
+                <MainButton className="project-settings-edit project-settings-cancel" disabled={isSaving} onClick={() => { setDraft(null); setSaveError(''); }}>취소</MainButton>
+                <MainButton className="project-settings-edit" type="submit" disabled={isSaving}>{isSaving ? '저장 중...' : '저장하기'}</MainButton>
+              </>
+            ) : (
+              <MainButton className="project-settings-edit" disabled={!isLoaded || isChangingStatus || isCompleted} onClick={() => { setDraft({ ...project }); setSaveError(''); setSaveNotice(''); }}>수정하기</MainButton>
+            )}
+          </div>
+        </div>
         {!isLoaded && (loadError ? <div role="alert"><p>{loadError}</p><button type="button" onClick={() => { setLoadError(''); setLoadAttempt((value) => value + 1); }}>다시 시도</button></div> : <p role="status">프로젝트 정보를 불러오는 중입니다.</p>)}
         <div className="project-settings-fields">
           <div className="project-settings-identity">
@@ -312,11 +326,11 @@ export default function ProjectSettingsPage() {
             <h3 id="project-settings-period-label">프로젝트 기간</h3>
             <div className="project-settings-period" role="group" aria-labelledby="project-settings-period-label">
               {isEditing ? (
-                <input type="date" aria-label="프로젝트 시작일" required value={values.startDate?.slice(0, 10) || ''} max={values.endDate?.slice(0, 10)} onChange={(event) => updateDraft('startDate', event.target.value)} />
+                <DateInput aria-label="프로젝트 시작일" required disabled={isSaving} value={values.startDate?.slice(0, 10) || ''} max={values.endDate?.slice(0, 10)} onChange={(event) => updateDraft('startDate', event.target.value)} />
               ) : <time dateTime={project.startDate}>{formatDate(project.startDate)}</time>}
               <span>~</span>
               {isEditing ? (
-                <input type="date" aria-label="프로젝트 종료일" required value={values.endDate?.slice(0, 10) || ''} min={values.startDate?.slice(0, 10)} onChange={(event) => updateDraft('endDate', event.target.value)} />
+                <DateInput aria-label="프로젝트 종료일" required disabled={isSaving} value={values.endDate?.slice(0, 10) || ''} min={values.startDate?.slice(0, 10)} onChange={(event) => updateDraft('endDate', event.target.value)} />
               ) : <time dateTime={project.endDate}>{formatDate(project.endDate)}</time>}
             </div>
           </div>
@@ -330,17 +344,7 @@ export default function ProjectSettingsPage() {
             <button type="button" className="project-settings-end" disabled={isSaving || isChangingStatus || isEditing || isCompleted} onClick={() => openConfirmation('end')}>{isCompleted ? '종료된 프로젝트' : '프로젝트 종료'}</button>
             <button type="button" className="project-settings-delete" onClick={() => openConfirmation('delete')}>프로젝트 삭제</button>
           </div>
-          <div className="project-settings-actions">
-            {isEditing ? (
-              <>
-                {hasChanges && <p className="project-settings-unsaved" role="status">저장하지 않은 변경 사항이 있습니다.</p>}
-                <MainButton className="project-settings-edit project-settings-cancel" disabled={isSaving} onClick={() => { setDraft(null); setSaveError(''); }}>취소</MainButton>
-                <MainButton className="project-settings-edit" type="submit" disabled={isSaving}>{isSaving ? '저장 중...' : '저장하기'}</MainButton>
-              </>
-            ) : (
-              <MainButton className="project-settings-edit" disabled={!isLoaded || isChangingStatus || isCompleted} onClick={() => { setDraft({ ...project }); setSaveError(''); setSaveNotice(''); }}>수정하기</MainButton>
-            )}
-          </div>
+
         </div>
       </form>
       ) : activeTab === 'recruitment' ? (

@@ -226,13 +226,32 @@
   gap: 16px 24px;
 }
 
+.project-settings-info-toolbar {
+  position: sticky;
+  top: var(--header-height, 56px);
+  z-index: 10;
+  height: 22px;
+  background: #fff;
+}
+
 .project-settings-actions {
+  position: absolute;
+  top: -9px;
+  right: 0;
   display: flex;
   align-items: center;
   justify-content: flex-end;
   flex-wrap: wrap;
   gap: 12px 20px;
   margin-left: auto;
+}
+
+.project-settings-actions .project-settings-unsaved {
+  position: absolute;
+  top: 100%;
+  right: 0;
+  margin-top: 4px;
+  white-space: nowrap;
 }
 
 .project-settings-management {
@@ -375,8 +394,10 @@
 }
 
 .project-settings-actions .project-settings-edit {
-  height: 41px;
-  padding: 10px 24px;
+  height: 39px;
+  box-sizing: border-box;
+  padding: 0 24px;
+  line-height: 1;
   border-radius: 5px;
   font-weight: 700;
 }
@@ -430,7 +451,7 @@
   pointer-events: none;
 }
 
-.project-settings-period input[type='date'] {
+.project-settings-period input {
   width: 154px;
   max-width: 100%;
   height: 37px;
