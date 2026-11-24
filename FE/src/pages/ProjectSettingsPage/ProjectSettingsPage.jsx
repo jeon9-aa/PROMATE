@@ -186,7 +186,7 @@ export default function ProjectSettingsPage() {
         replace: true,
         state: { ...state, project: updatedProject, projectTitle: payload.title, dueDate: payload.endDate },
       });
-      setSaveNotice('프로젝트 정보가 저장되었습니다.');
+      window.alert('프로젝트 정보가 저장되었습니다.');
     } catch (error) {
       setSaveError(error.response?.data?.message || error.message || '프로젝트 정보 저장에 실패했습니다. 다시 시도해주세요.');
     } finally {
