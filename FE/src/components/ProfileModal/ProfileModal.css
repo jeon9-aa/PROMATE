@@ -164,6 +164,14 @@
   color: #000000;
 }
 
+.profile-project-manual-label {
+  margin-left: 6px;
+  font-size: 12px;
+  font-weight: 400;
+  color: #666666;
+  white-space: nowrap;
+}
+
 .project-period {
   font-family: "Pretendard";
   font-weight: 400;

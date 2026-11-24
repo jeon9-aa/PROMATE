@@ -296,7 +296,10 @@ const ProfilePage = () => {
                           {proj.title}
                         </Link>
                       ) : (
-                        <span className="proj-title">{proj.title}</span>
+                        <span className="proj-title">
+                          {proj.title}
+                          {proj.isManual && <span className="proj-manual-label">(수동 입력)</span>}
+                        </span>
                       )}
                       {proj.role && <span className="proj-role">{proj.role}</span>}
                     </div>

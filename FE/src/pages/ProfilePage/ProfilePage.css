@@ -235,13 +235,20 @@
   white-space: nowrap;
 }
 
+.proj-manual-label {
+  margin-left: 6px;
+  font-size: 12px;
+  font-weight: 400;
+  color: #666666;
+  white-space: nowrap;
+}
+
 .proj-title-link {
   text-decoration: none;
 }
 
 .proj-title-link:hover,
 .proj-title-link:focus-visible {
-  color: #ff6600;
   text-decoration: underline;
   text-underline-offset: 3px;
 }

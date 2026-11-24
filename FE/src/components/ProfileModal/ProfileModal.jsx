@@ -148,7 +148,11 @@ function ProfileModal({ isOpen, onClose, user, position }) {
 
           <div className="profile-project-list">
             {projects.map((project, index) => {
-              const title = project.title || project.projectTitle;
+              const title = project.title || project.projectTitle || project.projectName;
+              const hasValidId = (id) => id != null && id !== "" && id !== "null";
+              const isManual = project.isManual ?? ![
+                project.projectId, project.recruitmentId, project.postId,
+              ].some(hasValidId);
               const period = project.period || (project.startDate && project.endDate ? `${project.startDate} ~ ${project.endDate}` : "");
               
               const rawStatus = project.status || project.projectStatus;
@@ -160,11 +164,14 @@ function ProfileModal({ isOpen, onClose, user, position }) {
                 <div 
                   className="profile-project-item" 
                   key={index}
-                  onClick={() => handleProjectClick(project)}
-                  style={{ cursor: "pointer" }}
+                  onClick={isManual ? undefined : () => handleProjectClick(project)}
+                  style={{ cursor: isManual ? "default" : "pointer" }}
                 >
                   <div className="project-main-info">
-                    <span className="project-title">{title}</span>
+                    <span className="project-title">
+                      {title}
+                      {isManual && <span className="profile-project-manual-label">(수동 입력)</span>}
+                    </span>
                     <span className="project-period">{period}</span>
                   </div>
 
