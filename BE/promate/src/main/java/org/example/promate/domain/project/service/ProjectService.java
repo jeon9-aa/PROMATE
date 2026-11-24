@@ -181,6 +181,7 @@ public class ProjectService {
                 .stream()
                 .map(member -> ProjectMemberResponseDTO.builder()
                         .userId(member.getUser().getId())
+                        .profileImageUrl(member.getUser().getProfileImageUrl())
                         .name(member.getUser().getName())
                         .memberId(member.getId())
                         .role(member.getRole())

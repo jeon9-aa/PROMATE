@@ -10,7 +10,7 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @NoArgsConstructor
 public class ProjectMemberResponseDTO {
-
+    private String profileImageUrl;
     private Long userId;
     private String name;
     private Long memberId;

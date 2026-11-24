@@ -11,6 +11,5 @@ import java.time.LocalDateTime;
 @AllArgsConstructor
 public class RoleChangeResponseDto {
     Long memberId;
-    String profileImageUrl;
     LocalDateTime updatedAt;
 }

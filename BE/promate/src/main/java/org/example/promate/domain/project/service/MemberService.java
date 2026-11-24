@@ -44,7 +44,6 @@ public class MemberService {
 
         return RoleChangeResponseDto.builder()
                 .memberId(member.getId())
-                .profileImageUrl(member.getUser().getProfileImageUrl())
                 .updatedAt(member.getUpdatedAt())
                 .build();
     }
