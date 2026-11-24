@@ -1,12 +1,14 @@
 import { useEffect, useRef, useState } from 'react';
 import { Pencil } from 'lucide-react';
 import { getProjectMembers } from '../../api/TeamPage';
-import { updateProjectMemberRole } from '../../api/Project/projectApi';
+import { removeProjectMember, updateProjectMemberRole } from '../../api/Project/projectApi';
 import ProfileAvatar from '../../components/ProfileAvatar/ProfileAvatar';
 
 function MemberRow({ member, onRoleChange, onRemove }) {
   const [role, setRole] = useState(member.role || '');
   const [isSaving, setIsSaving] = useState(false);
+  const [isRemoving, setIsRemoving] = useState(false);
+  const isPending = isSaving || isRemoving;
   const [error, setError] = useState('');
   const pendingRef = useRef(false);
   const hasChanges = role !== (member.role || '');
@@ -33,6 +35,22 @@ function MemberRow({ member, onRoleChange, onRemove }) {
     }
   };
 
+  const handleRemove = async () => {
+    if (pendingRef.current) return;
+    if (!window.confirm(`${member.name} 님을 프로젝트에서 내보내시겠습니까?`)) return;
+    pendingRef.current = true;
+    setIsRemoving(true);
+    setError('');
+    try {
+      await onRemove(member.memberId);
+    } catch (error) {
+      setError(error.response?.data?.message || error.message || '멤버 방출에 실패했습니다. 다시 시도해주세요.');
+    } finally {
+      pendingRef.current = false;
+      setIsRemoving(false);
+    }
+  };
+
   return (
     <li className="project-settings-member-row">
       <div className="project-settings-member-person">
@@ -47,7 +65,7 @@ function MemberRow({ member, onRoleChange, onRemove }) {
             aria-label={`${member.name} 직무`}
             aria-describedby="project-settings-role-help"
             value={role}
-            disabled={isSaving}
+            disabled={isPending}
             placeholder="직무 입력"
             title={role || '직무 입력'}
             onChange={(event) => setRole(event.target.value)}
@@ -69,16 +87,14 @@ function MemberRow({ member, onRoleChange, onRemove }) {
           />
           {hasChanges ? (
             <button type="button" className="project-settings-role-save"
-              aria-label={`${member.name} 직무 저장`} disabled={isSaving || !role.trim()}
+              aria-label={`${member.name} 직무 저장`} disabled={isPending || !role.trim()}
               onClick={saveRole}>{isSaving ? '저장 중...' : '저장'}</button>
           ) : <Pencil className="project-settings-role-icon" size={14} aria-hidden="true" />}
         </div>
         <button type="button" className="project-settings-member-remove"
-          disabled={isSaving}
+          disabled={isPending}
           aria-label={`${member.name} 내보내기`}
-          onClick={() => {
-            if (window.confirm(`${member.name} 님을 프로젝트에서 내보내시겠습니까?`)) onRemove(member.userId);
-          }}>내보내기</button>
+          onClick={handleRemove}>{isRemoving ? '내보내는 중...' : '내보내기'}</button>
       </div>
       {error && <p role="alert">{error}</p>}
     </li>
@@ -114,9 +130,14 @@ export default function ProjectMembersPanel({ projectId }) {
     setMessage('직무가 저장되었습니다.');
   };
 
-  const removeMember = (userId) => {
-    setMembers((current) => current.filter((member) => member.userId !== userId));
-    setMessage('멤버가 화면의 목록에서 제외되었습니다.');
+  const removeMember = async (memberId) => {
+    if (projectId == null || memberId == null) {
+      throw new Error('프로젝트 또는 멤버 ID를 확인할 수 없습니다. 페이지를 새로고침해주세요.');
+    }
+    setMessage('');
+    await removeProjectMember(projectId, memberId);
+    setMembers((current) => current.filter((member) => member.memberId !== memberId));
+    setMessage('멤버를 성공적으로 방출했습니다.');
   };
 
   return (

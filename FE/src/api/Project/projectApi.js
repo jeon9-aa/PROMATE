@@ -1,5 +1,13 @@
 import apiClient from '../apiClient';
 
+export const removeProjectMember = async (projectId, memberId) => {
+  const { data } = await apiClient.delete(
+    `/projects/${encodeURIComponent(projectId)}/members/${encodeURIComponent(memberId)}`,
+  );
+  if (data?.isSuccess === true) return data.data;
+  throw new Error(data?.message || '프로젝트 멤버 방출 결과를 확인하지 못했습니다.');
+};
+
 export const updateProjectMemberRole = async (projectId, memberId, role) => {
   const { data } = await apiClient.patch(
     `/projects/${encodeURIComponent(projectId)}/members/${encodeURIComponent(memberId)}/role`,
