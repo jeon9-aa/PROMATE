@@ -41,7 +41,7 @@ function InvitePageContent({ inviteToken }) {
     <main className="password-invite-login-page">
       <section className="password-invite-login-panel" aria-labelledby="password-invite-title">
         <header className="password-invite-logo">
-          <img src={logoImg} alt="" width="24" height="24" />
+          <img src={logoImg} alt="" width="22" height="22" />
           <span>PRO:MATE</span>
         </header>
 
@@ -56,6 +56,11 @@ function InvitePageContent({ inviteToken }) {
 
         {isLoading && <p className="password-invite-feedback" role="status">초대 정보를 불러오는 중…</p>}
         {error && <p className="password-invite-feedback is-error" role="alert">{error}</p>}
+        {invitation && (isLoggedIn ? (
+          <PasswordInviteForm key={inviteToken} inviteToken={inviteToken} />
+        ) : (
+          <Link className="password-invite-submit" to="/login" state={{ inviteToken }}>로그인하고 계속하기</Link>
+        ))}
         {invitation && (
           <div className="password-invite-project">
             {invitation.thumbnailUrl && (
@@ -65,11 +70,6 @@ function InvitePageContent({ inviteToken }) {
             <p>유효시간: <time dateTime={invitation.expiresAt}>{formatInviteExpiry(invitation.expiresAt)}</time>까지 (한국 시간)</p>
           </div>
         )}
-        {invitation && (isLoggedIn ? (
-          <PasswordInviteForm key={inviteToken} inviteToken={inviteToken} />
-        ) : (
-          <Link to="/login" state={{ inviteToken }}>로그인하고 계속하기</Link>
-        ))}
       </section>
     </main>
   );
