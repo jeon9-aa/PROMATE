@@ -50,4 +50,4 @@ logging:
     org.hibernate.orm.jdbc.bind: OFF
 
 app:
-  frontend-url: https://https://promate-nd-six.vercel.app
+  frontend-url: https://promate-nd-six.vercel.app
