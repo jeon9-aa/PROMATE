@@ -46,10 +46,15 @@ function InvitePageContent({ inviteToken }) {
         </header>
 
         <div className="password-invite-intro">
+          {invitation?.thumbnailUrl && (
+            <img className="password-invite-thumbnail"
+              src={getSecureImageUrl(invitation.thumbnailUrl)} alt={`${invitation.projectTitle} 썸네일`}
+              onError={(event) => { event.currentTarget.hidden = true; }} />
+          )}
           <h1 id="password-invite-title">{invitation?.projectTitle || "프로젝트 초대"}</h1>
           <p id="password-invite-description">
             {inviteToken
-              ? "팀에서 설정한 숫자 4자리 초대 비밀번호를 입력해 주세요."
+              ? <>팀에서 설정한 비밀번호를<br />입력해주세요.</>
               : "팀에서 공유한 초대 링크를 열어 주세요."}
           </p>
         </div>
@@ -63,10 +68,6 @@ function InvitePageContent({ inviteToken }) {
         ))}
         {invitation && (
           <div className="password-invite-project">
-            {invitation.thumbnailUrl && (
-              <img src={getSecureImageUrl(invitation.thumbnailUrl)} alt={`${invitation.projectTitle} 썸네일`}
-                onError={(event) => { event.currentTarget.hidden = true; }} />
-            )}
             <p>유효시간: <time dateTime={invitation.expiresAt}>{formatInviteExpiry(invitation.expiresAt)}</time>까지 (한국 시간)</p>
           </div>
         )}
