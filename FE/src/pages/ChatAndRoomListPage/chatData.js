@@ -20,6 +20,12 @@ export function formatMessageTime(value) {
   return new Intl.DateTimeFormat('ko-KR', { hour: 'numeric', minute: '2-digit' }).format(new Date(value));
 }
 
+export function formatMessageDate(value) {
+  return new Intl.DateTimeFormat('ko-KR', {
+    year: 'numeric', month: 'long', day: 'numeric', weekday: 'long',
+  }).format(new Date(value));
+}
+
 export function formatRoomTime(value) {
   const date = new Date(value);
   if (date.toDateString() === new Date().toDateString()) return formatMessageTime(value);

@@ -1,8 +1,9 @@
-import { useEffect, useRef, useState } from 'react';
+import { Fragment, useEffect, useRef, useState } from 'react';
 import { Link } from 'react-router-dom';
-import { ChevronLeft, LogOut, Menu, MessageCircle, Send } from 'lucide-react';
+import { CalendarDays, ChevronLeft, LogOut, Menu, MessageCircle, Send } from 'lucide-react';
 import ProfileAvatar from '../../../components/ProfileAvatar/ProfileAvatar';
 import ChatMessage from './ChatMessage';
+import { formatMessageDate } from '../chatData';
 
 export default function ChatPanel({ room, draft, onDraftChange, onSend, onBack, onLeave, canSend = true, status = '', historyLoading = false, historyError = '', isLeaving = false }) {
   const [menuOpen, setMenuOpen] = useState(false);
@@ -59,7 +60,21 @@ export default function ChatPanel({ room, draft, onDraftChange, onSend, onBack, 
       <div className="chat-panel__messages" ref={messagesRef} role="log" aria-label="대화 내용" aria-live="polite">
         {historyLoading && <p className="chat-empty" role="status">이전 메시지를 불러오는 중입니다.</p>}
         {historyError && <p className="chat-empty" role="alert">{historyError} 페이지를 새로고침해 다시 시도해 주세요.</p>}
-        {room.messages.map((message) => <ChatMessage key={message.id} message={message} room={room} />)}
+        {room.messages.map((message, index) => {
+          const dateLabel = formatMessageDate(message.sentAt);
+          const showDate = index === 0 || dateLabel !== formatMessageDate(room.messages[index - 1].sentAt);
+          return (
+            <Fragment key={message.id}>
+              {showDate && (
+                <div className="chat-date-divider">
+                  <CalendarDays size={16} aria-hidden="true" />
+                  <time dateTime={message.sentAt}>{dateLabel}</time>
+                </div>
+              )}
+              <ChatMessage message={message} room={room} />
+            </Fragment>
+          );
+        })}
         {!historyLoading && !historyError && !room.messages.length && <p className="chat-empty">첫 메시지를 보내보세요.</p>}
       </div>
       {status && <p className="chat-connection-status" role="status">{status}</p>}
