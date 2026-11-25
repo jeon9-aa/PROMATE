@@ -1,6 +1,7 @@
 import { Fragment, useEffect, useRef, useState } from 'react';
 import { Link } from 'react-router-dom';
-import { CalendarDays, ChevronLeft, LogOut, Menu, MessageCircle, Send } from 'lucide-react';
+import { ChevronLeft, LogOut, Menu, MessageCircle, Send } from 'lucide-react';
+import calendarIcon from '../../../assets/CalendarIcon.svg';
 import ProfileAvatar from '../../../components/ProfileAvatar/ProfileAvatar';
 import ChatMessage from './ChatMessage';
 import { formatMessageDate } from '../chatData';
@@ -67,7 +68,7 @@ export default function ChatPanel({ room, draft, onDraftChange, onSend, onBack, 
             <Fragment key={message.id}>
               {showDate && (
                 <div className="chat-date-divider">
-                  <CalendarDays size={16} aria-hidden="true" />
+                  <img src={calendarIcon} width={16} height={18} alt="" />
                   <time dateTime={message.sentAt}>{dateLabel}</time>
                 </div>
               )}
