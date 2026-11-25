@@ -68,7 +68,7 @@ export default function ChatPanel({ room, draft, onDraftChange, onSend, onBack, 
             <Fragment key={message.id}>
               {showDate && (
                 <div className="chat-date-divider">
-                  <img src={calendarIcon} width={16} height={18} alt="" />
+                  <img src={calendarIcon} width={14} height={16} alt="" />
                   <time dateTime={message.sentAt}>{dateLabel}</time>
                 </div>
               )}
