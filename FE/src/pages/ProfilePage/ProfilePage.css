@@ -242,7 +242,14 @@
   white-space: nowrap;
 }
 
+.proj-title-group {
+  display: flex;
+  align-items: baseline;
+  min-width: 0;
+}
+
 .proj-manual-label {
+  flex-shrink: 0;
   margin-left: 6px;
   font-size: 12px;
   font-weight: 400;

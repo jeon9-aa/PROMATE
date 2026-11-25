@@ -297,8 +297,8 @@ const ProfilePage = () => {
                           {proj.title}
                         </Link>
                       ) : (
-                        <span className="proj-title" title={proj.title}>
-                          {proj.title}
+                        <span className="proj-title-group">
+                          <span className="proj-title" title={proj.title}>{proj.title}</span>
                           {proj.isManual && <span className="proj-manual-label">(수동 입력)</span>}
                         </span>
                       )}
