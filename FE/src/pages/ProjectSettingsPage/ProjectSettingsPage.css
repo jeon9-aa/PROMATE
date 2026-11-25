@@ -1,7 +1,7 @@
 .project-settings-page {
   box-sizing: border-box;
   min-height: calc(100vh - 56px);
-  padding: 14px 30px 0px;
+  padding: 19px 30px 0px;
   background: linear-gradient(180deg, #F0F0F0 0%, #FFFFFF 100%);
   color: #000;
   font-family: 'Pretendard', sans-serif;

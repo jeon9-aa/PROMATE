@@ -136,7 +136,6 @@ const ApplicantList = () => {
                         state: {
                           recruitmentId: targetId,
                           projectTitle: recruitment.title,
-                          recruitImageUrl: recruitment.recruitImageUrl,
                         },
                       })
               }

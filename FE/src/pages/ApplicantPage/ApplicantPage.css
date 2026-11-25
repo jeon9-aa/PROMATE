@@ -138,12 +138,6 @@
   box-sizing: border-box;
 }
 
-.ad-heading {
-  display: flex;
-  align-items: center;
-  gap: 12px;
-}
-
 .ad-title {
   margin: 0;
   font-family: 'YSpotlightOTF', 'Pretendard Variable', 'Pretendard', sans-serif;
