@@ -53,9 +53,11 @@ function InvitePageContent({ inviteToken }) {
           )}
           <h1 id="password-invite-title">{invitation?.projectTitle || "프로젝트 초대"}</h1>
           <p id="password-invite-description">
-            {inviteToken
-              ? <>팀에서 설정한 비밀번호를<br />입력해주세요.</>
-              : "팀에서 공유한 초대 링크를 열어 주세요."}
+            {!inviteToken
+              ? "팀에서 공유한 초대 링크를 열어 주세요."
+              : isLoggedIn
+                ? <>팀에서 설정한 비밀번호를 입력해주세요.</>
+                : <>프로젝트에 참여하려면 먼저 로그인해주세요.<br />로그인 후 초대 비밀번호를 입력할 수 있어요.</>}
           </p>
         </div>
 
