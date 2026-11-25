@@ -70,7 +70,7 @@ function InvitePageContent({ inviteToken }) {
         ))}
         {invitation && (
           <div className="password-invite-project">
-            <p>유효시간: <time dateTime={invitation.expiresAt}>{formatInviteExpiry(invitation.expiresAt)}</time>까지 (한국 시간)</p>
+            <p>초대링크 유효시간: <time dateTime={invitation.expiresAt}>{formatInviteExpiry(invitation.expiresAt)}</time>까지 (한국 시간)</p>
           </div>
         )}
       </section>
