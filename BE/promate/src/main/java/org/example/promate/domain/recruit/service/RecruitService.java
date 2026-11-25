@@ -113,6 +113,10 @@ public class RecruitService {
         LocalDate startDate = (recruit.getProject() != null) ? recruit.getProject().getStartDate() : null;
         LocalDate endDate = (recruit.getProject() != null) ? recruit.getProject().getEndDate() : null;
 
+        Long projectId = (recruit.getProject() != null)
+                ? recruit.getProject().getId()
+                : null;
+
         return new RecruitDetailResponse(
                 recruit.getId(),
                 recruit.getTitle(),
@@ -134,7 +138,8 @@ public class RecruitService {
                 startDate,
                 endDate,
                 recruit.getTotalSlots(),
-                recruit.getJoinedCount()
+                recruit.getJoinedCount(),
+                projectId
         );
     }
 

@@ -24,7 +24,8 @@ public record RecruitDetailResponse(
         LocalDate startDate,    // 프로젝트 시작일
         LocalDate endDate,      // 프로젝트 마감일
         int totalSlots,         // 총 모집 인원
-        int joinedCount
+        int joinedCount,
+        Long projectId
 ) {
     //모집글(부모) - 작성자(자식) 상속관계 표현
     public record AuthorDto(
