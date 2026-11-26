@@ -120,6 +120,21 @@
   border-top: 1px solid #d9d9d9;
 }
 
+.profile-section-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 12px;
+  padding-right: 5px;
+}
+
+.profile-score-caption {
+  font-size: 11px;
+  line-height: 15px;
+  color: #666666;
+  white-space: nowrap;
+}
+
 .profile-section-title {
   margin: 0;
 

@@ -147,7 +147,10 @@ function ProfileModal({ isOpen, onClose, user, position }) {
         </div>
 
         <div className="profile-project-section">
-          <h3 className="profile-section-title">프로젝트 경험</h3>
+          <div className="profile-section-header">
+            <h3 className="profile-section-title">프로젝트 경험</h3>
+            <span className="profile-score-caption">(상호평가)</span>
+          </div>
 
           <div className="profile-project-list">
             {projects.map((project, index) => {
