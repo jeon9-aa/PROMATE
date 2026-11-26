@@ -153,6 +153,9 @@ function ProfileModal({ isOpen, onClose, user, position }) {
           </div>
 
           <div className="profile-project-list">
+            {projects.length === 0 && (
+              <p className="profile-project-empty">등록된 프로젝트가 없습니다.</p>
+            )}
             {projects.map((project, index) => {
               const title = project.title || project.projectTitle || project.projectName;
               const hasValidId = (id) => id != null && id !== "" && id !== "null";

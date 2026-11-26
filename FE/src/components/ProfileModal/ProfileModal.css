@@ -154,6 +154,15 @@
   padding-right: 5px;
 }
 
+.profile-project-empty {
+  margin: 0;
+  padding: 20px 0;
+  font-size: 13px;
+  line-height: 20px;
+  color: #666666;
+  text-align: center;
+}
+
 .profile-project-list::-webkit-scrollbar {
   width: 4px;
 }
