@@ -137,9 +137,12 @@ function ProfileModal({ isOpen, onClose, user, position }) {
             <strong className="profile-name">{user?.name || user?.leaderName || "김아무개"}</strong>
           </div>
 
-          <div className="profile-task-count">
-            <span className="completed-task">{user?.completedTaskCount ?? 0}</span>
-            <span className="total-task">/{user?.totalTaskCount ?? ((user?.completedTaskCount || 0) + (user?.incompleteTaskCount || 0))}</span>
+          <div className="profile-task-summary">
+            <div className="profile-task-count">
+              <span className="completed-task">{user?.completedTaskCount ?? 0}</span>
+              <span className="total-task">/{user?.totalTaskCount ?? ((user?.completedTaskCount || 0) + (user?.incompleteTaskCount || 0))}</span>
+            </div>
+            <small className="profile-task-caption">(기한 내 완료 태스크)</small>
           </div>
         </div>
 

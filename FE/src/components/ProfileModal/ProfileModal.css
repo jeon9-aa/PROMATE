@@ -71,6 +71,20 @@
   color: #000000;
 }
 
+.profile-task-summary {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 4px;
+  flex-shrink: 0;
+}
+
+.profile-task-caption {
+  font-size: 11px;
+  line-height: 15px;
+  color: #666666;
+}
+
 .profile-task-count {
   display: flex;
   align-items: flex-end;
