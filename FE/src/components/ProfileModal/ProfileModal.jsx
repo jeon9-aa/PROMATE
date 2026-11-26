@@ -72,8 +72,9 @@ function ProfileModal({ isOpen, onClose, user, position }) {
   const projects = user?.projects ?? [];
 
   const handleProjectClick = (project) => {
+    const recruitmentId = project.recruitmentId ?? project.postId;
+    const projectId = project.projectId;
     const hasValidId = (id) => id != null && id !== "" && id !== "null";
-    const recruitmentId = [project.recruitmentId, project.postId].find(hasValidId);
 
     if (hasValidId(recruitmentId)) {
       onClose();
@@ -81,7 +82,18 @@ function ProfileModal({ isOpen, onClose, user, position }) {
       return;
     }
 
-    alert("해당 프로젝트의 소개 페이지 연결 정보가 없습니다.");
+    if (hasValidId(projectId)) {
+      onClose();
+      navigate(`/project/${projectId}`, {
+        state: {
+          projectTitle: project.projectTitle || project.title,
+          dueDate: project.endDate,
+        },
+      });
+      return;
+    }
+
+    alert("해당 프로젝트의 상세 페이지가 없습니다.");
   };
 
   const popoverStyle = isMobile
