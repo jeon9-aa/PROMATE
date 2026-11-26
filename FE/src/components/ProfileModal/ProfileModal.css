@@ -149,7 +149,7 @@
 .profile-project-list {
   display: flex;
   flex-direction: column;
-  max-height: 126px;
+  max-height: 189px;
   overflow-y: auto;
   padding-right: 5px;
 }
