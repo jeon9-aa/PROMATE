@@ -5,7 +5,7 @@ import "./ProfileModal.css";
 import closeIcon from "../../assets/icons/closeIcon.svg";
 import ProfileAvatar from "../ProfileAvatar/ProfileAvatar";
 
-function ProfileModal({ isOpen, onClose, user, position }) {
+function ProfileModal({ isOpen, onClose, user, position, hasProfileError = false }) {
   const [modalPos, setModalPos] = useState({ top: 0, left: 0 });
   const [isDragging, setIsDragging] = useState(false);
   const [isMobile, setIsMobile] = useState(false);
@@ -69,7 +69,8 @@ function ProfileModal({ isOpen, onClose, user, position }) {
 
   if (!isOpen) return null;
 
-  const projects = user?.projects ?? [];
+  const hasProjectsError = hasProfileError || !Array.isArray(user?.projects);
+  const projects = hasProjectsError ? [] : user.projects;
 
   const handleProjectClick = (project) => {
     const recruitmentId = project.recruitmentId ?? project.postId;
@@ -137,13 +138,13 @@ function ProfileModal({ isOpen, onClose, user, position }) {
             <strong className="profile-name">{user?.name || user?.leaderName || "김아무개"}</strong>
           </div>
 
-          <div className="profile-task-summary">
+          {!hasProfileError && <div className="profile-task-summary">
             <div className="profile-task-count">
               <span className="completed-task">{user?.completedTaskCount ?? 0}</span>
               <span className="total-task">/{user?.totalTaskCount ?? ((user?.completedTaskCount || 0) + (user?.incompleteTaskCount || 0))}</span>
             </div>
             <small className="profile-task-caption">(기한 내 완료 태스크)</small>
-          </div>
+          </div>}
         </div>
 
         <div className="profile-project-section">
@@ -153,7 +154,12 @@ function ProfileModal({ isOpen, onClose, user, position }) {
           </div>
 
           <div className="profile-project-list">
-            {projects.length === 0 && (
+            {hasProjectsError ? (
+              <p className="profile-project-empty" role="alert">
+                프로젝트 정보를 불러오지 못했습니다.<br />
+                잠시 후 프로필을 다시 열어 주세요.
+              </p>
+            ) : projects.length === 0 && (
               <p className="profile-project-empty">등록된 프로젝트가 없습니다.</p>
             )}
             {projects.map((project, index) => {

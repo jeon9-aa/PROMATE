@@ -77,6 +77,7 @@ function ProjectReadMePage() {
     }
   };
   const [selectedUser, setSelectedUser] = useState(null);
+  const [hasProfileError, setHasProfileError] = useState(false);
   const [modalPosition, setModalPosition] = useState(null);
 
   const [isApplyModalOpen, setIsApplyModalOpen] = useState(false);
@@ -171,6 +172,7 @@ function ProjectReadMePage() {
   }, [postId, navigate]);
 
   const handleMemberClick = async (event) => {
+    setHasProfileError(false);
     const rect = event.currentTarget.getBoundingClientRect();
     setModalPosition({
       top: rect.top,
@@ -180,13 +182,18 @@ function ProjectReadMePage() {
 
     try {
       const response = await apiClient.get(`/recruitments/${postId}/leader-profile`);
-      if (response.data && response.data.isSuccess) {
-        setSelectedUser(response.data.data);
-        setIsProfileModalOpen(true);
+      if (!response.data?.isSuccess || !response.data.data) {
+        throw new Error('팀장 프로필 응답이 올바르지 않습니다.');
       }
+      setSelectedUser(response.data.data);
+      setIsProfileModalOpen(true);
     } catch (error) {
       console.error('팀장 프로필 조회 실패:', error);
-      alert('팀장 프로필 정보를 불러오는데 실패했습니다.');
+      setSelectedUser({
+        name: projectData.author?.nickname || '알 수 없음',
+      });
+      setHasProfileError(true);
+      setIsProfileModalOpen(true);
     }
   };
 
@@ -398,6 +405,7 @@ function ProjectReadMePage() {
         isOpen={isProfileModalOpen} 
         onClose={() => setIsProfileModalOpen(false)} 
         user={selectedUser} 
+        hasProfileError={hasProfileError}
         position={modalPosition}
       />
 
