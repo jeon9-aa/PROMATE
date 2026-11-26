@@ -51,7 +51,10 @@ const ApplicantDetail = () => {
   const handleViewDetail = (person) => {
     return getApplicationDetail(recruitmentId, person.applicationId)
       .then((res) => setSelectedApplicant(res.data?.data ?? res.data))
-      .catch((err) => console.error('지원서 조회 실패', err));
+      .catch((err) => {
+        console.error('지원서 조회 실패', err);
+        alert(err.response?.data?.message || err.message || '지원서 조회에 실패했습니다. 잠시 후 다시 시도해주세요.');
+      });
   };
 
   const handleStatusChange = (applicationId, status) => {
