@@ -32,18 +32,26 @@ apiClient.interceptors.request.use(
 apiClient.interceptors.response.use(
   (response) => {
     if (response.data && response.data.isSuccess === false) {
-      return Promise.reject(new Error(response.data.message || "API 요청 처리 중 문제가 발생했습니다."));
+      const apiError = new Error(response.data.message || "API 요청 처리 중 문제가 발생했습니다.");
+      apiError.response = response;
+      return Promise.reject(apiError);
     }
     return response;
   },
   async (error) => {
     const originalRequest = error.config;
+    const status = error.response?.status;
+    // 운영 서버는 유효하지 않은 JWT에 대해 응답 본문 없이 403을 반환한다.
+    const isAuthenticationError =
+      status === 401 || (status === 403 && !error.response?.data);
 
-    if (error.response && error.response.status === 401 && !originalRequest._retry) {
+    if (isAuthenticationError && originalRequest && !originalRequest._retry) {
       originalRequest._retry = true;
 
       try {
-        const { accessToken, refreshToken, login } = useAuthStore.getState();
+        const accessToken = localStorage.getItem("accessToken");
+        const refreshToken = localStorage.getItem("refreshToken");
+        const { login } = useAuthStore.getState();
 
         if (!refreshToken) {
           throw new Error("리프레시 토큰이 없습니다.");
@@ -52,8 +60,8 @@ apiClient.interceptors.response.use(
         const newTokens = await reissueKakaoToken(refreshToken, accessToken);
 
         if (login) login(newTokens.accessToken, newTokens.refreshToken);
-        localStorage.setItem("accessToken", newTokens.accessToken); // 기존 request interceptor 호환용
 
+        originalRequest.headers = originalRequest.headers || {};
         originalRequest.headers.Authorization = `Bearer ${newTokens.accessToken}`;
         return apiClient(originalRequest);
       } catch (reissueError) {
@@ -68,12 +76,13 @@ apiClient.interceptors.response.use(
         }
         return Promise.reject(reissueError);
       }
-    } else if (error.response && error.response.status === 403) {
+    } else if (status === 403) {
       console.warn("API 접근 권한이 없습니다 (403 Forbidden). 요청 url:", error.config?.url);
     }
 
     if (error.response?.data?.message) {
-      return Promise.reject(new Error(error.response.data.message));
+      // Axios 오류 객체를 유지해야 호출부에서 status, code 등 상세 원인을 확인할 수 있다.
+      error.message = error.response.data.message;
     }
 
     return Promise.reject(error);

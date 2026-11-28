@@ -1,3 +1,4 @@
+import GuardedButton from '../GuardedButton/GuardedButton.jsx';
 import React from 'react';
 import './Pagination.css';
 
@@ -6,29 +7,29 @@ function Pagination({ currentPage, totalPages, onPageChange }) {
 
   return (
     <div className="pagination-container">
-      <button
+      <GuardedButton
         className="pagination-btn"
         onClick={() => onPageChange(Math.max(currentPage - 1, 1))}
         disabled={currentPage === 1}
       >
         &lt;
-      </button>
+      </GuardedButton>
       {Array.from({ length: totalPages }, (_, i) => i + 1).map((page) => (
-        <button
+        <GuardedButton
           key={page}
           className={`pagination-btn ${currentPage === page ? 'active' : ''}`}
           onClick={() => onPageChange(page)}
         >
           {page}
-        </button>
+        </GuardedButton>
       ))}
-      <button
+      <GuardedButton
         className="pagination-btn"
         onClick={() => onPageChange(Math.min(currentPage + 1, totalPages))}
         disabled={currentPage === totalPages}
       >
         &gt;
-      </button>
+      </GuardedButton>
     </div>
   );
 }

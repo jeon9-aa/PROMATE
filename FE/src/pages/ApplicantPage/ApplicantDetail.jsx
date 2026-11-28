@@ -1,3 +1,4 @@
+import GuardedButton from '../../components/GuardedButton/GuardedButton.jsx';
 import React, { useState, useEffect } from 'react';
 import { useLocation } from 'react-router-dom';
 import Avatar from '../../components/Avatar/Avatar';
@@ -48,13 +49,16 @@ const ApplicantDetail = () => {
   }, [recruitmentId]);
 
   const handleViewDetail = (person) => {
-    getApplicationDetail(recruitmentId, person.applicationId)
+    return getApplicationDetail(recruitmentId, person.applicationId)
       .then((res) => setSelectedApplicant(res.data?.data ?? res.data))
-      .catch((err) => console.error('지원서 조회 실패', err));
+      .catch((err) => {
+        console.error('지원서 조회 실패', err);
+        alert(err.response?.data?.message || err.message || '지원서 조회에 실패했습니다. 잠시 후 다시 시도해주세요.');
+      });
   };
 
   const handleStatusChange = (applicationId, status) => {
-    updateApplicationStatus(recruitmentId, applicationId, status)
+    return updateApplicationStatus(recruitmentId, applicationId, status)
       .then((res) => {
         const resData = res.data?.data;
 
@@ -90,18 +94,18 @@ const ApplicantDetail = () => {
 
   return (
     <div className="ad-page">
-      <h1 className="ad-title">지원자 검토 - {projectTitle}</h1>
+      <h1 className="ad-title">지원자 검토 | {projectTitle}</h1>
 
       <div className="ad-card">
         <div className="ad-tab-bar">
           {tabs.map((tab) => (
-            <button
+            <GuardedButton
               key={tab.key}
               className={`ad-tab${activeTab === tab.key ? ' ad-tab--active' : ''}`}
               onClick={() => setActiveTab(tab.key)}
             >
               {tab.label}
-            </button>
+            </GuardedButton>
           ))}
         </div>
 
@@ -137,12 +141,12 @@ const ApplicantDetail = () => {
               <span className="ad-cell ad-cell--date">
                 {person.appliedAt?.slice(0, 10).replace(/-/g, ' - ')}
               </span>
-              <button
+              <GuardedButton
                 className="ad-view-btn"
                 onClick={() => handleViewDetail(person)}
               >
                 지원서 보기
-              </button>
+              </GuardedButton>
             </div>
           ))}
         </div>
@@ -223,37 +227,37 @@ const ApplicantDetail = () => {
               <div className="app-panel-actions">
                 {selectedApplicant.status === 'PENDING' && (
                   <>
-                    <button
+                    <GuardedButton
                       className="app-btn-reject"
                       onClick={() => handleStatusChange(selectedApplicant.applicationId, 'REJECTED')}
                     >
                       거절
-                    </button>
-                    <button
+                    </GuardedButton>
+                    <GuardedButton
                       className="app-btn-accept"
                       onClick={() => handleStatusChange(selectedApplicant.applicationId, 'ACCEPTED')}
                     >
                       수락
-                    </button>
+                    </GuardedButton>
                   </>
                 )}
                 {selectedApplicant.status === 'ACCEPTED' && (
-                  <button
+                  <GuardedButton
                     className="app-btn-reject"
                     style={{ width: '100%' }}
                     onClick={() => handleStatusChange(selectedApplicant.applicationId, 'REJECTED')}
                   >
                     팀에서 제외
-                  </button>
+                  </GuardedButton>
                 )}
                 {selectedApplicant.status === 'REJECTED' && (
-                  <button
+                  <GuardedButton
                     className="app-btn-accept"
                     style={{ width: '100%' }}
                     onClick={() => handleStatusChange(selectedApplicant.applicationId, 'ACCEPTED')}
                   >
                     수락
-                  </button>
+                  </GuardedButton>
                 )}
               </div>
             </div>

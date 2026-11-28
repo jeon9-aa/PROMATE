@@ -9,17 +9,17 @@ body {
   color: #1a1a1a;
 }
 
-.page-wrapper {
+.teammaking-page {
   width: 100%;
-  height: calc(100vh - 56px);
-  overflow: hidden;
+  min-height: calc(100vh - 56px);
+  min-height: calc(100dvh - 56px);
   background-color: #f8f8f8;
-  padding: 19px 50px 20px 30px;
+  padding: 19px 30px 20px;
   background: linear-gradient(180deg, #f0f0f0 0%, #ffffff 100%);
 }
 
 .teammaking-page-title {
-  width: 864px;
+  width: 100%;
   max-width: 100%;
   margin: 0 0 20px;
   margin-left: 0;
@@ -33,31 +33,104 @@ body {
 .card {
   background-color: #ffffff;
   border-radius: 9px;
-  width: 864px;
+  width: 100%;
   max-width: 100%;
-  height: 599px;
+  height: 590px;
   padding: 19px 33px;
   margin: 0;
   position: relative;
   box-shadow: 0 10px 28px rgba(0, 0, 0, 0.04);
 }
 
+.teammaking-image-field {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 18px;
+}
+
 .teammaking-logo-box {
   width: 48px;
   height: 48px;
+  padding: 0;
+  border: 0;
   display: flex;
   align-items: center;
   justify-content: center;
-  margin-bottom: 18px;
+  margin-bottom: 0;
   border-radius: 6px;
   background-color: #f0f0f0;
+  position: relative;
+  overflow: hidden;
+  cursor: pointer;
+  font-family: inherit;
+}
+
+.teammaking-logo-box:hover {
+  box-shadow: 0 0 0 2px rgba(243, 132, 30, 0.32);
+}
+
+.teammaking-logo-box:focus-visible {
+  outline: none;
+  box-shadow: 0 0 0 3px rgba(243, 132, 30, 0.42);
 }
 
 .teammaking-logo-box img {
   width: 36px;
   height: 36px;
+  object-fit: cover;
   filter: grayscale(1);
   opacity: 0.24;
+}
+
+.teammaking-logo-box.has-image img {
+  width: 100%;
+  height: 100%;
+  filter: none;
+  opacity: 1;
+}
+
+.teammaking-logo-edit {
+  position: absolute;
+  right: 2px;
+  bottom: 2px;
+  width: 16px;
+  height: 16px;
+  border-radius: 50%;
+  background: #fe9a57;
+  color: #ffffff;
+  font-size: 15px;
+  font-weight: 700;
+  line-height: 15px;
+  text-align: center;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.2);
+}
+
+.teammaking-image-input {
+  display: none;
+}
+
+.teammaking-image-reset {
+  height: 30px;
+  padding: 0 10px;
+  border: 1px solid #bcbcbc;
+  border-radius: 4px;
+  background: #ffffff;
+  color: #666666;
+  font-family: inherit;
+  font-size: 12px;
+  cursor: pointer;
+}
+
+.teammaking-image-reset:hover {
+  border-color: #fe9a57;
+  background: #fff8f3;
+  color: #f08040;
+}
+
+.teammaking-image-reset:focus-visible {
+  outline: none;
+  box-shadow: 0 0 0 2px rgba(243, 132, 30, 0.3);
 }
 
 .form-field {
@@ -84,12 +157,11 @@ body {
   font-size: 14px;
   color: #1a1a1a;
   outline: none;
-  transition: background-color 0.2s ease, box-shadow 0.2s ease;
 }
 
 .text-input:focus {
-  background-color: #e8e8e8;
-  box-shadow: 0 0 0 2px rgba(243, 132, 30, 0.25);
+  outline: none;
+  border-color: #fe9a57;
 }
 
 .text-input::placeholder {
@@ -106,6 +178,17 @@ body {
   background: #D9D9D9;
   border: 1px solid #ABABAB;
   color: #FFFFFF;
+}
+
+.domain-tags .common-tag:not(.active):hover {
+  background: #fff3eb;
+  border-color: #fe9a57;
+  color: #f08040;
+}
+
+.domain-tags .common-tag.active:hover {
+  background: #f08040;
+  border-color: #e96e27;
 }
 
 .project-period-field {
@@ -152,9 +235,8 @@ body {
   box-sizing: border-box;
 }
 
-.period-date-picker:focus-visible .period-date-display {
-  background-color: #e8e8e8;
-  box-shadow: 0 0 0 2px rgba(243, 132, 30, 0.25);
+.period-date-picker:focus-within .period-date-display {
+  outline: 1px solid #fe9a57;
 }
 
 .period-separator {
@@ -162,159 +244,6 @@ body {
   font-size: 20px;
   font-weight: 500;
   line-height: 1;
-}
-
-.date-picker-backdrop {
-  position: fixed;
-  inset: 0;
-  z-index: 1000;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  padding: 24px;
-  background: rgba(0, 0, 0, 0.55);
-}
-
-.date-picker-dialog {
-  width: min(100%, 430px);
-  overflow: hidden;
-  border-radius: 4px;
-  background: #fbf9ff;
-  box-shadow: 0 12px 34px rgba(0, 0, 0, 0.26);
-}
-
-.date-picker-hero {
-  min-height: 112px;
-  padding: 22px 34px 20px;
-  background: #4f67a3;
-  color: #ffffff;
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-}
-
-.date-picker-hero span {
-  margin-bottom: 8px;
-  color: rgba(255, 255, 255, 0.72);
-  font-size: 20px;
-  font-weight: 800;
-  line-height: 1;
-}
-
-.date-picker-hero strong {
-  font-size: 34px;
-  font-weight: 800;
-  line-height: 1.1;
-}
-
-.date-picker-calendar {
-  padding: 24px 34px 20px;
-}
-
-.date-picker-monthbar {
-  display: grid;
-  grid-template-columns: 40px 1fr 40px;
-  align-items: center;
-  margin-bottom: 28px;
-}
-
-.date-picker-monthbar strong {
-  color: #1a1a1a;
-  font-size: 20px;
-  font-weight: 800;
-  text-align: center;
-}
-
-.date-picker-monthbar button {
-  width: 34px;
-  height: 34px;
-  border: 0;
-  background: transparent;
-  color: #1a1a1a;
-  font-family: inherit;
-  font-size: 34px;
-  line-height: 1;
-  cursor: pointer;
-}
-
-.date-picker-weekdays,
-.date-picker-days {
-  display: grid;
-  grid-template-columns: repeat(7, 1fr);
-}
-
-.date-picker-weekdays {
-  margin-bottom: 18px;
-}
-
-.date-picker-weekdays span {
-  color: #444444;
-  font-size: 15px;
-  font-weight: 700;
-  text-align: center;
-}
-
-.date-picker-days {
-  row-gap: 8px;
-}
-
-.date-picker-days > span,
-.date-picker-day {
-  width: 34px;
-  height: 34px;
-  margin: 0 auto;
-}
-
-.date-picker-day {
-  border: 0;
-  border-radius: 50%;
-  background: transparent;
-  color: #222222;
-  font-family: inherit;
-  font-size: 16px;
-  font-weight: 500;
-  cursor: pointer;
-}
-
-.date-picker-day:hover {
-  background: rgba(79, 103, 163, 0.12);
-}
-
-.date-picker-day--selected {
-  background: #4f67a3;
-  color: #ffffff;
-}
-
-.date-picker-day--selected:hover {
-  background: #4f67a3;
-}
-
-.date-picker-day:disabled {
-  color: #d1d1d1;
-  cursor: not-allowed;
-}
-
-.date-picker-day:disabled:hover {
-  background: transparent;
-  color: #d1d1d1;
-}
-
-.date-picker-actions {
-  display: grid;
-  grid-template-columns: repeat(3, 1fr);
-  gap: 18px;
-  margin-top: 22px;
-}
-
-.date-picker-actions button {
-  height: 32px;
-  border: 0;
-  background: transparent;
-  color: #4b5575;
-  font-family: inherit;
-  font-size: 18px;
-  font-weight: 700;
-  cursor: pointer;
 }
 
 .textarea-input {
@@ -331,13 +260,12 @@ body {
   outline: none;
   line-height: 1.4;
   font-family: inherit;
-  transition: background-color 0.2s ease, box-shadow 0.2s ease;
 }
 
-.recruit-count-select {
+.recruit-count-input {
   width: 160px;
   height: 32px;
-  padding: 0 34px 0 11px;
+  padding: 0 11px;
   border: 1px solid #bcbcbc;
   border-radius: 3px;
   background-color: #f3f3f3;
@@ -345,18 +273,34 @@ body {
   font-family: inherit;
   font-size: 14px;
   outline: none;
-  cursor: pointer;
-  transition: background-color 0.2s ease, box-shadow 0.2s ease;
+  cursor: text;
 }
 
-.recruit-count-select:focus {
-  background-color: #e8e8e8;
-  box-shadow: 0 0 0 2px rgba(243, 132, 30, 0.25);
+.recruit-count-input:focus {
+  outline: none;
+  border-color: #fe9a57;
+}
+
+.recruit-count-help {
+  font-size: 12px;
+  color: #666;
+}
+
+.recruit-count-label-row {
+  display: flex;
+  align-items: baseline;
+  flex-wrap: wrap;
+  gap: 4px 8px;
+  margin-bottom: 2px;
+}
+
+.recruit-count-label-row .teammaking-form-label {
+  margin-bottom: 0;
 }
 
 .textarea-input:focus {
-  background-color: #e8e8e8;
-  box-shadow: 0 0 0 2px rgba(243, 132, 30, 0.25);
+  outline: none;
+  border-color: #fe9a57;
 }
 
 .textarea-input::placeholder {
@@ -395,7 +339,6 @@ body {
   line-height: 21px;
   cursor: pointer;
   font-family: "Pretendard", sans-serif;
-  transition: background 0.15s;
   white-space: nowrap;
 }
 
@@ -421,7 +364,6 @@ body {
   line-height: 21px;
   cursor: pointer;
   font-family: "Pretendard", sans-serif;
-  transition: background 0.15s;
   white-space: nowrap;
 }
 
@@ -430,8 +372,8 @@ body {
 }
 
 @media (max-width: 768px) {
-  .page-wrapper {
-    padding: 16px 14px 0;
+  .teammaking-page {
+    padding: 16px 14px 20px;
   }
 
   .teammaking-page-title {
@@ -444,13 +386,10 @@ body {
 
   .card {
     width: 100%;
-    height: 585px;
+    height: auto;
+    min-height: 585px;
     border-radius: 9px;
     padding: 22px 18px;
-  }
-
-  .teammaking-logo-box {
-    display: none;
   }
 
   .form-field {
@@ -479,7 +418,7 @@ body {
     font-size: 14px;
   }
 
-  .recruit-count-select {
+  .recruit-count-input {
     width: 140px;
     height: 32px;
   }
@@ -507,70 +446,9 @@ body {
     font-size: 18px;
   }
 
-  .date-picker-backdrop {
-    align-items: center;
-    padding: 0 34px;
-  }
-
-  .date-picker-dialog {
-    width: 100%;
-  }
-
-  .date-picker-hero {
-    min-height: 104px;
-    padding: 20px 30px 18px;
-  }
-
-  .date-picker-hero span {
-    font-size: 18px;
-  }
-
-  .date-picker-hero strong {
-    font-size: 30px;
-  }
-
-  .date-picker-calendar {
-    padding: 22px 26px 18px;
-  }
-
-  .date-picker-monthbar {
-    margin-bottom: 20px;
-  }
-
-  .date-picker-monthbar strong {
-    font-size: 18px;
-  }
-
-  .date-picker-weekdays span {
-    font-size: 14px;
-  }
-
-  .date-picker-days {
-    row-gap: 7px;
-  }
-
-  .date-picker-days > span,
-  .date-picker-day {
-    width: 32px;
-    height: 32px;
-  }
-
-  .date-picker-day {
-    font-size: 15px;
-  }
-
-  .date-picker-actions {
-    margin-top: 20px;
-  }
-
-  .date-picker-actions button {
-    font-size: 17px;
-  }
-
   .bottom-bar {
-    position: absolute;
-    right: 18px;
-    bottom: 12px;
+    position: static;
+    margin-top: 20px;
   }
 
   .teammaking-actions {

@@ -1,3 +1,5 @@
+import DateInput from '../DatePicker/DateInput.jsx';
+import GuardedButton from '../GuardedButton/GuardedButton.jsx';
 import React, { useState, useEffect } from 'react';
 import ReactDOM from 'react-dom';
 import { useNavigate } from 'react-router-dom';
@@ -174,36 +176,36 @@ function EventDetailModal({ event, onClose, onDeleteEvent, onUpdateEvent }) {
         <div className="edm-header">
           {isEditing ? (
             <div className="edm-header-actions">
-              <button type="button" className="edm-btn edm-cancel-btn" onClick={() => setIsEditing(false)} disabled={isLoading}>
+              <GuardedButton type="button" className="edm-btn edm-cancel-btn" onClick={() => setIsEditing(false)} disabled={isLoading}>
                 취소
-              </button>
-              <button type="button" className="edm-btn edm-save-btn" onClick={handleUpdate} disabled={isLoading}>
+              </GuardedButton>
+              <GuardedButton type="button" className="edm-btn edm-save-btn" onClick={handleUpdate} disabled={isLoading}>
                 저장
-              </button>
+              </GuardedButton>
             </div>
           ) : (
             <>
               {detailData.projectId && (
                 <div className="edm-more-container">
-                  <button type="button" className="edm-more-btn" onClick={() => setIsMenuOpen(!isMenuOpen)}>
+                  <GuardedButton type="button" className="edm-more-btn" onClick={() => setIsMenuOpen(!isMenuOpen)}>
                     <span className="edm-more-icon"></span>
-                  </button>
+                  </GuardedButton>
 
                   {isMenuOpen && (
                     <div className="edm-dropdown-menu">
-                      <button type="button" className="edm-dropdown-item" onClick={startEdit}>
+                      <GuardedButton type="button" className="edm-dropdown-item" onClick={startEdit}>
                         수정
-                      </button>
-                      <button type="button" className="edm-dropdown-item delete" onClick={handleDelete} disabled={isLoading}>
+                      </GuardedButton>
+                      <GuardedButton type="button" className="edm-dropdown-item delete" onClick={handleDelete} disabled={isLoading}>
                         삭제
-                      </button>
+                      </GuardedButton>
                     </div>
                   )}
                 </div>
               )}
-              <button type="button" className="edm-close-btn" onClick={onClose} aria-label="닫기">
+              <GuardedButton type="button" className="edm-close-btn" onClick={onClose} aria-label="닫기">
                 ✕
-              </button>
+              </GuardedButton>
             </>
           )}
         </div>
@@ -222,9 +224,9 @@ function EventDetailModal({ event, onClose, onDeleteEvent, onUpdateEvent }) {
                 <div className="edm-info-row">
                   <span className="edm-info-label">날짜</span>
                   <div className="edm-edit-date-group">
-                    <input type="date" className="edm-edit-date" value={editStartDate} onChange={(e) => setEditStartDate(e.target.value)} />
+                    <DateInput className="edm-edit-date" value={editStartDate} onChange={(e) => setEditStartDate(e.target.value)} />
                     <span>~</span>
-                    <input type="date" className="edm-edit-date" value={editEndDate} onChange={(e) => setEditEndDate(e.target.value)} />
+                    <DateInput className="edm-edit-date" value={editEndDate} onChange={(e) => setEditEndDate(e.target.value)} />
                   </div>
                 </div>
                 <div className="edm-divider" />

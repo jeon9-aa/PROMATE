@@ -1,4 +1,5 @@
-import React, { useState, useEffect } from 'react';
+import GuardedButton from '../../components/GuardedButton/GuardedButton.jsx';
+import React, { useState, useEffect, useRef } from 'react';
 import { ClipboardList, SquarePen, Users } from 'lucide-react';
 import { useNavigate, useParams, useLocation } from 'react-router-dom';
 import Calendar from '../../components/Calendar/Calendar';
@@ -6,17 +7,12 @@ import ProgressBar from '../../components/ProgressBar/ProgressBar';
 import SummaryCard from '../../components/SummaryCard/SummaryCard';
 import moreIcon from '../../assets/moreIcon.svg';
 import NewTaskModal from '../../components/NewTaskModal/NewTaskModal.jsx';
-import PostModal from './components/PostModal.jsx';
-import PostDetailModal from './components/PostDetailModal.jsx';
 import TaskDetailModal from './components/TaskDetailModal.jsx';
+import TeamPageMenu from '../../components/TeamPageMenu/TeamPageMenu.jsx';
 import { 
   getProjectMembers, 
   getProjectTasks, 
   getProjectPosts, 
-  getPostDetail, 
-  createProjectPost,
-  updateProjectPost,
-  deleteProjectPost,
   getTaskDetail,
   createProjectTask,
   updateProjectTask,
@@ -32,16 +28,19 @@ const TASK_STATUS_LABELS = {
   IN_PROGRESS: '진행 중',
   DONE: '진행 완료'
 };
+const NO_ASSIGNED_TASKS_MESSAGE = '해당 프로젝트에 할당된 태스크를 찾을 수 없어 진행률을 계산할 수 없습니다';
 
 const getTaskStatusLabel = (status) => TASK_STATUS_LABELS[status] || status;
 
 function TeamPage() {
+  const calendarRef = useRef(null);
   const { projectId } = useParams();
   const navigate = useNavigate();
   const location = useLocation();
   
   const [tasks, setTasks] = useState([]);
   const [projectProgress, setProjectProgress] = useState(0);
+  const [projectTitle, setProjectTitle] = useState(location.state?.projectTitle || '프로젝트');
   const [isTasksLoading, setIsTasksLoading] = useState(true);
   const [tasksError, setTasksError] = useState(null);
 
@@ -57,24 +56,19 @@ function TeamPage() {
   const [isBoardLoading, setIsBoardLoading] = useState(true);
   const [boardError, setBoardError] = useState(null);
 
-  const [selectedPost, setSelectedPost] = useState(null);
-  const [isDetailLoading, setIsDetailLoading] = useState(false);
-  const [detailError, setDetailError] = useState(null);
-
   const [visibleTaskCount, setVisibleTaskCount] = useState(INITIAL_VISIBLE_COUNT);
   const [visiblePostCount, setVisiblePostCount] = useState(INITIAL_VISIBLE_COUNT);
   
-  const [isPostModalOpen, setIsPostModalOpen] = useState(false);
-  const [isEditMode, setIsEditMode] = useState(false);
-  const [postTitle, setPostTitle] = useState('');
-  const [postContent, setPostContent] = useState('');
-  const [editingPostId, setEditingPostId] = useState(null);
-  const [isPostSubmitting, setIsPostSubmitting] = useState(false);
   const [isNewTaskModalOpen, setIsNewTaskModalOpen] = useState(false);
 
   const idToFetch = Number(projectId);
-  const projectTitle = location.state?.projectTitle || '프로젝트';
   const projectDueDate = location.state?.dueDate || '마감일 미정';
+
+  useEffect(() => {
+    if (location.hash !== '#calendar') return;
+    calendarRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    calendarRef.current?.focus({ preventScroll: true });
+  }, [location.hash, location.key]);
 
   const completedTasksCount = tasks.filter(task => task.status === 'DONE').length;
   const pendingTasksCount = tasks.filter(task => task.status !== 'DONE').length;
@@ -94,7 +88,14 @@ function TeamPage() {
       const data = await getProjectTasks(idToFetch);
       setTasks(data.taskList || []);
       setProjectProgress(data.projectProgress || 0);
+      if (data.projectTitle) setProjectTitle(data.projectTitle);
     } catch (err) {
+      if (err.message?.includes(NO_ASSIGNED_TASKS_MESSAGE)) {
+        setTasks([]);
+        setProjectProgress(0);
+        return;
+      }
+
       setTasksError(err.message);
     } finally {
       setIsTasksLoading(false);
@@ -105,8 +106,8 @@ function TeamPage() {
     try {
       setIsBoardLoading(true);
       setBoardError(null);
-      const data = await getProjectPosts(idToFetch);
-      setBoardPosts(data.postList || []);
+      const postList = await getProjectPosts(idToFetch);
+      setBoardPosts(postList);
     } catch (err) {
       setBoardError(err.message);
     } finally {
@@ -211,111 +212,33 @@ function TeamPage() {
     }
   };
 
-  const handlePostClick = async (postId) => {
-    try {
-      setIsDetailLoading(true);
-      setDetailError(null);
-      setSelectedPost({ postId });
-      const data = await getPostDetail(idToFetch, postId);
-      setSelectedPost(data);
-    } catch (err) {
-      setDetailError(err.message);
-    } finally {
-      setIsDetailLoading(false);
-    }
+  const handlePostClick = (postId) => {
+    const params = new URLSearchParams({
+      projectId: String(idToFetch),
+      projectTitle,
+    });
+    navigate(`/board/${postId}?${params.toString()}`, {
+      state: { projectTitle, dueDate: projectDueDate },
+    });
   };
 
-  const handleOpenCreateModal = () => {
-    setIsEditMode(false);
-    setPostTitle('');
-    setPostContent('');
-    setIsPostModalOpen(true);
-  };
-
-const handleOpenEditModal = () => {
-  if (!selectedPost) return;
-
-  setIsEditMode(true);
-  setEditingPostId(selectedPost.postId);
-  setPostTitle(selectedPost.title);
-  setPostContent(selectedPost.content);
-  //수정 모달 열리면 기존 조회 모델 닫게 수정 완료(2026/06/02)
-  setSelectedPost(null);
-  setIsPostModalOpen(true);
-};
-
-const handlePostSubmit = async () => {
-  if (!postTitle.trim() || !postContent.trim() || isPostSubmitting) {
-    return;
-  }
-
-  try {
-    setIsPostSubmitting(true);
-
-    if (isEditMode) {
-      await updateProjectPost(idToFetch, editingPostId, {
-        title: postTitle.trim(),
-        content: postContent.trim(),
-        postType: selectedPost?.postType || "GENERAL",
-      });
-
-      setSelectedPost((prev) => ({
-        ...prev,
-        postId: editingPostId,
-        title: postTitle.trim(),
-        content: postContent.trim(),
-      }));
-    } else {
-      await createProjectPost(idToFetch, {
-        title: postTitle.trim(),
-        content: postContent.trim(),
-        postType: "GENERAL",
-      });
-    }
-
-    closePostModal();
-    if (!isEditMode) closePostDetailModal();
-    await fetchPosts();
-  } catch (err) {
-    console.log("수정 에러:", err);
-    console.log("status:", err.response?.status);
-    console.log("data:", err.response?.data);
-    alert(`게시글 처리에 실패했습니다: ${err.message}`);
-  } finally {
-    setIsPostSubmitting(false);
-  }
-};
-
-  const handleDeletePost = async () => {
-    if (!selectedPost) return;
-    if (!window.confirm('정말로 이 게시글을 삭제하시겠습니까?')) return;
-
-    try {
-      setIsDetailLoading(true);
-      await deleteProjectPost(idToFetch, selectedPost.postId);
-      closePostDetailModal();
-      await fetchPosts();
-    } catch (err) {
-      alert(`게시글 삭제에 실패했습니다: ${err.message}`);
-    } finally {
-      setIsDetailLoading(false);
-    }
+  const openCreatePage = () => {
+    const params = new URLSearchParams({ projectId: String(idToFetch), projectTitle });
+    navigate(`/board/new?${params.toString()}`, {
+      state: { projectTitle, dueDate: projectDueDate, fromProject: true },
+    });
   };
 
   const openTaskBoard = (status) => {
     navigate(`/task-board?projectId=${idToFetch}&status=${status}`, { state: { projectTitle, dueDate: projectDueDate } });
   };
 
-const closePostModal = () => {
-  setIsPostModalOpen(false);
-  setPostTitle("");
-  setPostContent("");
-  setEditingPostId(null);
-};
-
-  const closePostDetailModal = () => {
-    setSelectedPost(null);
-    setDetailError(null);
+  const openBoard = () => {
+    const boardParams = new URLSearchParams({
+      projectId: String(idToFetch),
+      projectTitle,
+    });
+    navigate(`/board?${boardParams.toString()}`, { state: { projectTitle, dueDate: projectDueDate } });
   };
 
   const formatDate = (dateString) => {
@@ -329,11 +252,19 @@ const closePostModal = () => {
 
   return (
     <div className="team-page-container">
-      <h1 className="team-page-title">{projectTitle}</h1>
+      <header className="team-page-header">
+        <h1 className="team-page-title">{projectTitle}</h1>
+        <TeamPageMenu projectId={projectId} projectTitle={projectTitle} dueDate={projectDueDate}
+          onCalendarClick={() => {
+            calendarRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+            calendarRef.current?.focus({ preventScroll: true });
+          }} />
+      </header>
 
       <div className={`team-page-grid ${isTaskExpanded ? 'team-task-expanded' : ''}`}>
         <section
           className="team-card team-progress-card team-card-clickable"
+          data-tooltip="태스크 페이지로 이동"
           role="button"
           tabIndex={0}
           onClick={() => openTaskBoard('all')}
@@ -361,7 +292,7 @@ const closePostModal = () => {
           unit="개"
           isAllEmpty={true}
           actionButton={
-            <button
+            <GuardedButton
               type="button"
               className="team-board-write-button"
               onClick={(e) => {
@@ -371,7 +302,7 @@ const closePostModal = () => {
             >
               <SquarePen size={12} />
               <span>태스크 쓰기</span>
-            </button>
+            </GuardedButton>
           }
         />
 
@@ -380,7 +311,7 @@ const closePostModal = () => {
             {tasksError && <div className="team-member-status" style={{ color: 'red' }}>{tasksError}</div>}
             
             {!isTasksLoading && !tasksError && tasks.length === 0 && (
-              <div className="team-member-status">등록된 태스크가 없습니다.</div>
+              <div className="team-empty-state">등록된 태스크가 없습니다.</div>
             )}
 
             {!isTasksLoading && !tasksError && visibleTasks.map((task) => (
@@ -428,6 +359,7 @@ const closePostModal = () => {
 
         <div
           className="team-card team-metric-card team-metric-card-urgent team-card-clickable"
+          data-tooltip="태스크 페이지(진행 중)로 이동"
           role="button"
           tabIndex={0}
           onClick={() => openTaskBoard('IN_PROGRESS')}
@@ -442,6 +374,7 @@ const closePostModal = () => {
         </div>
         <div
           className="team-card team-metric-card team-metric-card-completed team-card-clickable"
+          data-tooltip="태스크(완료) 페이지로 이동"
           role="button"
           tabIndex={0}
           onClick={() => openTaskBoard('DONE')}
@@ -455,28 +388,31 @@ const closePostModal = () => {
           <SummaryCard title="완료한 태스크" count={completedTasksCount} isAllEmpty={true} />
         </div>
 
-        <div className="team-calendar">
+        <div id="calendar" className="team-calendar" ref={calendarRef} tabIndex={-1}>
           <Calendar projectId={idToFetch} projectTitle={projectTitle} />
         </div>
 
         <section className={`team-card team-board-card ${isBoardExpanded ? 'team-card-expanded' : ''}`}>
-          <div className="team-board-header">
-            <PanelTitle icon={<ClipboardList size={18} />} title="게시판" />
-            <button
+          <div className="team-board-header team-board-header-clickable" onClick={openBoard}>
+            <PanelTitle icon={<ClipboardList size={18} />} title="게시판" onClick={openBoard} />
+            <GuardedButton
               type="button"
               className="team-board-write-button"
-              onClick={handleOpenCreateModal}
+              onClick={(event) => {
+                event.stopPropagation();
+                openCreatePage();
+              }}
             >
               <SquarePen size={12} />
               <span>글쓰기</span>
-            </button>
+            </GuardedButton>
           </div>
           <div className="team-board-list">
             {isBoardLoading && <div className="team-member-status">불러오는 중...</div>}
             {boardError && <div className="team-member-status" style={{ color: 'red' }}>{boardError}</div>}
             
             {!isBoardLoading && !boardError && boardPosts.length === 0 && (
-              <div className="team-member-status">등록된 게시글이 없습니다.</div>
+              <div className="team-empty-state">등록된 게시글이 없습니다.</div>
             )}
 
             {!isBoardLoading && !boardError && visiblePosts.map((post) => (
@@ -485,10 +421,14 @@ const closePostModal = () => {
                 key={post.postId}
                 role="button"
                 tabIndex={0}
-                onClick={() => handlePostClick(post.postId)}
+                onClick={(event) => {
+                  event.stopPropagation();
+                  handlePostClick(post.postId);
+                }}
                 onKeyDown={(event) => {
                   if (event.key === 'Enter' || event.key === ' ') {
                     event.preventDefault();
+                    event.stopPropagation();
                     handlePostClick(post.postId);
                   }
                 }}
@@ -515,7 +455,7 @@ const closePostModal = () => {
             {membersError && <div className="team-member-status" style={{ color: 'red' }}>{membersError}</div>}
             
             {!isMembersLoading && !membersError && members.length === 0 && (
-              <div className="team-member-status">참여 중인 팀원이 없습니다.</div>
+              <div className="team-empty-state">참여 중인 팀원이 없습니다.</div>
             )}
 
             {!isMembersLoading && !membersError && members.map((member) => (
@@ -528,27 +468,7 @@ const closePostModal = () => {
         </section>
       </div>
 
-      <PostModal
-        isOpen={isPostModalOpen}
-        isEditMode={isEditMode}
-        title={postTitle}
-        setTitle={setPostTitle}
-        content={postContent}
-        setContent={setPostContent}
-        onClose={closePostModal}
-        onSubmit={handlePostSubmit}
-        isSubmitting={isPostSubmitting}
-      />
 
-      <PostDetailModal
-        isOpen={!!selectedPost}
-        post={selectedPost}
-        isLoading={isDetailLoading}
-        error={detailError}
-        onClose={closePostDetailModal}
-        onEdit={handleOpenEditModal}
-        onDelete={handleDeletePost}
-      />
 
       <TaskDetailModal
         isOpen={!!selectedTask}
@@ -575,14 +495,42 @@ const closePostModal = () => {
 
 function MoreButton({ isExpanded, onClick }) {
   return (
-    <button className="team-more-button" type="button" aria-expanded={isExpanded} onClick={onClick}>
+    <GuardedButton
+      className="team-more-button"
+      type="button"
+      aria-expanded={isExpanded}
+      onClick={(event) => {
+        event.stopPropagation();
+        onClick();
+      }}
+    >
       <span>{isExpanded ? '접기' : '더보기'}</span>
       <img src={moreIcon} alt="" aria-hidden="true" />
-    </button>
+    </GuardedButton>
   );
 }
 
-function PanelTitle({ icon, title }) {
+function PanelTitle({ icon, title, onClick }) {
+  if (onClick) {
+    return (
+      <div
+        className="team-panel-title team-panel-title-button"
+        role="button"
+        tabIndex={0}
+        onClick={onClick}
+        onKeyDown={(event) => {
+          if (event.key === 'Enter' || event.key === ' ') {
+            event.preventDefault();
+            onClick();
+          }
+        }}
+      >
+        {icon}
+        <h2>{title}</h2>
+      </div>
+    );
+  }
+
   return (
     <div className="team-panel-title">
       {icon}

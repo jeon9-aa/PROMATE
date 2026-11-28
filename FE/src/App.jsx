@@ -5,6 +5,7 @@ import Sidebar from "./components/SideBar/Sidebar";
 import Header from "./components/Header/Header";
 import ComingSoonPage from "./pages/ComingSoonPage.jsx";
 import LoginPage from "./pages/LoginPage/LoginPage.jsx";
+import PasswordInviteLoginPage from "./pages/PasswordInviteLoginPage/PasswordInviteLoginPage.jsx";
 import AuthCallbackPage from "./pages/AuthCallbackPage/AuthCallbackPage.jsx";
 import TeamCreatePage from "./pages/TeamCreatePage/TeamCreatePage.jsx";
 import DashboardPage from "./pages/DashboardPage/DashboardPage.jsx";
@@ -13,14 +14,22 @@ import ApplicantDetail from "./pages/ApplicantPage/ApplicantDetail.jsx";
 import ProfilePage from "./pages/ProfilePage/ProfilePage.jsx";
 import FindTeamPage from "./pages/FindTeamPage/FindTeamPage.jsx";
 import ProjectPage from "./pages/ProjectPage/ProjectPage.jsx";
+import ProjectSettingsPage from "./pages/ProjectSettingsPage/ProjectSettingsPage.jsx";
 import TeamPage from "./pages/TeamPage/TeamPage.jsx";
 import TaskBoardPage from "./pages/TaskBoardPage/TaskBoardPage.jsx";
+import BoardCreatePage from "./pages/BoardCreatePage/BoardCreatePage.jsx";
+import BoardPage from "./pages/BoardPage/BoardPage.jsx";
+import BoardDetailPage from "./pages/BoardDetailPage/BoardDetailPage.jsx";
 import MemberReviewPage from "./pages/MemberReviewPage/MemberReviewPage.jsx";
 import ProjectReadMePage from "./pages/ProjectReadMePage/ProjectReadMePage.jsx";
+import SmallMeetingListPage from "./pages/SmallMeetingListPage/SmallMeetingListPage.jsx";
+import SmallMeetingAddPage from "./pages/SmallMeetingAddPage/SmallMeetingAddPage.jsx";
+import SmallMeetingDetailPage from "./pages/SmallMeeingDetailPage/SmallMeetingDetailPage.jsx";
+import ChatAndRoomListPage from "./pages/ChatAndRoomListPage/ChatAndRoomListPage.jsx";
 
 function AppLayout({ isMenuOpen, toggleMenu, closeMenu }) {
   return (
-    <div style={{ display: "flex", flexDirection: "column", minHeight: "100vh" }}>
+    <div className="app-layout">
       <Header onMenuClick={toggleMenu} />
       <div style={{ display: "flex", flex: 1, backgroundColor: "#F8F9FA" }}>
         <Sidebar isOpen={isMenuOpen} onClose={closeMenu} />
@@ -49,6 +58,8 @@ function App() {
     <BrowserRouter>
       <Routes>
         <Route path="/login" element={<LoginPage />} />
+        <Route path="/invite/password" element={<PasswordInviteLoginPage />} />
+        <Route path="/invite/:inviteToken" element={<PasswordInviteLoginPage />} />
         <Route path="/auth/kakao/callback" element={<AuthCallbackPage />} />
 
         <Route
@@ -62,6 +73,7 @@ function App() {
         >
           <Route path="/" element={<DashboardPage />} />
           <Route path="/dashboard" element={<DashboardPage />} />
+          <Route path="/chat/:roomId?" element={<ChatAndRoomListPage />} />
           <Route path="/teamCreate" element={<TeamCreatePage />} />
           <Route path="/readme/:postId" element={<ProjectReadMePage />} />
           <Route path="/applicant" element={<ApplicantPage/>} />
@@ -70,8 +82,16 @@ function App() {
           <Route path="/findTeam" element={<FindTeamPage />} />
           <Route path="/project" element={<ProjectPage />} />
           <Route path="/project/:projectId" element={<TeamPage />} />
+          <Route path="/project/:projectId/settings" element={<ProjectSettingsPage />} />
           <Route path="/task-board" element={<TaskBoardPage />} />
+          <Route path="/board" element={<BoardPage />} />
+          <Route path="/board/new" element={<BoardCreatePage key="create" />} />
+          <Route path="/board/:postId/edit" element={<BoardCreatePage key="edit" />} />
+          <Route path="/board/:postId" element={<BoardDetailPage />} />
           <Route path="/memberReview" element={<MemberReviewPage />} />
+          <Route path="/project/:projectId/smallMeetingList" element={<SmallMeetingListPage />} />
+          <Route path="/project/:projectId/smallMeeting/add" element={<SmallMeetingAddPage />} />
+          <Route path="/project/:projectId/smallMeeting/:meetingId" element={<SmallMeetingDetailPage />} />
           <Route path="*" element={<ComingSoonPage />} />
         </Route>
       </Routes>

@@ -1,0 +1,236 @@
+.project-board {
+  width: 100%;
+  min-height: calc(100vh - 56px);
+  padding: 19px 30px 20px;
+  box-sizing: border-box;
+  background: linear-gradient(180deg, #f0f0f0 0%, #ffffff 100%);
+  overflow: auto;
+}
+
+.project-board__content {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+}
+
+.project-board__header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.project-board__title {
+  margin: 0;
+  font-family: 'YSpotlightOTF', 'Pretendard', sans-serif;
+  font-size: 22px;
+  font-weight: 500;
+  line-height: 1.35;
+  color: #000000;
+}
+
+.project-board__title-button {
+  padding: 0;
+  border: 0;
+  border-radius: 4px;
+  background: transparent;
+  color: inherit;
+  font: inherit;
+  cursor: pointer;
+}
+
+.project-board__more {
+  width: 32px;
+  height: 32px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0;
+  border: 0;
+  border-radius: 5px;
+  background: transparent;
+  color: #000000;
+}
+
+.project-board__toolbar {
+  min-height: 19px;
+  display: flex;
+  justify-content: flex-end;
+  align-items: center;
+}
+
+.project-board__write-button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  padding: 0;
+  border: 0;
+  border-radius: 5px;
+  background: transparent;
+  color: #ff6600;
+  font-family: 'Pretendard', sans-serif;
+  font-size: 16px;
+  font-weight: 700;
+  line-height: 19px;
+  cursor: pointer;
+}
+
+.project-board__write-button:hover,
+.project-board__write-button:focus-visible {
+  background: rgba(255, 102, 0, 0.05);
+  outline: none;
+}
+
+.project-board__list {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  filter: drop-shadow(0 0 10px rgba(0, 0, 0, 0.05));
+}
+
+.project-board__list--paginated {
+  min-height: 390px;
+}
+
+.project-board__card {
+  width: 100%;
+  min-width: 0;
+  min-height: 70px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 24px;
+  padding: 14px 20px;
+  border-radius: 10px;
+  box-sizing: border-box;
+  background: #ffffff;
+  cursor: pointer;
+}
+
+.project-board__card:hover {
+  background-color: #f8f9fa;
+}
+
+.project-board__card:focus-visible {
+  outline: 2px solid #ff6600;
+  outline-offset: 2px;
+}
+
+.project-board__post-info {
+  min-width: 0;
+  flex: 1 1 auto;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.project-board__post-title {
+  margin: 0;
+  overflow: hidden;
+  color: #000000;
+  font-family: 'Pretendard', sans-serif;
+  font-size: 16px;
+  font-weight: 600;
+  line-height: 19px;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.project-board__meta {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  color: #909090;
+  font-family: 'Pretendard', sans-serif;
+  font-size: 14px;
+  font-weight: 400;
+  line-height: 17px;
+}
+
+.project-board__divider {
+  width: 1px;
+  height: 17px;
+  background: #d9d9d9;
+}
+
+.project-board__comments {
+  flex: 0 0 auto;
+  min-width: 74px;
+  min-height: 30px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 5px;
+  padding: 6px 12px;
+  border-radius: 20px;
+  box-sizing: border-box;
+  background: #f1f1f1;
+  color: #909090;
+  font-family: 'Pretendard', sans-serif;
+  font-size: 14px;
+  font-weight: 600;
+  line-height: 18px;
+  white-space: nowrap;
+}
+
+p.project-board__status {
+  margin: 0;
+  padding: 24px;
+  border-radius: 10px;
+  background: #ffffff;
+  color: #909090;
+  font-family: 'Pretendard', sans-serif;
+  font-size: 14px;
+  text-align: center;
+}
+
+p.project-board__status--error {
+  color: #d83b3b;
+}
+
+.project-board__empty-state {
+  margin: 0;
+  padding: 40px 0;
+  color: #888888;
+  font-family: 'Pretendard', sans-serif;
+  font-size: 14px;
+  font-weight: 400;
+  text-align: center;
+}
+
+.project-board .pagination-container {
+  margin-top: 8px;
+}
+
+@media (max-width: 768px) {
+  .project-board {
+    padding: 22px 16px 36px;
+  }
+
+  .project-board__content {
+    gap: 18px;
+  }
+
+  .project-board__title {
+    font-size: 20px;
+    line-height: 28px;
+  }
+
+  .project-board__card {
+    gap: 12px;
+    padding: 14px 16px;
+  }
+
+  .project-board__meta {
+    gap: 7px;
+    font-size: 12px;
+  }
+
+  .project-board__comments {
+    min-width: auto;
+    padding: 6px 10px;
+    font-size: 12px;
+  }
+}

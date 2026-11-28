@@ -56,6 +56,7 @@ function ProjectPage() {
               id: item.recruitmentId,
               applicationId: item.applicationId,
               title: item.title,
+              recruitImageUrl: item.recruitImageUrl,
               summary: item.description,
               capacity: item.recruitCount,
               applied: true,
@@ -104,6 +105,7 @@ function ProjectPage() {
               projectId: item.projectId,
               applicationId: item.myApplicationId,
               title: item.title,
+              recruitImageUrl: item.recruitImageUrl,
               summary: item.description,
               capacity: item.maxMember,
               dueDate: item.deadline ? item.deadline.split('T')[0].replace(/-/g, '.') : '',
@@ -129,14 +131,28 @@ function ProjectPage() {
       try {
         const response = await getActiveProjects();
         if (response.data && response.data.isSuccess) {
-          const fetchedData = response.data.data.map((item) => ({
-            id: `active-${item.projectId}`,
-            projectId: item.projectId,
-            title: item.title,
-            dueDate: item.endDate ? item.endDate.replace(/-/g, '.') : '',
-            currentStep: item.completedTaskCount,
-            totalStep: item.completedTaskCount + item.incompleteTaskCount,
-          }));
+          const getDeadline = (endDate) => {
+            const deadline = Date.parse(endDate);
+            return Number.isNaN(deadline) ? Number.POSITIVE_INFINITY : deadline;
+          };
+
+          const fetchedData = [...response.data.data]
+            .sort((a, b) => {
+              const aDeadline = getDeadline(a.endDate);
+              const bDeadline = getDeadline(b.endDate);
+
+              if (aDeadline === bDeadline) return 0;
+              return aDeadline < bDeadline ? -1 : 1;
+            })
+            .map((item) => ({
+              id: `active-${item.projectId}`,
+              projectId: item.projectId,
+              title: item.title,
+              recruitImageUrl: item.recruitImageUrl,
+              dueDate: item.endDate ? item.endDate.replace(/-/g, '.') : '',
+              currentStep: item.completedTaskCount,
+              totalStep: item.completedTaskCount + item.incompleteTaskCount,
+            }));
           setActiveProjects(fetchedData);
         }
       } catch (error) {
@@ -163,6 +179,7 @@ function ProjectPage() {
               id: `completed-${item.projectId}`,
               projectId: item.projectId,
               title: item.title,
+              recruitImageUrl: item.recruitImageUrl,
               summary: item.description,
               status: 'completed',
               applyStatus: 'accepted',
@@ -259,6 +276,7 @@ function ProjectPage() {
                   <ProjectBox 
                     key={project.id}
                     title={project.title}
+                    avatarSrc={project.recruitImageUrl}
                     dueDate={project.dueDate}
                     currentStep={project.currentStep}
                     totalStep={project.totalStep}
@@ -337,6 +355,7 @@ function ProjectPage() {
                 <ApplicantBox
                   key={project.id}
                   title={project.title}
+                  avatarSrc={project.recruitImageUrl}
                   summary={project.summary}
                   capacity={project.capacity}
                   showCapacity={project.status !== 'completed'}

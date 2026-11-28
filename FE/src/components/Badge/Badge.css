@@ -14,10 +14,6 @@
   line-height: 1;
   white-space: nowrap;
   cursor: pointer;
-  transition:
-    transform 0.15s ease,
-    box-shadow 0.15s ease,
-    background 0.2s ease;
 }
 
 .badge:hover {

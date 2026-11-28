@@ -1,6 +1,16 @@
 
+.app-layout {
+  --header-height: 56px;
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+  padding-top: var(--header-height);
+  box-sizing: border-box;
+}
+
 .main-content {
   margin-left: 220px;
+  min-width: 0;
 }
 
 @media (max-width: 768px) {

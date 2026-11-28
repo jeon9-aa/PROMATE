@@ -1,6 +1,10 @@
+import GuardedButton from '../GuardedButton/GuardedButton.jsx';
 import React, { useState, useEffect } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useLocation, useNavigate } from 'react-router-dom';
+import { LogOut } from 'lucide-react';
+import ChatLink from './ChatLink';
 import { getUserInfo } from '../../api/User/userProfileApi.js';
+import { useAuthStore } from '../../stores/useAuthStore.js';
 import logoImg from '../../assets/logoOrange.svg';
 import profileIcon from '../../assets/icons/profileIcon.svg';
 import profileIconHover from '../../assets/icons/profileOrangeIcon.svg';
@@ -8,15 +12,22 @@ import ProfileAvatar from '../ProfileAvatar/ProfileAvatar';
 import './Header.css';
 
 function Header({ onMenuClick }) {
+  const navigate = useNavigate();
+  const location = useLocation();
+  const logout = useAuthStore((state) => state.logout);
+  const isLoggedIn = useAuthStore((state) => state.isLoggedIn);
   const [userData, setUserData] = useState({ userName: "...", profileImageUrl: null });
-  const [isLoggedIn, setIsLoggedIn] = useState(false);
+
+  const handleLogout = () => {
+    logout();
+    navigate('/', { replace: true });
+  };
 
   useEffect(() => {
     const fetchUserData = async () => {
       const token = localStorage.getItem("accessToken");
       
       if (!token) {
-        setIsLoggedIn(false);
         return;
       }
 
@@ -30,13 +41,9 @@ function Header({ onMenuClick }) {
             userName: userData?.name || userData?.nickname || userData?.userName || "사용자",
             profileImageUrl: userData?.profileImageUrl || null
           });
-          setIsLoggedIn(true);
-        } else {
-          setIsLoggedIn(false);
         }
       } catch (error) {
         console.error("유저 정보 로드 실패", error);
-        setIsLoggedIn(false);
       }
     };
     fetchUserData();
@@ -45,14 +52,14 @@ function Header({ onMenuClick }) {
     return () => {
       window.removeEventListener('userProfileUpdated', fetchUserData);
     };
-  }, []);
+  }, [isLoggedIn]);
 
   return (
     <header className="header">
       <div className="header-left">
-        <button className="hamburger-btn" onClick={onMenuClick} aria-label="메뉴 열기">
+        <GuardedButton className="hamburger-btn" onClick={onMenuClick} aria-label="메뉴 열기">
           <span></span><span></span><span></span>
-        </button>
+        </GuardedButton>
         <div className="header-logo">
           <Link to="/" className="logo-link">
             <img src={logoImg} alt="ProMate 로고" className="logo-image" />
@@ -65,15 +72,26 @@ function Header({ onMenuClick }) {
       <div className="header-right">
         {isLoggedIn ? (
           <>
-            <Link to="/profile" className="header-greeting">
-              <strong>{userData.userName}</strong> 님 안녕하세요 :)
-            </Link>
-            <Link to="/profile">
+            <ChatLink />
+            <GuardedButton
+              type="button"
+              className="header-logout-btn"
+              onClick={handleLogout}
+              aria-label="로그아웃"
+              data-tooltip="로그아웃"
+            >
+              <LogOut size={20} aria-hidden="true" className="header-logout-icon" />
+            </GuardedButton>
+            <span className="header-account-divider" aria-hidden="true" />
+            <Link to="/profile" className="header-profile" aria-label="내 프로필">
+              <span className="header-greeting">
+                <strong>{userData.userName}</strong> 님 안녕하세요 :)
+              </span>
               <ProfileAvatar src={userData.profileImageUrl} size="36px" />
             </Link>
           </>
         ) : (
-          <Link to="/login" className="header-login-btn">
+          <Link to="/login" state={{ returnTo: location.pathname + location.search + location.hash }} className="header-login-btn">
             <img src={profileIcon} alt="" className="header-login-icon default-icon" />
             <img src={profileIconHover} alt="" className="header-login-icon hover-icon" />
             로그인

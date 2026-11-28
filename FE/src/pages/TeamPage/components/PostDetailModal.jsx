@@ -1,3 +1,4 @@
+import GuardedButton from '../../../components/GuardedButton/GuardedButton.jsx';
 import React, { useState } from 'react';
 
 function PostDetailModal({
@@ -7,78 +8,101 @@ function PostDetailModal({
   error,
   onClose,
   onEdit,
-  onDelete
+  onDelete,
 }) {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
 
   if (!isOpen || !post) return null;
 
+  const handleClose = () => {
+    setIsMenuOpen(false);
+    onClose();
+  };
+
   return (
-    <div 
-      className="team-detail-overlay" 
-      role="presentation" 
-      onMouseDown={onClose}
-      style={{ 
-        display: 'flex', 
-        justifyContent: 'center', 
+    <div
+      className="team-detail-overlay"
+      role="presentation"
+      onMouseDown={handleClose}
+      style={{
+        display: 'flex',
+        justifyContent: 'center',
         alignItems: 'center',
         position: 'fixed',
         top: 0,
         left: 0,
         width: '100%',
         height: '100%',
-        zIndex: 1000
+        zIndex: 1000,
       }}
     >
       <article
         className="team-detail-container"
         role="dialog"
         aria-modal="true"
+        aria-labelledby="post-detail-title"
         onMouseDown={(event) => event.stopPropagation()}
       >
         <div className="team-detail-header">
           <div className="team-detail-more-container">
-            <button
+            <GuardedButton
               type="button"
               className="team-detail-more-btn"
               aria-label="게시글 메뉴"
+              aria-expanded={isMenuOpen}
               onClick={() => setIsMenuOpen((prev) => !prev)}
             >
-              <span className="team-detail-more-icon"></span>
-            </button>
+              <span className="team-detail-more-icon" />
+            </GuardedButton>
             {isMenuOpen && (
               <div className="team-detail-dropdown-menu">
-                <button type="button" className="team-detail-dropdown-item" onClick={() => { setIsMenuOpen(false); onEdit(); }}>
+                <GuardedButton
+                  type="button"
+                  className="team-detail-dropdown-item"
+                  onClick={() => {
+                    setIsMenuOpen(false);
+                    onEdit();
+                  }}
+                >
                   수정
-                </button>
-                <button type="button" className="team-detail-dropdown-item delete" onClick={() => { setIsMenuOpen(false); onDelete(); }}>
+                </GuardedButton>
+                <GuardedButton
+                  type="button"
+                  className="team-detail-dropdown-item delete"
+                  onClick={() => {
+                    setIsMenuOpen(false);
+                    return onDelete();
+                  }}
+                >
                   삭제
-                </button>
+                </GuardedButton>
               </div>
             )}
           </div>
-          <button type="button" className="team-detail-close-btn" onClick={onClose} aria-label="닫기">
+          <GuardedButton type="button" className="team-detail-close-btn" onClick={handleClose} aria-label="닫기">
             ✕
-          </button>
+          </GuardedButton>
         </div>
 
         <div className="team-detail-body">
-          {isLoading && <p className="team-member-status">처리 중...</p>}
+          {isLoading && <p className="team-member-status">게시글을 불러오는 중...</p>}
           {error && <p className="team-member-status" style={{ color: 'red' }}>{error}</p>}
 
           {!isLoading && !error && post.title && (
             <>
-              <h2 className="team-detail-title">{post.title}</h2>
-              
+              <h2 id="post-detail-title" className="team-detail-title">{post.title}</h2>
+
               <div className="team-detail-info">
                 <div className="team-detail-info-row">
                   <span className="team-detail-info-label">작성자</span>
-                  <span className="team-detail-info-value">{post.writerName}</span>
+                  <span className="team-detail-info-value">
+                    {post.writerName ?? post.authorName ?? '작성자'}
+                  </span>
                 </div>
               </div>
-              
+
               <div className="team-detail-divider" />
-              
+
               <div className="team-detail-content-wrapper">
                 <p className="team-detail-content">{post.content}</p>
               </div>

@@ -12,11 +12,19 @@ export const getProjectTasks = async (projectId) => {
 
 export const getProjectPosts = async (projectId) => {
   const response = await apiClient.get(`/projects/${projectId}/posts`);
-  return response.data.data;
+  const data = response.data.data;
+  return Array.isArray(data) ? data : data?.postList ?? [];
 };
 
 export const getPostDetail = async (projectId, postId) => {
   const response = await apiClient.get(`/projects/${projectId}/posts/${postId}`);
+  return response.data.data;
+};
+
+export const getPostComments = async (projectId, postId) => {
+  const response = await apiClient.get(
+    `/projects/${projectId}/posts/${postId}/comments`
+  );
   return response.data.data;
 };
 
@@ -57,5 +65,28 @@ export const updateTaskStatus = async (projectId, taskId, statusObj) => {
 
 export const deleteProjectTask = async (projectId, taskId) => {
   const response = await apiClient.delete(`/projects/${projectId}/tasks/${taskId}`);
+  return response.data.data;
+};
+
+export const createPostComment = async (projectId, postId, comment) => {
+  const response = await apiClient.post(
+    `/projects/${projectId}/posts/${postId}/comments`,
+    { comment }
+  );
+  return response.data.data;
+};
+
+export const updatePostComment = async (projectId, postId, commentId, comment) => {
+  const response = await apiClient.put(
+    `/projects/${projectId}/posts/${postId}/comments/${commentId}`,
+    { comment }
+  );
+  return response.data.data;
+};
+
+export const deletePostComment = async (projectId, postId, commentId) => {
+  const response = await apiClient.delete(
+    `/projects/${projectId}/posts/${postId}/comments/${commentId}`
+  );
   return response.data.data;
 };

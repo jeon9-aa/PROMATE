@@ -45,7 +45,6 @@
   border: none;
   cursor: pointer;
   border-radius: 30%;
-  transition: background-color 0.2s ease-in-out;
 }
 
 .profile-close-x-btn:hover {
@@ -70,6 +69,20 @@
   line-height: 22px;
 
   color: #000000;
+}
+
+.profile-task-summary {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 4px;
+  flex-shrink: 0;
+}
+
+.profile-task-caption {
+  font-size: 11px;
+  line-height: 15px;
+  color: #666666;
 }
 
 .profile-task-count {
@@ -107,6 +120,21 @@
   border-top: 1px solid #d9d9d9;
 }
 
+.profile-section-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 12px;
+  padding-right: 7px;
+}
+
+.profile-score-caption {
+  font-size: 11px;
+  line-height: 15px;
+  color: #666666;
+  white-space: nowrap;
+}
+
 .profile-section-title {
   margin: 0;
 
@@ -121,9 +149,18 @@
 .profile-project-list {
   display: flex;
   flex-direction: column;
-  max-height: 126px;
+  max-height: 189px;
   overflow-y: auto;
   padding-right: 5px;
+}
+
+.profile-project-empty {
+  margin: 0;
+  padding: 20px 0;
+  font-size: 13px;
+  line-height: 20px;
+  color: #666666;
+  text-align: center;
 }
 
 .profile-project-list::-webkit-scrollbar {
@@ -163,6 +200,14 @@
   line-height: 18px;
 
   color: #000000;
+}
+
+.profile-project-manual-label {
+  margin-left: 6px;
+  font-size: 12px;
+  font-weight: 400;
+  color: #666666;
+  white-space: nowrap;
 }
 
 .project-period {

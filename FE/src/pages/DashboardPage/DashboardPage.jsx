@@ -1,3 +1,4 @@
+import GuardedButton from '../../components/GuardedButton/GuardedButton.jsx';
 import React, { useEffect, useMemo, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import './DashboardPage.css';
@@ -6,20 +7,20 @@ import projectMenuIcon from '../../assets/projectMenuIcon.svg';
 import SummaryCard from '../../components/SummaryCard/SummaryCard';
 import ProjectBox from '../../components/ProjectBox/ProjectBox';
 import moreIcon from '../../assets/moreIcon.svg';
-import { getDashboardProjects, getDashboardUrgentTasks, getDashboardCompletedTasks, getDashboardProjectStatuses } from '../../api/Dashboard/dashboardApi';
+import { getDashboardProjects, getDashboardUrgentTasks, getDashboardInProgressTasks, getDashboardProjectStatuses } from '../../api/Dashboard/dashboardApi';
 
 function DashboardPage() {
   const [dashboardData, setDashboardData] = useState({
     projects: [],
     urgentTasks: [],
-    completedTasks: [],
+    inProgressTasks: [],
     projectStatuses: [],
   });
 
   const [fetchErrors, setFetchErrors] = useState({
     projects: false,
     urgentTasks: false,
-    completedTasks: false,
+    inProgressTasks: false,
     projectStatuses: false,
   });
 
@@ -42,10 +43,11 @@ function DashboardPage() {
       try {
         setIsLoading(true);
         
+        const projectsPromise = getDashboardProjects();
         const results = await Promise.allSettled([
-          getDashboardProjects(),
+          projectsPromise,
           getDashboardUrgentTasks(),
-          getDashboardCompletedTasks(),
+          projectsPromise.then((response) => getDashboardInProgressTasks(response.data.data || [])),
           getDashboardProjectStatuses(),
         ]);
 
@@ -66,19 +68,19 @@ function DashboardPage() {
         const newDashboardData = {
           projects: [],
           urgentTasks: [],
-          completedTasks: [],
+          inProgressTasks: [],
           projectStatuses: [],
         };
 
         const projectsRes = results[0].status === 'fulfilled' ? results[0].value : null;
         const urgentTasksRes = results[1].status === 'fulfilled' ? results[1].value : null;
-        const completedTasksRes = results[2].status === 'fulfilled' ? results[2].value : null;
+        const inProgressTasksRes = results[2].status === 'fulfilled' ? results[2].value : null;
         const projectStatusesRes = results[3].status === 'fulfilled' ? results[3].value : null;
 
         setFetchErrors({
           projects: results[0].status === 'rejected',
           urgentTasks: results[1].status === 'rejected',
-          completedTasks: results[2].status === 'rejected',
+          inProgressTasks: results[2].status === 'rejected',
           projectStatuses: results[3].status === 'rejected',
         });
 
@@ -87,6 +89,7 @@ function DashboardPage() {
             return {
               id: item.projectId,
               title: item.title,
+              recruitImageUrl: item.recruitImageUrl,
               dueDate: formatDate(item.endDate),
               currentStep: 0,
               totalStep: 0,
@@ -105,8 +108,8 @@ function DashboardPage() {
           }));
         }
 
-        if (completedTasksRes) {
-          newDashboardData.completedTasks = (completedTasksRes.data.data || []).map((task) => ({
+        if (inProgressTasksRes) {
+          newDashboardData.inProgressTasks = inProgressTasksRes.map((task) => ({
             id: task.taskId,
             projectId: task.projectId,
             projectTitle: task.projectTitle,
@@ -121,6 +124,7 @@ function DashboardPage() {
             return {
               id: status.projectId,
               title: status.title,
+              recruitImageUrl: newDashboardData.projects.find((project) => project.id === status.projectId)?.recruitImageUrl,
               dueDate: formatDate(status.endDate),
               currentStep: status.completedTaskCount ?? 0,
               totalStep: status.totalTaskCount ?? 0,
@@ -156,9 +160,9 @@ function DashboardPage() {
       },
       {
         id: 3,
-        title: '완료한 태스크',
-        items: dashboardData.completedTasks,
-        isError: fetchErrors.completedTasks,
+        title: '남은 태스크',
+        items: dashboardData.inProgressTasks,
+        isError: fetchErrors.inProgressTasks,
       },
     ],
     [dashboardData, fetchErrors]
@@ -200,7 +204,7 @@ function DashboardPage() {
         </div>
 
         <div className="dashboard-detail-row">
-          <Calendar showAddButton={false} />
+          <Calendar showAddButton={false} showThemeButton projects={dashboardData.projects} />
 
           <div className="status-section">
             <div className="section-header">
@@ -228,6 +232,7 @@ function DashboardPage() {
                     currentStep={project.currentStep}
                     totalStep={project.totalStep}
                     avatarSize="52px"
+                    avatarSrc={project.recruitImageUrl}
                     onClick={() => navigate(`/project/${project.id}`, { state: { projectTitle: project.title, dueDate: project.dueDate } })}
                     hidePcLabel
                   />
@@ -236,23 +241,23 @@ function DashboardPage() {
             </div>
 
             {visibleStatusCount < dashboardData.projectStatuses.length ? (
-              <button 
+              <GuardedButton
                 className="more-btn" 
                 onClick={handleShowMoreStatus} 
                 style={{ alignSelf: 'center', marginTop: '16px' }}
               >
                 더보기
                 <img src={moreIcon} alt="moreIcon" />
-              </button>
+              </GuardedButton>
             ) : dashboardData.projectStatuses.length > 3 ? (
-              <button 
+              <GuardedButton
                 className="more-btn" 
                 onClick={() => setVisibleStatusCount(3)} 
                 style={{ alignSelf: 'center', marginTop: '16px' }}
               >
                 접기
                 <img src={moreIcon} alt="moreIcon" style={{ transform: 'rotate(180deg)' }} />
-              </button>
+              </GuardedButton>
             ) : null}
           </div>
         </div>

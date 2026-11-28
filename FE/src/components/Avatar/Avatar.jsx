@@ -1,4 +1,6 @@
+import { useState } from "react";
 import "./Avatar.css";
+import { getSecureImageUrl } from "../../utils/imageUrl.js";
 
 function Avatar({
   src,
@@ -8,6 +10,10 @@ function Avatar({
   icon = null,
   className = "",
 }) {
+  const [failedImageSrc, setFailedImageSrc] = useState(null);
+  const secureSrc = getSecureImageUrl(src);
+  const hasImageError = secureSrc === failedImageSrc;
+
   const classes = [
     "avatar",
     `avatar--${size}`,
@@ -19,8 +25,13 @@ function Avatar({
 
   return (
     <div className={classes}>
-      {src ? (
-        <img className="avatar__image" src={src} alt={alt} />
+      {secureSrc && !hasImageError ? (
+        <img
+          className="avatar__image"
+          src={secureSrc}
+          alt={alt}
+          onError={() => setFailedImageSrc(secureSrc)}
+        />
       ) : (
         <div className="avatar__placeholder" aria-label={alt} role="img">
           {icon ?? (

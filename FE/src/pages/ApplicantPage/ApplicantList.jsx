@@ -2,8 +2,9 @@ import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import ApplicantBox from '../../components/ApplicantBox/ApplicantBox';
 import Pagination from '../../components/Pagination/Pagination';
-import { getMyRecruitments } from '../../api/RecruitApi';
+import { getMyRecruitments, getPendingApplications } from '../../api/RecruitApi';
 import apiClient from '../../api/apiClient';
+import { resolveRecruitmentImages } from '../../api/Recruits/resolveRecruitmentImages.js';
 import './ApplicantPage.css';
 
 const CATEGORY_LABEL = {
@@ -21,6 +22,38 @@ const ApplicantList = () => {
   const [recruitments, setRecruitments] = useState([]);
   const [loading, setLoading] = useState(false);
   const [currentPage, setCurrentPage] = useState(1);
+  const [visibleRecruitments, setVisibleRecruitments] = useState([]);
+  const [applicantCounts, setApplicantCounts] = useState({});
+
+  useEffect(() => {
+    let cancelled = false;
+    const page = recruitments.slice(
+      (currentPage - 1) * ITEMS_PER_PAGE,
+      currentPage * ITEMS_PER_PAGE,
+    );
+    setVisibleRecruitments(page);
+    setApplicantCounts({});
+    page.filter((recruitment) =>
+      recruitment.status !== 'COMPLETED' && recruitment.status !== 'CANCELLED'
+    ).forEach((recruitment) => {
+      const id = recruitment.recruitmentId || recruitment.id || recruitment.postId;
+      getPendingApplications(id)
+        .then((response) => {
+          const applicants = response.data?.data?.applicants;
+          if (!cancelled && Array.isArray(applicants)) {
+            setApplicantCounts((counts) => ({ ...counts, [id]: applicants.length }));
+          }
+        })
+        .catch((err) => console.error('현재 지원자 수 조회 실패', err));
+    });
+    resolveRecruitmentImages(page, async (id) => {
+      const response = await apiClient.get(`/recruitments/${id}`);
+      return response.data?.data;
+    }).then((resolved) => {
+      if (!cancelled) setVisibleRecruitments(resolved);
+    });
+    return () => { cancelled = true; };
+  }, [recruitments, currentPage]);
 
   const fetchRecruitments = () => {
     setLoading(true);
@@ -62,10 +95,6 @@ const ApplicantList = () => {
   };
 
   const totalPages = Math.ceil(recruitments.length / ITEMS_PER_PAGE);
-  const currentRecruitments = recruitments.slice(
-    (currentPage - 1) * ITEMS_PER_PAGE,
-    currentPage * ITEMS_PER_PAGE
-  );
 
   return (
     <main className="al-page">
@@ -79,13 +108,14 @@ const ApplicantList = () => {
             등록된 모집글이 없습니다.
           </div>
         )}
-        {!loading && currentRecruitments.map((recruitment) => {
+        {!loading && visibleRecruitments.map((recruitment) => {
           const isClosed = recruitment.status === 'COMPLETED' || recruitment.status === 'CANCELLED';
           const targetId = recruitment.recruitmentId || recruitment.id || recruitment.postId;
           return (
             <ApplicantBox
               key={targetId}
               title={recruitment.title}
+              avatarSrc={recruitment.recruitImageUrl}
               summary={CATEGORY_LABEL[recruitment.category] ?? recruitment.category}
               capacity={recruitment.maxMember}
               showBookmark={false}
@@ -94,6 +124,7 @@ const ApplicantList = () => {
               secondaryButtonColor="#D9D9D9"
               onSecondaryButtonClick={() => handleCompleteRecruitment(targetId)}
               buttonText={isClosed ? '모집 마감' : '지원자 검토'}
+              applicantCount={isClosed ? undefined : applicantCounts[targetId]}
               buttonColor={isClosed ? '#D9D9D9' : '#FE9A57'}
               disabled={isClosed}
               onClick={() => navigate(`/readme/${targetId}`, { state: recruitment })}

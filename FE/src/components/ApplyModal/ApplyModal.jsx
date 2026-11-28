@@ -1,4 +1,6 @@
-import { useEffect, useState } from "react";
+import GuardedForm from '../GuardedForm/GuardedForm.jsx';
+import GuardedButton from '../GuardedButton/GuardedButton.jsx';
+import { useEffect, useState, useRef } from "react";
 import "./ApplyModal.css";
 import { getApplicationForm, postApplication } from "../../api/Recruits/recruitmentApi";
 
@@ -15,6 +17,7 @@ function ApplyModal({
 }) {
   const [fetchedTitle, setFetchedTitle] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const submitLockRef = useRef(false);
 
   useEffect(() => {
     const previousOverflow = document.body.style.overflow;
@@ -48,8 +51,9 @@ function ApplyModal({
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    if (isSubmitting) return;
+    if (submitLockRef.current) return;
 
+    submitLockRef.current = true;
     setIsSubmitting(true);
     try {
       const applicationData = {
@@ -70,14 +74,19 @@ function ApplyModal({
       }
     } catch (error) {
       console.error("지원서 제출 실패:", error);
-      alert(error.response?.data?.message || "지원서 제출 중 오류가 발생했습니다.");
+      const errorMessage =
+        error.response?.data?.message ||
+        error.message ||
+        "지원서 제출 중 오류가 발생했습니다.";
+      alert(errorMessage);
     } finally {
+      submitLockRef.current = false;
       setIsSubmitting(false);
     }
   };
 
   const handleOverlayClick = (e) => {
-    if (e.target === e.currentTarget) {
+    if (!submitLockRef.current && e.target === e.currentTarget) {
       onClose?.();
     }
   };
@@ -87,7 +96,7 @@ function ApplyModal({
       <div className="apply-modal">
         <h2 className="apply-modal-title">{fetchedTitle || projectName}</h2>
 
-        <form className="apply-modal-form" onSubmit={handleSubmit}>
+        <GuardedForm className="apply-modal-form" onSubmit={handleSubmit}>
           <div className="apply-modal-group">
             <label htmlFor="apply-job" className="apply-modal-label">
               기여하고 싶은 분야 (선택)
@@ -122,18 +131,23 @@ function ApplyModal({
           </div>
 
           <div className="apply-modal-button-wrap">
-            <button type="button" className="apply-modal-cancel-btn" onClick={onClose}>
+            <GuardedButton
+              type="button"
+              className="apply-modal-cancel-btn"
+              onClick={onClose}
+              disabled={isSubmitting}
+            >
               취소
-            </button>
-            <button 
+            </GuardedButton>
+            <GuardedButton
               type="submit" 
               className="apply-modal-submit-btn"
               disabled={isSubmitting}
             >
               {isSubmitting ? "지원중..." : "지원하기"}
-            </button>
+            </GuardedButton>
           </div>
-        </form>
+        </GuardedForm>
       </div>
     </div>
   );

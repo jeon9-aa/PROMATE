@@ -1,6 +1,6 @@
 .al-page {
   min-height: 100%;
-  padding: 19px 50px 20px 30px;
+  padding: 19px 30px 20px;
   background: linear-gradient(180deg, #F0F0F0 0%, #FFFFFF 100%);
   font-family: 'Pretendard Variable', 'Pretendard', 'Noto Sans KR', sans-serif;
   color: #000000;
@@ -21,7 +21,6 @@
   flex-direction: column;
   gap: 10px;
   width: 100%;
-  max-width: 1000px;
   filter: drop-shadow(0px 0px 10px rgba(0, 0, 0, 0.05));
 }
 
@@ -121,7 +120,6 @@
   font-weight: 700;
   color: #FFFFFF;
   white-space: nowrap;
-  transition: background 0.15s;
   flex-shrink: 0;
 }
 
@@ -133,7 +131,7 @@
   display: flex;
   flex-direction: column;
   align-items: flex-start;
-  padding: 19px 50px 20px 30px;
+  padding: 19px 30px 20px;
   gap: 20px;
   min-height: 100%;
   background: linear-gradient(180deg, #F0F0F0 0%, #FFFFFF 100%);
@@ -156,7 +154,6 @@
   padding: 20px;
   gap: 20px;
   width: 100%;
-  max-width: 1000px;
   background: #FFFFFF;
   box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.05);
   border-radius: 10px;
@@ -190,7 +187,6 @@
   font-weight: 500;
   line-height: 17px;
   color: #ABABAB;
-  transition: background 0.15s, color 0.15s;
 }
 
 .ad-tab--active {
@@ -336,7 +332,6 @@
   color: #FFFFFF;
   white-space: nowrap;
   box-sizing: border-box;
-  transition: background 0.15s;
 }
 
 .ad-view-btn:hover {
@@ -717,7 +712,6 @@
   font-weight: 700;
   line-height: 19px;
   color: #FFFFFF;
-  transition: opacity 0.15s;
 }
 
 .app-btn-accept {

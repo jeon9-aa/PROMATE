@@ -1,6 +1,6 @@
 .header {
   width: 100%;
-  height: 56px;
+  height: var(--header-height, 56px);
   background-color: #FFFFFF;
   border-bottom: 1px solid #D9D9D9;
   display: flex;
@@ -8,8 +8,9 @@
   justify-content: space-between;
   padding: 0 24px;
   box-sizing: border-box;
-  position: sticky;
+  position: fixed;
   top: 0;
+  left: 0;
   z-index: 1000;
 }
 
@@ -38,7 +39,6 @@
   height: 2px;
   background-color: #333333;
   border-radius: 2px;
-  transition: all 0.3s ease;
 }
 
 .header-logo {
@@ -80,7 +80,27 @@
 .header-right {
   display: flex;
   align-items: center;
+  gap: 4px;
+  flex-shrink: 0;
+}
+
+.header-profile {
+  display: flex;
+  align-items: center;
   gap: 12px;
+  border-radius: 8px;
+}
+
+.header-profile:focus-visible {
+  outline: 2px solid #FE9A57;
+  outline-offset: 4px;
+}
+
+.header-account-divider {
+  width: 1px;
+  height: 20px;
+  margin-right: 8px;
+  background-color: #E5E5E5;
 }
 
 .header-right a {
@@ -118,6 +138,96 @@
   color: #FE9A57;
 }
 
+.header-chat-btn,
+.header-logout-btn {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 36px;
+  height: 36px;
+  padding: 0;
+  background: transparent;
+  color: #666666;
+  font-family: 'Pretendard', sans-serif;
+  font-size: 13px;
+  font-weight: 500;
+  white-space: nowrap;
+  border: 0;
+  border-radius: 8px;
+  cursor: pointer;
+}
+
+.header-chat-btn:hover,
+.header-chat-btn:focus-visible,
+.header-logout-btn:hover,
+.header-logout-btn:focus-visible {
+  color: #FE9A57;
+}
+
+.header-chat-btn:focus-visible,
+.header-logout-btn:focus-visible {
+  outline: 2px solid #FE9A57;
+  outline-offset: 2px;
+}
+
+.header-chat-badge {
+  position: absolute;
+  top: -2px;
+  right: -5px;
+  min-width: 18px;
+  height: 18px;
+  padding: 0 4px;
+  box-sizing: border-box;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: 2px solid #FFFFFF;
+  border-radius: 10px;
+  background-color: #E5484D;
+  color: #FFFFFF;
+  font-size: 10px;
+  font-weight: 700;
+  line-height: 1;
+  pointer-events: none;
+}
+
+.header-logout-icon {
+  display: block;
+  width: 20px;
+  height: 20px;
+}
+
+.header-chat-btn::after,
+.header-logout-btn::after {
+  content: attr(data-tooltip);
+  position: absolute;
+  top: calc(100% + 6px);
+  right: 0;
+  z-index: 10;
+  padding: 5px 8px;
+  border-radius: 4px;
+  background-color: #333333;
+  color: #FFFFFF;
+  font-family: 'Pretendard', sans-serif;
+  font-size: 12px;
+  line-height: 1;
+  white-space: nowrap;
+  opacity: 0;
+  visibility: hidden;
+  transform: translateY(-2px);
+  pointer-events: none;
+}
+
+.header-chat-btn:hover::after,
+.header-chat-btn:focus-visible::after,
+.header-logout-btn:hover::after,
+.header-logout-btn:focus-visible::after {
+  opacity: 1;
+  visibility: visible;
+  transform: translateY(0);
+}
+
 .header-login-icon {
   width: 14px;
   height: 14px;
@@ -136,6 +246,10 @@
 }
 
 @media (max-width: 768px) {
+  .header {
+    padding: 0 16px;
+  }
+
   .hamburger-btn {
     display: flex;
   }

@@ -1,3 +1,4 @@
+import GuardedButton from '../GuardedButton/GuardedButton.jsx';
 import "./Badge.css";
 
 function Badge({
@@ -13,9 +14,9 @@ function Badge({
     .join(" ");
 
   return (
-    <button type={type} className={classes} onClick={onClick} {...props}>
+    <GuardedButton type={type} className={classes} onClick={onClick} {...props}>
       {children}
-    </button>
+    </GuardedButton>
   );
 }
 

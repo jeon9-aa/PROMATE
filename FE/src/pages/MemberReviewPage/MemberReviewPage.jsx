@@ -1,3 +1,4 @@
+import GuardedButton from '../../components/GuardedButton/GuardedButton.jsx';
 import React, { useState, useEffect } from 'react';
 import { useParams, useLocation, useSearchParams, useNavigate } from 'react-router-dom';
 import checkIcon from '../../assets/icons/checkIcon.svg';
@@ -227,9 +228,9 @@ function MemberReviewPage() {
 
 
 
-            <button className="member-review-save" type="button" onClick={handleSave}>
+            <GuardedButton className="member-review-save" type="button" onClick={handleSave}>
               저장하기
-            </button>
+            </GuardedButton>
           </>
         ) : (
           <div style={{ padding: '60px 0', textAlign: 'center', color: '#909090', width: '100%' }}>

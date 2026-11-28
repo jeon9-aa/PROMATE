@@ -1,5 +1,7 @@
+import GuardedButton from '../../components/GuardedButton/GuardedButton.jsx';
+import ProjectAvatar from '../../components/ProjectAvatar/ProjectAvatar';
 import React, { useState, useEffect, useRef } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import apiClient from '../../api/apiClient';
 import MainButton from '../../components/MainButton/MainButton';
 import Avatar from '../../components/Avatar/Avatar';
@@ -284,7 +286,22 @@ const ProfilePage = () => {
                 <div key={proj.historyId ?? proj.id ?? proj.projectId} className="project-experience-row">
                   <div className="proj-row-inner">
                     <div className="proj-name-group">
-                      <span className="proj-title">{proj.title}</span>
+                      {!proj.isManual && <ProjectAvatar src={proj.recruitImageUrl} size="32px" />}
+                      {!proj.isManual && (proj.projectId ?? proj.id) != null ? (
+                        <Link
+                          className="proj-title proj-title-link"
+                          title={proj.title}
+                          to={`/project/${proj.projectId ?? proj.id}`}
+                          state={{ projectTitle: proj.title, dueDate: proj.dueDate ?? proj.endDate }}
+                        >
+                          {proj.title}
+                        </Link>
+                      ) : (
+                        <span className="proj-title-group">
+                          <span className="proj-title" title={proj.title}>{proj.title}</span>
+                          {proj.isManual && <span className="proj-manual-label">(수동 입력)</span>}
+                        </span>
+                      )}
                       {proj.role && <span className="proj-role">{proj.role}</span>}
                     </div>
                     <div className="proj-right-group">
@@ -295,27 +312,26 @@ const ProfilePage = () => {
                       <span className={proj.isCompleted ? 'badge-completed' : 'badge-ongoing'}>
                         <span>{proj.isCompleted ? '완료' : '진행중'}</span>
                       </span>
-                      <div className="proj-score-container">
-                        {proj.score != null ? (
-                          <>
-                            <span className="proj-score-num">{Number(proj.score).toFixed(1)}</span>
-                            <span className="proj-score-text">점</span>
-                          </>
-                        ) : (
-                          <span style={{ width: 47 }} />
-                        )}
-                      </div>
-                  {isEditing && proj.isManual && proj.isEditable && (
-                        <>
-                          <button
+                      {isEditing && proj.isManual && proj.isEditable ? (
+                        <div className="proj-row-actions">
+                          <GuardedButton
                             className="proj-delete-btn"
                             onClick={() => setEditingProject(proj)}
-                          >✏</button>
-                          <button
+                          >✏</GuardedButton>
+                          <GuardedButton
                             className="proj-delete-btn"
                             onClick={() => handleDeleteProject(proj)}
-                          >✕</button>
-                        </>
+                          >✕</GuardedButton>
+                        </div>
+                      ) : (
+                        <div className="proj-score-container">
+                          {proj.score != null && (
+                            <>
+                              <span className="proj-score-num">{Number(proj.score).toFixed(1)}</span>
+                              <span className="proj-score-text">점</span>
+                            </>
+                          )}
+                        </div>
                       )}
                     </div>
                   </div>
@@ -323,13 +339,13 @@ const ProfilePage = () => {
               ))}
 
             {isEditing && (
-              <button className="proj-add-row-btn" onClick={() => setIsAddModalOpen(true)}>
+              <GuardedButton className="proj-add-row-btn" onClick={() => setIsAddModalOpen(true)}>
                 <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
                   <line x1="12" y1="5" x2="12" y2="19" stroke="#ABABAB" strokeWidth="1.5" strokeLinecap="round"/>
                   <line x1="5" y1="12" x2="19" y2="12" stroke="#ABABAB" strokeWidth="1.5" strokeLinecap="round"/>
                 </svg>
                 <span className="proj-add-text">프로젝트 추가하기</span>
-              </button>
+              </GuardedButton>
             )}
           </div>
         </div>
@@ -337,8 +353,8 @@ const ProfilePage = () => {
         <div className="profile-actions">
           {isEditing ? (
             <>
-              <button className="btn-edit-cancel" onClick={() => setIsEditing(false)}>취소</button>
-              <button className="btn-edit-complete" onClick={handleEditComplete}>완료</button>
+              <GuardedButton className="btn-edit-cancel" onClick={() => setIsEditing(false)}>취소</GuardedButton>
+              <GuardedButton className="btn-edit-complete" onClick={handleEditComplete}>완료</GuardedButton>
             </>
           ) : (
             <MainButton size="md" onClick={() => { setIsEditing(true); setEditName(userInfo.name); }}>수정하기</MainButton>

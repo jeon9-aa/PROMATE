@@ -1,3 +1,4 @@
+import GuardedButton from '../GuardedButton/GuardedButton.jsx';
 import React from 'react';
 import ProjectAvatar from '../ProjectAvatar/ProjectAvatar';
 import bookmarkGray from '../../assets/icons/bookmarkGray.svg';
@@ -10,6 +11,7 @@ function ApplicantBox({
   capacity,
   avatarSrc,
   buttonText = '지원하기',
+  applicantCount,
   buttonColor = '#FE9A57',
   buttonTextColor = '#FFFFFF',
   onButtonClick,
@@ -46,45 +48,50 @@ function ApplicantBox({
         </span>
         <div className="applicant-box-actions">
           {showBookmark && (
-            <button
+            <GuardedButton
               type="button"
               className="applicant-bookmark-btn"
               style={{ backgroundColor: isBookmarked ? '#FFEBDE' : '#EDEDED' }}
               onClick={(e) => {
                 if (onClick) e.stopPropagation();
-                if (onBookmarkClick) onBookmarkClick(e);
+                return onBookmarkClick?.(e);
               }}
               aria-label={isBookmarked ? "즐겨찾기 해제" : "즐겨찾기 추가"}
             >
               <img src={isBookmarked ? bookmarkOrange : bookmarkGray} alt="bookmark icon" />
-            </button>
+            </GuardedButton>
           )}
           {showSecondaryButton && (
-            <button
+            <GuardedButton
               type="button"
               className={`applicant-action-btn ${secondaryButtonColor === '#FE9A57' && !disableSecondaryButton ? 'hover-active' : ''}`}
               style={{ backgroundColor: secondaryButtonColor, color: secondaryButtonTextColor, cursor: disableSecondaryButton ? 'default' : 'pointer' }}
               onClick={(e) => {
                 if (onClick) e.stopPropagation();
-                if (onSecondaryButtonClick) onSecondaryButtonClick(e);
+                return onSecondaryButtonClick?.(e);
               }}
               disabled={disableSecondaryButton}
             >
               {secondaryButtonText}
-            </button>
+            </GuardedButton>
           )}
-          <button
+          <GuardedButton
             type="button"
             className={`applicant-action-btn ${buttonColor === '#FE9A57' && !disabled ? 'hover-active' : ''}`}
             style={{ backgroundColor: buttonColor, color: buttonTextColor, cursor: disabled ? 'default' : 'pointer' }}
             onClick={(e) => {
               if (onClick) e.stopPropagation();
-              if (onButtonClick) onButtonClick(e);
+              return onButtonClick?.(e);
             }}
             disabled={disabled}
           >
             {buttonText}
-          </button>
+            {applicantCount != null && (
+              <span className="applicant-count-badge" aria-label={`현재 지원자 ${applicantCount}명`}>
+                {applicantCount}
+              </span>
+            )}
+          </GuardedButton>
         </div>
       </div>
     </div>
