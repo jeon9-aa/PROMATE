@@ -1,24 +1,27 @@
 package org.example.promate.domain.project.entity;
 
-
 import jakarta.persistence.*;
 import lombok.*;
+import lombok.experimental.SuperBuilder;
+import org.example.promate.domain.project.enums.Position;
 import org.example.promate.domain.user.entity.User;
+
+import org.example.promate.domain.workspace.entity.Comment;
 import org.example.promate.domain.workspace.entity.Post;
-import org.example.promate.domain.workspace.entity.TaskAssignee;
-import org.springframework.data.annotation.CreatedDate;
+import org.example.promate.global.entity.BaseEntity;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
 @Entity
-@Builder
+@SuperBuilder
 @Getter
 @AllArgsConstructor(access = AccessLevel.PRIVATE)
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
+
 @Table(name="member")
-public class Member {
+public class Member extends BaseEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
@@ -26,9 +29,9 @@ public class Member {
     @Column(name="role", nullable = false)
     private String role;
 
-    @CreatedDate
-    @Column(name="created_at", nullable = false)
-    private LocalDateTime createdAt;
+    @Column(name="member_position", nullable = false) //MySQL 예약어랑 겹쳐서 수정
+    @Enumerated(EnumType.STRING)
+    private Position position;
 
     //mapping
     @ManyToOne(fetch = FetchType.LAZY)
@@ -41,9 +44,17 @@ public class Member {
 
     @OneToMany(mappedBy = "member", fetch = FetchType.LAZY)
     @Builder.Default
-    private List<TaskAssignee> taskAssignees = new ArrayList<>();
+    private List<Post> posts = new ArrayList<>();
 
     @OneToMany(mappedBy = "member", fetch = FetchType.LAZY)
     @Builder.Default
-    private List<Post> posts = new ArrayList<>();
+    private List<Comment> comments = new ArrayList<>();
+
+    public void delete(){
+        super.performDelete();
+    }
+
+    public void changeRole(String role){
+        this.role = role;
+    }
 }

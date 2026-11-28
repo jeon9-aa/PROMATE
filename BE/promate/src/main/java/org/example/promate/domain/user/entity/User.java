@@ -2,6 +2,7 @@ package org.example.promate.domain.user.entity;
 
 import jakarta.persistence.*;
 import lombok.*;
+import lombok.experimental.SuperBuilder;
 import org.example.promate.domain.apply.entity.Apply;
 import org.example.promate.domain.project.entity.Member;
 import org.example.promate.domain.project.entity.Project;
@@ -15,7 +16,7 @@ import java.util.List;
 
 @Entity
 @Getter
-@Builder
+@SuperBuilder
 @AllArgsConstructor(access = AccessLevel.PRIVATE)
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Table(name="users")
@@ -27,23 +28,20 @@ public class User extends BaseEntity {
     @Column(name="kakao_id", nullable = false)
     private Long kakaoId;
 
-    @Column(name="email", nullable = false)
-    private String email;
-
-    @Column(name="phone_number", nullable = false)
-    private String phoneNumber;
-
-    @Column(name="name", nullable = false)
+    @Column(name="name", nullable = true)
     private String name;
 
-    @Column(name="profile_image_url", nullable = false)
+    @Column(name="profile_image_url", nullable = true, columnDefinition = "LONGTEXT")
     private String profileImageUrl;
 
-    @Column(name="manner_temp", nullable = false)
+    @Column(name="manner_temp", nullable = true)
     private BigDecimal mannerTemp;
 
-    @Column(name="diligence_temp", nullable = false)
+    @Column(name="diligence_temp", nullable = true)
     private BigDecimal diligenceTemp;
+
+    @Column(name="is_profile_completed", nullable = false)
+    private boolean isProfileCompleted;
 
     //mapping
     @OneToMany(mappedBy = "user", fetch = FetchType.LAZY)
@@ -65,4 +63,18 @@ public class User extends BaseEntity {
     @OneToMany(mappedBy = "user", fetch = FetchType.LAZY)
     @Builder.Default
     private List<Apply> applies = new ArrayList<>();
+
+    @OneToMany(mappedBy = "user", fetch = FetchType.LAZY)
+    @Builder.Default
+    private List<UserProjectHistory> projectHistories = new ArrayList<>();
+
+    public void updateProfile(String name, String profileImageBase64
+    ) {
+        if (name != null) {
+            this.name = name;
+        }
+        if (profileImageBase64 != null) {
+            this.profileImageUrl = profileImageBase64;
+        }
+    }
 }

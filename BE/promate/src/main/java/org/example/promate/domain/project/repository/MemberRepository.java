@@ -1,0 +1,66 @@
+package org.example.promate.domain.project.repository;
+
+import org.example.promate.domain.project.entity.Member;
+import org.example.promate.domain.project.enums.ProjectStatus;
+import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
+
+import java.util.List;
+import java.util.Optional;
+
+public interface MemberRepository extends JpaRepository<Member,Long> {
+    @Query("select m from Member m " +
+            "join fetch m.project " +
+            "where m.project.id = :projectId " +
+            "and m.user.id = :userId")
+    Optional<Member> findMemberWithProject(@Param("projectId") Long projectId, @Param("userId") Long userId);
+
+    Optional<Member> findByProjectIdAndUserId(Long projectId, Long userId);
+    boolean existsByUserIdAndProjectId(Long userId, Long projectId);
+
+    Optional<Member> findByUserIdAndProjectId(Long userId,Long projectId);
+
+    List<Member> findByProjectId(Long projectId);
+
+    // 특정 사용자의 프로젝트 목록 조회 (N+1 문제 방지)
+    @Query("select m from Member m join fetch m.project where m.user.id = :userId and m.project.status = :status")
+    List<Member> findByUserIdAndProjectStatus(
+            @Param("userId") Long userId,
+            @Param("status") ProjectStatus status
+    );
+
+    List<Member> findByUserId(Long userId);
+
+    List<Member> findAllByProjectIdAndIsDeletedFalse(Long projectId);
+
+    boolean existsByProjectIdAndUserIdAndIsDeletedFalse(Long projectId, Long userId);
+
+    int countByProjectId(Long projectId);
+
+    // 특정 사용자의 프로젝트 목록 조회 (프로젝트 상태 무관)
+    @Query("select m from Member m " +
+            "join fetch m.project " +
+            "where m.user.id = :userId")
+    List<Member> findByUserIdWithProject(@Param("userId") Long userId);
+
+    @Query("SELECT m FROM Member m " +
+            "JOIN FETCH m.project p " +
+            "LEFT JOIN FETCH p.recruit " +
+            "WHERE m.id = :memberId AND p.id = :projectId AND m.isDeleted = false")
+    Optional<Member> findByIdAndProjectIdWithProjectAndRecruit(
+            @Param("memberId") Long memberId,
+            @Param("projectId") Long projectId
+    );
+
+    @Query("""
+    SELECT m
+    FROM Member m
+    JOIN FETCH m.user u
+    WHERE m.project.id = :projectId
+      AND m.isDeleted = false
+    """)
+    List<Member> findAllByProjectIdAndIsDeletedFalseWithUser(
+            @Param("projectId") Long projectId
+    );
+}

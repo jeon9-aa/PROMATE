@@ -6,7 +6,11 @@ package org.example.promate.global.entity;
 import jakarta.persistence.Column;
 import jakarta.persistence.EntityListeners;
 import jakarta.persistence.MappedSuperclass;
+import lombok.AccessLevel;
+import lombok.AllArgsConstructor;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.experimental.SuperBuilder;
 import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.annotation.LastModifiedDate;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
@@ -16,12 +20,15 @@ import java.time.LocalDateTime;
 @Getter
 @EntityListeners(AuditingEntityListener.class)
 @MappedSuperclass
+@SuperBuilder
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
+@AllArgsConstructor(access = AccessLevel.PROTECTED)
 public class BaseTimeEntity {
     @CreatedDate
-    @Column(name="created_at", nullable = false, updatable = false)
+    @Column(name="created_at", nullable = false, updatable = false, columnDefinition = "datetime(6) DEFAULT NOW(6)")
     private LocalDateTime createdAt;
 
     @LastModifiedDate
-    @Column(name="updated_at", nullable = false)
+    @Column(name="updated_at", nullable = false, columnDefinition = "datetime(6) DEFAULT NOW(6)")
     private LocalDateTime updatedAt;
 }

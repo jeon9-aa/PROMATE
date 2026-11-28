@@ -1,5 +1,7 @@
 server:
-  port: 8082
+  port: ${PORT:8082}
+  address: 0.0.0.0
+  forward-headers-strategy: framework
 
 spring:
   application:
@@ -14,9 +16,38 @@ spring:
   jpa:
     database: mysql
     database-platform: org.hibernate.dialect.MySQLDialect
-    show-sql: true
+    show-sql: false
     hibernate:
       ddl-auto: update
     properties:
       hibernate:
-        format_sql: true
+        format_sql: false
+
+springdoc:
+  querydsl:
+    enabled: false
+
+  api-docs:
+    enabled: true
+
+  security:
+    oauth2:
+      client:
+        registration:
+          kakao:
+            client-id: ${KAKAO_REST_API_KEY}
+            client-secret: ${KAKAO_CLIENT_SECRET}
+            redirect-uri: ${KAKAO_REDIRECT_URI}
+
+jwt:
+  secret: ${JWT_SECRET}
+  access-token-expiration: 10800000
+  refresh-token-expiration: 1209600000
+
+logging:
+  level:
+    org.hibernate.SQL: WARN
+    org.hibernate.orm.jdbc.bind: OFF
+
+app:
+  frontend-url: https://promate-nd-six.vercel.app

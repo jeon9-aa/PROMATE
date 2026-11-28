@@ -1,0 +1,170 @@
+package org.example.promate.domain.user.service;
+
+import lombok.RequiredArgsConstructor;
+import org.example.promate.domain.project.entity.Project;
+import org.example.promate.domain.project.enums.ProjectStatus;
+import org.example.promate.domain.project.repository.MemberRepository;
+import org.example.promate.domain.user.dto.*;
+import org.example.promate.domain.user.entity.User;
+import org.example.promate.domain.user.entity.UserProjectHistory;
+import org.example.promate.domain.user.exception.UserErrorCode;
+import org.example.promate.domain.user.exception.UserException;
+import org.example.promate.domain.user.repository.UserProjectHistoryRepository;
+import org.example.promate.domain.user.repository.UserRepository;
+import org.example.promate.domain.workspace.enums.TaskStatus;
+import org.example.promate.domain.workspace.repository.TaskRepository;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
+import java.time.LocalDate;
+import java.util.List;
+
+@Service
+@RequiredArgsConstructor
+public class UserService {
+
+    private final UserRepository userRepository;
+
+    @Transactional(readOnly = true)
+    public UserResponseDTO getUser(Long userId) {
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new UserException(UserErrorCode.USER_NOT_FOUND));
+
+        return UserResponseDTO.from(user);
+    }
+
+    @Transactional
+    public UserResponseDTO updateUserProfile(Long userId, UserProfileUpdateRequestDTO request) {
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new UserException(UserErrorCode.USER_NOT_FOUND));
+
+        user.updateProfile(
+                request.getName(),
+                request.getProfileImageBase64()
+        );
+
+        return UserResponseDTO.from(user);
+    }
+
+    private final UserProjectHistoryRepository userProjectHistoryRepository;
+
+    @Transactional(readOnly = true)
+    public List<UserProjectHistoryResponseDTO> getMyProjectHistories(Long userId) {
+        return userProjectHistoryRepository.findByUserId(userId)
+                .stream()
+                .map(UserProjectHistoryResponseDTO::from)
+                .toList();
+    }
+
+    @Transactional
+    public UserProjectHistoryResponseDTO createProjectHistory(
+            Long userId,
+            UserProjectHistoryRequestDTO request
+    ) {
+        validateProjectHistoryDate(request);
+
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new UserException(UserErrorCode.USER_NOT_FOUND));
+
+        UserProjectHistory history = UserProjectHistory.builder()
+                .user(user)
+                .projectName(request.getProjectName())
+                .role(request.getRole())
+                .status(calculateStatus(request.getStartDate(), request.getEndDate()))
+                .startDate(request.getStartDate())
+                .endDate(request.getEndDate())
+                .description(request.getDescription())
+                .build();
+
+        UserProjectHistory savedHistory = userProjectHistoryRepository.save(history);
+
+        return UserProjectHistoryResponseDTO.from(savedHistory);
+    }
+
+    @Transactional
+    public UserProjectHistoryResponseDTO updateProjectHistory(
+            Long userId,
+            Long historyId,
+            UserProjectHistoryRequestDTO request
+    ) {
+        validateProjectHistoryDate(request);
+
+        UserProjectHistory history = userProjectHistoryRepository.findByIdAndUserId(historyId, userId)
+                .orElseThrow(() -> new UserException(UserErrorCode.PROJECT_HISTORY_NOT_FOUND));
+
+        history.update(
+                request.getProjectName(),
+                request.getRole(),
+                request.getStartDate(),
+                request.getEndDate(),
+                request.getDescription(),
+                calculateStatus(request.getStartDate(), request.getEndDate())
+        );
+
+        return UserProjectHistoryResponseDTO.from(history);
+    }
+
+    @Transactional
+    public void deleteProjectHistory(Long userId, Long historyId) {
+        UserProjectHistory history = userProjectHistoryRepository.findByIdAndUserId(historyId, userId)
+                .orElseThrow(() -> new UserException(UserErrorCode.PROJECT_HISTORY_NOT_FOUND));
+
+        userProjectHistoryRepository.delete(history);
+    }
+
+    private final MemberRepository memberRepository;
+    private final TaskRepository taskRepository;
+
+    public List<ProjectTaskCountResponseDTO> getProjectTaskCounts(Long userId) {
+        return memberRepository.findByUserId(userId)
+                .stream()
+                .map(member -> {
+                    Project project = member.getProject();
+
+                    int completedCount = taskRepository.countByProjectIdAndMemberIdAndStatus(
+                            project.getId(),
+                            member.getId(),
+                            TaskStatus.DONE
+                    );
+
+                    int incompleteCount = taskRepository.countByProjectIdAndMemberIdAndStatusIn(
+                            project.getId(),
+                            member.getId(),
+                            List.of(TaskStatus.TODO, TaskStatus.IN_PROGRESS)
+                    );
+
+                    return ProjectTaskCountResponseDTO.builder()
+                            .projectId(project.getId())
+                            .projectTitle(project.getTitle())
+                            .completedTaskCount(completedCount)
+                            .incompleteTaskCount(incompleteCount)
+                            .build();
+                })
+                .toList();
+    }
+
+    private void validateProjectHistoryDate(UserProjectHistoryRequestDTO request) {
+        LocalDate startDate = request.getStartDate();
+        LocalDate endDate = request.getEndDate();
+
+        if (startDate != null && endDate != null && startDate.isAfter(endDate)) {
+            throw new UserException(UserErrorCode.INVALID_PROJECT_HISTORY_DATE);
+        }
+    }
+
+    private static ProjectStatus calculateStatus(LocalDate startDate, LocalDate endDate) {
+        LocalDate today = LocalDate.now();
+
+        if (startDate != null && startDate.isAfter(today)) {
+            return ProjectStatus.PREPARING;
+        }
+
+        if (endDate != null && endDate.isBefore(today)) {
+            return ProjectStatus.COMPLETED;
+        }
+
+        return ProjectStatus.ACTIVE;
+    }
+
+
+}
